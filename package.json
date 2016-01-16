@@ -1,0 +1,13 @@
+{
+  "name": "RedBlackGraph",
+  "version": "0.0.1",
+  "description": "sample code to demonstrate red black graph ideas",
+  "main": "sample.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "console.table": "^0.4.0"
+  }
+}
