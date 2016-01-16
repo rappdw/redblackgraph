@@ -1,20 +1,63 @@
 require('console.table');
 
-var m = new Array(7);
-var n = new Array(7);
+var people = [
+  'Jiovan Melendez',
+  'Linette Inez Williams',
+  'Marianna Rapp',
+  'Michael Joseph Rapp',
+  'Samuel Stewart',
+  'John Davis Williams',
+  'Daniel Rapp',
+  'Barbara Valcarcel',
+  'Emeline Chidester',
+  'Amalie Welke',
+  'Ewald Rapp',
+  'Del Robins',
+  'Susanna Roundy',
+  'Mariea Kalbert',
+  'Georg Rapp',
+  'John Stewart',
+  'Regina Stewart'
+];
+
+var m = new Array(people.length);
 var i;
-for (i = 0; i < 7; i++) {
-  m[i] = new Array(7);
-  n[i] = new Array(7);
-  m[i][i] = i & 1;
+for (i = 0; i < 17; i++) {
+  m[i] = new Array(people.length);
 }
 
-m[0][1] = 2;
-m[0][2] = 3;
-m[1][3] = 2;
-m[1][4] = 3;
-m[2][5] = 2;
-m[2][6] = 3;
+m[0][0] = 0;
+m[0][7] = 3;
+m[1][1] = 1;
+m[1][5] = 2;
+m[1][12] = 3;
+m[2][2] = 1;
+m[2][10] = 2;
+m[2][16] = 3;
+m[3][3] = 0;
+m[3][14] = 2;
+m[3][13] = 3;
+m[4][4] = 0;
+m[5][5] = 0;
+m[6][6] = 0;
+m[6][10] = 2;
+m[6][16] = 3;
+m[7][7] = 1;
+m[8][8] = 1;
+m[9][9] = 1;
+m[10][10] = 0;
+m[10][3] = 2;
+m[10][9] = 3;
+m[11][11] = 1;
+m[12][12] = 1;
+m[13][13] = 1;
+m[14][14] = 0;
+m[15][15] = 0;
+m[15][4] = 2;
+m[15][9] = 3;
+m[16][16] = 1;
+m[16][15] = 2;
+m[16][1] = 3;
 
 console.table(m);
 
@@ -41,9 +84,9 @@ function avos(a, b) {
 }
 
 function expand(m) {
-  var result = [];
+  var result = new Array(m.length);
   for (var i = 0; i < m.length; i++) {
-    result[i] = [];
+    result[i] = new Array(m[i].length);
     for (var j = 0; j < m[0].length; j++) {
       if (typeof(m[i][j]) == 'undefined') {
         var sum = 0;
@@ -62,6 +105,8 @@ function expand(m) {
   return result;
 }
 
+m = expand(m);
+console.table(m);
 m = expand(m);
 console.table(m);
 m = expand(m);
