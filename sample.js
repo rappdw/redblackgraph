@@ -1,28 +1,29 @@
 require('console.table');
 
 var people = [
-  'Jiovan Melendez',
-  'Linette Inez Williams',
-  'Marianna Rapp',
-  'Michael Joseph Rapp',
-  'Samuel Stewart',
-  'John Davis Williams',
-  'Daniel Rapp',
-  'Barbara Valcarcel',
-  'Emeline Chidester',
-  'Amalie Welke',
-  'Ewald Rapp',
-  'Del Robins',
-  'Susanna Roundy',
-  'Mariea Kalbert',
-  'Georg Rapp',
-  'John Stewart',
-  'Regina Stewart'
+  'Jiovan Melendez',        // 0
+  'Linette Inez Williams',  // 1
+  'Marianna Rapp',          // 2
+  'Michael Joseph Rapp',    // 3
+  'Samuel Stewart',         // 4
+  'John Davis Williams',    // 5
+  'Daniel Rapp',            // 6
+  'Barbara Valcarcel',      // 7
+  'Emeline Chidester',      // 8
+  'Amalie Welke',           // 9
+  'Ewald Rapp',             // 10
+  'Del Robins',             // 11
+  'Susanna Roundy',         // 12
+  'Mariea Kalbert',         // 13
+  'Georg Rapp',             // 14
+  'John Stewart',           // 15
+  'Regina Stewart',         // 16
+  'Iris Gonzalez'           // 17
 ];
 
 var m = new Array(people.length);
 var i;
-for (i = 0; i < 17; i++) {
+for (i = 0; i < people.length; i++) {
   m[i] = new Array(people.length);
 }
 
@@ -43,21 +44,23 @@ m[6][6] = 0;
 m[6][10] = 2;
 m[6][16] = 3;
 m[7][7] = 1;
+m[7][17] = 3;
 m[8][8] = 1;
 m[9][9] = 1;
 m[10][10] = 0;
 m[10][3] = 2;
 m[10][9] = 3;
-m[11][11] = 1;
+m[11][11] = 0;
 m[12][12] = 1;
 m[13][13] = 1;
 m[14][14] = 0;
 m[15][15] = 0;
 m[15][4] = 2;
-m[15][9] = 3;
+m[15][8] = 3;
 m[16][16] = 1;
 m[16][15] = 2;
 m[16][1] = 3;
+m[17][17] = 1;
 
 console.table(m);
 
@@ -111,5 +114,4 @@ m = expand(m);
 console.table(m);
 m = expand(m);
 console.table(m);
-
 
