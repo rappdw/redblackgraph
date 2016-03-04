@@ -5,6 +5,10 @@ module.exports = {
     //noinspection StatementWithEmptyBodyJS
     for(var i = 0; x > 0; x = x >> 1, i++);
     return i > 0 ? i - 1 : i;
+    // or...
+    // if (x < 0) return undefined;
+    // if (x == 0) return 0;
+    // return Math.floor(Math.log2(x));
   },
 
   avos: function(a, b) {
