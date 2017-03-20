@@ -3,7 +3,7 @@ import redblackgraph
 from scipy.sparse import csr_matrix
 
 GENERATION_TUPLES = [
-    # (pedigree number, expected gneeration)
+    # (pedigree number, expected generation)
     (0, 0),
     (1, 0),
     (2, 1),

@@ -51,7 +51,7 @@ def _csr_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
                     head = k
                     length += 1
         for jj in range(0, length):
-            # 2) We preserve zero element results if they are on the diagonla
+            # 2) We preserve zero element results if they are on the diagonal
             if sums[head] != 0 or head == i:
                 Cj[nnz] = head
                 Cx[nnz] = sums[head]
