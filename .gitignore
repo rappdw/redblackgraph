@@ -1,1 +1,10 @@
-.idea
+activate
+.venv
+dist/
+build/
+.cache/
+.eggs/
+**/__pycache__
+redblackgraph/about.py
+redblackgraph/sparse.py
+redblackgrapy.egg-info/

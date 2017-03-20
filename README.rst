@@ -1,3 +1,6 @@
+RedBlackGraph: "Binary" graph with interesting properties
+******************************
+
 A RedBlack Graph is a DAG such that any node is colored either red or black with the following constraint: any node may
 have at most 1 outbound arc to a given colored node.
 
@@ -8,5 +11,7 @@ Properties of the graph:
    - any node in the tree can be uniquely identified such that:
     < fill in here >>
  - Identification of direct ancestry is O(1) operation
- - Identification of relationship is O(Log2(n)) operation
+ - Identification of relationship is O(Log(n)) operation
 
+
+It's commercial open-source software, released under the MIT license.
