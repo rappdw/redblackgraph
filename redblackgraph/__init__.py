@@ -1,1 +1,1 @@
-from .redblackgraph import *
+from .rbm import rb_matrix
