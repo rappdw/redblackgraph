@@ -42,7 +42,8 @@ setup(
 
     install_requires=[
         'numpy==1.12.0',
-        'scipy==0.19.0'
+        'scipy==0.19.0',
+        'infix=1.2'
     ],
 
     extras_require={
