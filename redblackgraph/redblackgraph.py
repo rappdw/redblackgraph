@@ -46,6 +46,7 @@ def _csr_matmat_pass1(n_row, n_col, Ap, Aj, Bp, Bj, Cp):
 def accumulate_cell_value(cell, transitive_relationship):
     return transitive_relationship if cell == 0 else min(cell, transitive_relationship)
 
+# this differs from the _csr_matmat_pass2 in scipy in two ways noted below in 1) and 2)
 def _csr_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
     next = np.empty(n_col, dtype=np.int32)
     next.fill(-1)
@@ -61,13 +62,17 @@ def _csr_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
             v = Ax[jj]
             for kk in range(Bp[j], Bp[j + 1]):
                 k = Bj[kk]
+                # 1) rather than multiplication and summation, we perform the avos operator
+                # in place of multiplication and accumulate_cell_value in place of
+                # summation
                 sums[k] = accumulate_cell_value(sums[k], avos(v, Bx[kk]))
                 if next[k] == -1:
                     next[k] = head
                     head = k
                     length += 1
         for jj in range(0, length):
-            if sums[head] != 0 or head == i:  # only take non-zero elements unless it's on the diagonal
+            # 2) We preserve zero element results if they are on the diagonla
+            if sums[head] != 0 or head == i:
                 Cj[nnz] = head
                 Cx[nnz] = sums[head]
                 nnz += 1
