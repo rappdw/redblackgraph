@@ -8,7 +8,7 @@ from .operators import acc, avos
 
 
 # this differs from the _csr_matmat_pass2 in scipy in two ways noted below in 1) and 2)
-def _csr_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
+def _rbm_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
     next = np.empty(n_col, dtype=np.int32)
     next.fill(-1)
     sums = np.zeros(n_col, dtype=np.int32)
@@ -33,6 +33,7 @@ def _csr_matmat_pass2(n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, Cp, Cj, Cx):
                     length += 1
         for jj in range(0, length):
             # 2) We preserve zero element results if they are on the diagonal
+            # perhaps another argument for 1 == self (see comment in operators.generation2
             if sums[head] != 0 or head == i:
                 Cj[nnz] = head
                 Cx[nnz] = sums[head]
@@ -73,7 +74,7 @@ class rb_matrix(csr_matrix):
         indices = np.zeros(nnz, dtype=idx_dtype)
         data = np.zeros(nnz, dtype=idx_dtype)
 
-        fn = _csr_matmat_pass2
+        fn = _rbm_matmat_pass2
         fn(M, N,
            np.asarray(m.indptr, dtype=idx_dtype),
            np.asarray(m.indices, dtype=idx_dtype),
