@@ -1,5 +1,5 @@
 import pytest
-from redblackgraph.operators import generation, acc, avos
+from redblackgraph.operators import generation, avos
 
 GENERATION_TUPLES = [
     # (pedigree number, expected generation)
@@ -11,7 +11,10 @@ GENERATION_TUPLES = [
     (7, 2),
     (8, 3),
     (15, 3),
-    (16, 4)
+    (16, 4),
+    (21, 4),
+    (31, 4),
+    (32, 5)
 ]
 
 AVOS_TUPLES = [

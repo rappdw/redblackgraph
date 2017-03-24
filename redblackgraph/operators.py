@@ -1,14 +1,22 @@
 from infix import shift_infix as infix
+from math import log
 
 
 def generation(x):
-    if x < 0:
-        raise ValueError('Undefined when x < 0. x: {}'.format(x))
-    generation = 0
-    while x > 0:
-        x >>= 1
-        generation += 1
-    return generation - 1 if generation > 0 else generation
+    # The approach commented out takes about 5 times longer to execute
+    # than int(log(x, 2))
+    #
+    # if x < 0:
+    #     raise ValueError('Undefined when x < 0. x: {}'.format(x))
+    # generation = 0
+    # while x > 0:
+    #     x >>= 1
+    #     generation += 1
+    # return generation - 1 if generation > 0 else generation
+    #
+    if x == 0:
+        return 0
+    return int(log(x, 2))
 
 
 @infix
