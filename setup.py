@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
+from numpy.distutils.misc_util import get_numpy_include_dirs, get_pkg_info
 
 from codecs import open
 from os import path
@@ -7,6 +8,9 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+sparse_tools = Extension('_sparsetools',
+                         sources=['redblackgraph/sparsetools/sparsetools.cxx', 'redblackgraph/sparsetools/rbm.cxx'],
+                         include_dirs=get_numpy_include_dirs())
 
 setup(
     name='redblackgraph',
@@ -42,8 +46,7 @@ setup(
 
     install_requires=[
         'numpy>=1.12.0',
-        'scipy>=0.19.0',
-        'infix>=1.2'
+        'scipy>=0.19.0'
     ],
 
     extras_require={
@@ -57,4 +60,6 @@ setup(
 
     package_data={
     },
+
+    ext_modules=[sparse_tools]
 )
