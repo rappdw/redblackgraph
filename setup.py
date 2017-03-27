@@ -45,8 +45,8 @@ setup(
     #   py_modules=["my_module"],
 
     install_requires=[
-        'numpy>=1.12.0',
-        'scipy>=0.19.0'
+        'numpy==1.12.1',
+        'scipy==0.19.0'
     ],
 
     extras_require={
