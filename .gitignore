@@ -6,5 +6,7 @@ build/
 .eggs/
 **/__pycache__
 redblackgraph/about.py
-redblackgraph/sparse.py
 redblackgraph.egg-info/
+redblackgraph/sparsetools/CMakeLists.txt
+_sparsetools.cpython-36m-darwin.so
+redblackgraph/sparsetools/cmake-build-debug/
