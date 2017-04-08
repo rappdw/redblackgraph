@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# vim: filetype=sh:
+
+export GIT_HASH=`git log --pretty=format:'%h' -n 1`
+
+echo "GIT HASH: $GIT_HASH" > _testing_output/pytest_output.txt
+
+pytest --color=yes --cov-config coverage.cfg --cov=redblackgraph --cov-fail-under=80 --cov-report term-missing redblackgraph | tee -a _testing_output/pytest_output.txt

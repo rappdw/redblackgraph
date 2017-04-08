@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+
+# Python script to build/clean containers associated with this project
+#
+# The development workflow is generally as follows:
+#   1) Build the base image
+#       bin/build-image base
+#   2) Development loop:
+#       a) change code
+#       b) bin/build-image dev
+#       c) bin/dev
+#
+import argparse
+import subprocess
+import shlex
+import os
+import sys
+
+
+def get_image_name(project, mode, image_name):
+    return image_name if image_name else '{}-{}'.format(project, mode)
+
+
+def build(project, mode, image_name):
+    return 'docker build -t {image_name} -f docker/{mode}/Dockerfile .'.format(
+        image_name=get_image_name(project, mode, image_name).lower(), mode=mode)
+
+
+def clean(project, mode, image_name):
+    return 'docker rmi {image_name}'.format(image_name=get_image_name(project, mode, image_name).lower())
+
+
+def get_default_project_name():
+    return os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def image_operation(operation):
+    print('\n\n============================================================================')
+    print('{}\n\n'.format(operation))
+    return subprocess.call(shlex.split(operation))
+
+
+if __name__ == '__main__':
+    docker_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'docker')
+    image_types = [x for x in os.listdir(docker_dir) if os.path.isdir(os.path.join(docker_dir, x))]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("image", choices=['all', 'clean'] + image_types, help="image to build")
+    parser.add_argument("-i", "--image_name", help="Image name to build")
+    args = parser.parse_args()
+
+    images_to_build = []
+    fn = build
+    if args.image == 'all':
+        images_to_build = image_types
+    elif args.image == 'clean':
+        images_to_build = image_types
+        fn = clean
+    else:
+        images_to_build = [args.image]
+
+    for image in images_to_build:
+        rc = image_operation(fn(get_default_project_name(), image, args.image_name))
+        if rc:
+            sys.exit(rc)
+    sys.exit(0)

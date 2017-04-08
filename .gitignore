@@ -10,3 +10,4 @@ redblackgraph.egg-info/
 redblackgraph/sparsetools/CMakeLists.txt
 _sparsetools.cpython-36m-darwin.so
 redblackgraph/sparsetools/cmake-build-debug/
+.coverage

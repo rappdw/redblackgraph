@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# vim: filetype=sh:
+
+cd "$(dirname $0)"; cd ..;
+
+PACKAGE_IMAGE_NAME=${PACKAGE_IMAGE_NAME:-redblackgraph}
+BUILD_NUMBER=${BUILD_NUMBER:-0}
+
+echo -e "Pushing the image"
+docker push $PACKAGE_IMAGE_NAME
+docker tag $PACKAGE_IMAGE_NAME $PACKAGE_IMAGE_NAME:$BUILD_NUMBER
+docker push $PACKAGE_IMAGE_NAME:$BUILD_NUMBER
