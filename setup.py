@@ -1,5 +1,6 @@
+import versioneer
 from setuptools import setup, find_packages, Extension
-from numpy.distutils.misc_util import get_numpy_include_dirs, get_pkg_info
+from numpy.distutils.misc_util import get_numpy_include_dirs
 
 from codecs import open
 from os import path
@@ -14,10 +15,8 @@ sparse_tools = Extension('_sparsetools',
 
 setup(
     name='redblackgraph',
-    use_scm_version={
-        'write_to': 'redblackgraph/about.py'
-    },
-    setup_requires=['setuptools_scm'],
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='Linear algebra for a specialized ajacency matrix',
     long_description=long_description,
     url='',
