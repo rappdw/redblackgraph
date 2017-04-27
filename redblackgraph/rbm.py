@@ -4,11 +4,16 @@ import numpy as np
 from scipy.sparse.csr import csr_matrix
 import _sparsetools
 from scipy.sparse.sputils import (get_index_dtype, upcast)
+from scipy.sparse import hstack, vstack
 
+class Color():
+    RED = 0
+    BLACK = 1
 
 class rb_matrix(csr_matrix):
 
-    #format = 'rbm' # keep format as csr, aside from matmul all other operations should be the same
+    #format = 'rbm' # keep format as csr, aside from matmul (and specifically csr_matmat_pass2) all
+    # other operations should be the same
 
     def _mul_sparse_matrix(self, other):
         # this is lifted from scipy.csr._mul_sparxe_matrix and is identical asside from the
@@ -24,7 +29,7 @@ class rb_matrix(csr_matrix):
                                     maxval=M*N)
         indptr = np.empty(major_axis + 1, dtype=idx_dtype)
 
-        fn = getattr(_sparsetools, 'rbm_matmat_pass1')
+        fn = getattr(_sparsetools, 'rbm_matmat_pass1') # This could be csr_matmat_pass1
         fn(M, N,
            np.asarray(self.indptr, dtype=idx_dtype),
            np.asarray(self.indices, dtype=idx_dtype),
@@ -50,4 +55,27 @@ class rb_matrix(csr_matrix):
            indptr, indices, data)
 
         return self.__class__((data,indices,indptr),shape=(M,N))
+
+    def rc(self, u=None, v=None, color=Color.BLACK):
+        '''
+        rvc or Relational Composition is the mechanism used to add a new node
+        into a Red/Black Graph. (See README.md)
+        
+        Keyword arguments:
+        u -- *simple* row vector 
+        v -- *simple* column vector
+        color -- the coloring of the new node
+        '''
+        u_complete = u * self
+        v_complete = self * v
+
+        v_new = hstack([u_complete, color])
+        with_col = hstack([self, v_complete])
+        result = vstack([with_col, v_new])
+
+        # TODO:
+        # for v_j in v_completed where v_j != 0:
+        #   for u_i in u_complete:
+        #       result[i, j] = u_i avos v_j
+        return result
 

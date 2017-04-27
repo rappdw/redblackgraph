@@ -160,35 +160,33 @@ following properties
     *A<sub>complete</sub>* *avos* *v<sub>simple</sub>* = *v<sub>complete</sub>*
 
 ## Relational Composition
-Given *A<sub>complete</sub>* of size *N*, a relational composition is generation of *A<sup>'</sup><sub>complete</sub>* of size *N+1* from
-the independant *simple* row/column vectors representing a new node in the graph. Conceptually:
+Given *A<sub>complete</sub>* of size *N*, we define a relational composition to be a generation of *A<sup>'</sup><sub>complete</sub>* 
+of size *N+1* from the independant, *simple* row/column vectors representing a new node in the graph. Conceptually:
 
 *A<sup>'* = *u* *A* *v*
 
-This composition is accomplished as follows:
+This composition is accomplished by:
 
-*u<sup>'</sup>* = *u* *avos* *A*
+* *u<sup>'</sup>* = *u* *avos* *A*
  
-*v<sup>'</sup>* = *A* *avos* *v*
+* *v<sup>'</sup>* = *A* *avos* *v*
 
-*A<sup>'</sup>* is composed by "appending" *u<sup>'</sup>* as a new row, *v<sup>'</sup>* as a new column, and then
+* *A<sup>'</sup>* is composed by "appending" *u<sup>'</sup>* as a new row, *v<sup>'</sup>* as a new column, and then
 adding a diagonal element A<sub>N+1,N+1</sub> of either 0 or 1 (0 if the node is *black*, 1 if the node is *red*).
 
-At this point, *A<sup>'</sup>* is composed, but not *complete*. To complete *A<sup>'</sup>*, to the following for each row where
+* At this point, *A<sup>'</sup>* is composed, but not *complete*. To complete *A<sup>'</sup>*, do the following:
 
+    For each row, *r*, where *v<sup>'</sup><sub>i</sub>* != 0, set *r<sub>j</sub>* = *u<sup>'</sup><sub>j</sub>* *avos* *v<sup>'</sup><sub>i</sub>*
 
-# Old Stuff
-A RedBlack Graph is a DAG such that any node is colored either red or black with the following constraint: any node may
-have at most 1 outbound arc to a given colored node.
+# Additional Properties of *A<sub>complete</sub>*
 
-Properties of the graph:
- - The "view" of the graph outbound from any given node is a binary tree
- - Use the following numbering scheme on this binary tree (base 2):
-   - root node is numbered 0 if red, 1 if black, root of a parent node is 10 if red, 11 if black, etc.
-   - any node in the tree can be uniquely identified such that:
-    < fill in here >>
- - Identification of direct ancestry is O(1) operation
- - Identification of relationship is O(Log(n)) operation
+* Determining whether *x* is an ancestor of *y* is ***O**(1)* and provided by *A<sub>x,y</sub>*
+* Determining whether *x* is a descendant of *y* is ***O**(1)* and provided by *A<sub>y,x</sub>*
+* Determining if *x* is related to *y* is ***O**(m)* where *m* is the expected number of ancestors, and *m* << *N*, and 
+is determined when *element<sub>j</sub>* of both the row vectors for *x* and *y* are non-null. When this occurs,
+*node<sub>j</sub>* is a common ancestor and the nature of the relationship is determined by the *pedigree_numbers* of 
+*x<sub>j</sub>* and *y<sub>j</sub>* respectively.
 
-
-It's commercial open-source software, released under the MIT license.
+# Areas to Explore
+* Eigenvalues
+* Preventing loops
