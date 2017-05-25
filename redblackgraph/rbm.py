@@ -56,9 +56,9 @@ class rb_matrix(csr_matrix):
 
         return self.__class__((data,indices,indptr),shape=(M,N))
 
-    def rc(self, u=None, v=None, color=Color.BLACK):
+    def rc(self, u, v, color=Color.BLACK):
         '''
-        rvc or Relational Composition is the mechanism used to add a new node
+        rc or Relational Composition is the mechanism used to add a new node
         into a Red/Black Graph. (See README.md)
         
         Keyword arguments:

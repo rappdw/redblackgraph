@@ -44,16 +44,20 @@ setup(
     #   py_modules=["my_module"],
 
     install_requires=[
-        'numpy==1.12.1',
-        'scipy==0.19.0'
+        'numpy==1.13.2',
+        'scipy==1.0.0rc1',
+        'jupyter==1.0.0',
+        'matplotlib==2.1.0rc1',
+        'sympy==1.1.1'
     ],
 
     extras_require={
         'dev': [
-            'wheel==0.29.0'
+            'wheel==0.30.0'
         ],
         'test': [
-            'pytest==3.0.7'
+            'pytest==3.2.2',
+            'pytest-cov==2.5.1'
         ],
     },
 

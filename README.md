@@ -61,7 +61,7 @@ table are not part of the matrix. They label a given row or column)
 given node, while the column vectors represent the *upstream* view of a given node.)
 
 ## Binary Tree Functions, Products & Algebra
-You are probably familar with a [pedigree chart](http://pedigreechart.com). 
+You are likely familar with a [pedigree chart](http://pedigreechart.com). 
 It is a form of binary tree used for family history research. Each slot in the
 pedigree has a numeric label, 2 for father, 3 for mother, 4 for paternal grandfather, 5 for
 paternal grandmother, 6 for maternal grandfather, 7 for maternal grandmother, etc.
