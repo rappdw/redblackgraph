@@ -46,8 +46,13 @@ setup(
     install_requires=[
         'numpy==1.13.2',
         'scipy==1.0.0rc1',
+        'hide_code==0.3.0',
         'jupyter==1.0.0',
+        'jupyter_contrib_nbextensions==0.3.1',
+        'jupyter_nbextensions_configurator==0.2.7',
         'matplotlib==2.1.0rc1',
+        'networkx==2.0',
+        'nxpd==0.2.0',
         'sympy==1.1.1'
     ],
 
