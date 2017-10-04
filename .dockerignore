@@ -6,3 +6,6 @@ build
 dist
 *.pyc
 **/__pycache__
+_sparsetools.cpython-36m-darwin.so
+_sparsetools.cpython-36m-x86_64-linux-gnu.so
+redblackgraph/.ipynb_checkpoints
