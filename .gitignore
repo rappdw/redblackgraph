@@ -11,3 +11,5 @@ redblackgraph/sparsetools/CMakeLists.txt
 _sparsetools.cpython-36m-darwin.so
 redblackgraph/sparsetools/cmake-build-debug/
 .coverage
+_sparsetools.cpython-36m-x86_64-linux-gnu.so
+redblackgraph/.ipynb_checkpoints/

@@ -7,6 +7,9 @@ RUN pip install -r /requirements.txt
 # End of Base Image - If you make changes above this line, please reflect them in all other Dockerfiles
 ###################
 
+ADD requirements-dev.txt /requirements-dev.txt
+RUN pip install -r /requirements-dev.txt
+
 # add less and vim (for debugging in container)
 RUN apt-get update && apt-get install -y \
         bzip2 \
