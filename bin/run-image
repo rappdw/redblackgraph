@@ -8,7 +8,7 @@ import shlex
 import os
 
 run_cmd = {'prod': 'docker run {keep_container} {interactive} -v /data:/data {project}-prod /bin/bash',
-           'dev': 'docker run {keep_container} {interactive} -v {root}:/{workdir} {project}-dev /bin/bash',
+           'dev': 'docker run {keep_container} {interactive} -p 8888:8888 -v {root}:/{workdir} {project}-dev /bin/bash',
            'jenkins': 'docker run {keep_container} {interactive} -v {root}/dist:/{workdir}/dist -v {root}/.git:/{workdir}/.git:ro {project}-jenkins /bin/bash'}
 
 def get_default_root():
@@ -21,6 +21,7 @@ def run(mode, root=get_default_root(), project=get_default_project_name(), workd
     it = '-d' if keep_container else '-it'
     keep = '' if keep_container else '--rm'
     cmd = run_cmd[mode].format(root=root, project=project.lower(), workdir=workdir, keep_container=keep, interactive=it)
+    print(f"running: {cmd}")
     subprocess.call(shlex.split(cmd))
 
 

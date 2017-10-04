@@ -6,7 +6,7 @@ from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 sparse_tools = Extension('_sparsetools',
@@ -44,9 +44,8 @@ setup(
     #   py_modules=["my_module"],
 
     install_requires=[
-        'numpy==1.13.2',
+        'numpy==1.13.3',
         'scipy==1.0.0rc1',
-        'hide_code==0.3.0',
         'jupyter==1.0.0',
         'jupyter_contrib_nbextensions==0.3.1',
         'jupyter_nbextensions_configurator==0.2.7',
