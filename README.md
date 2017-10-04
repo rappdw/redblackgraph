@@ -7,7 +7,8 @@ Red Black Trees are binary trees such that each node has an extra bit, color (re
 
 1. `bin/build-image dev`
 2. `bin/run-image dev`
-3. open the url in the log, e.g. http://localhost:8888/?token=1417275a25db329622eeee89e48e28dd6c1bae3edc3eb8d9
+3. `start-notebook.sh`
+4. open the url in the log, e.g. http://localhost:8888/?token=1417275a25db329622eeee89e48e28dd6c1bae3edc3eb8d9
 
 This module provides an optimized implementation of a Red Black Graph built on  scipy's sparse matrix implementation. 
 
