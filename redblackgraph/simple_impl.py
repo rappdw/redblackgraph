@@ -45,9 +45,9 @@ def warshall(M):
     '''Computes the transitive closure of a Red Black adjacency matrix and as a side-effect,
     the diameter.'''
 
-    ## Modification of stardard warshall algorithm:
-    ## * Replaces innermost loop's: `W[i][j] = W[i][j] or (W[i][k] and W[k][j])`
-    ## * Adds diameter calculation
+    # Modification of stardard warshall algorithm:
+    # * Replaces innermost loop's: `W[i][j] = W[i][j] or (W[i][k] and W[k][j])`
+    # * Adds diameter calculation
     n = len(M)
     W = M
     diameter = 0
