@@ -14,6 +14,7 @@ RUN pip install -r /requirements-dev.txt
 RUN apt-get update && apt-get install -y \
         bzip2 \
         ca-certificates \
+        graphviz \
         less \
         locales \
         fonts-liberation \
