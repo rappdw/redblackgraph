@@ -70,9 +70,10 @@ EXPOSE 8888
 
 # As the entry point, install an editable version into the python environment and then
 # start the shell
-ENTRYPOINT /usr/local/bin/pip install -e /workdir && /bin/bash
+CMD /usr/local/bin/pip install -e /workdir && /bin/bash
 
 # Add local files as late as possible to avoid cache busting
+COPY docker/dev/dev-start-notebook.sh /usr/local/bin
 COPY docker/dev/start.sh /usr/local/bin/
 COPY docker/dev/start-notebook.sh /usr/local/bin/
 COPY docker/dev/start-singleuser.sh /usr/local/bin/

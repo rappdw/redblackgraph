@@ -8,7 +8,8 @@ import shlex
 import os
 
 run_cmd = {'prod': 'docker run {keep_container} {interactive} -v /data:/data {project}-prod /bin/bash',
-           'dev': 'docker run {keep_container} {interactive} -p 8888:8888 -v {root}:/{workdir} {project}-dev /bin/bash',
+           'dev': 'docker run {keep_container} {interactive} -p 8888:8888 -v {root}:/{workdir} {project}-dev',
+           'notebook': 'docker run {keep_container} {interactive} -p 8888:8888 -v {root}:/{workdir} {project}-dev dev-start-notebook.sh',
            'jenkins': 'docker run {keep_container} {interactive} -v {root}/dist:/{workdir}/dist -v {root}/.git:/{workdir}/.git:ro {project}-jenkins /bin/bash'}
 
 def get_default_root():
@@ -26,7 +27,7 @@ def run(mode, root=get_default_root(), project=get_default_project_name(), workd
 
 
 if __name__ == '__main__':
-    image_types = ['prod', 'dev', 'jenkins']
+    image_types = ['prod', 'dev', 'jenkins', 'notebook']
     parser = argparse.ArgumentParser()
     parser.add_argument("image", choices=image_types, help="image to build")
     parser.add_argument("--keep", "-k", help="keep the image after execution", action='store_true')
