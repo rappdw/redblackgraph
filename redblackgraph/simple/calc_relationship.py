@@ -1,8 +1,11 @@
 from redblackgraph.simple import generation
 
+
 def lookup_relationship(du, dv):
     removal = abs(du - dv)
     generational = min(du, dv)
+
+    # TODO: Not providing direct ancestry representation
 
     if generational == 1:
         assert removal == 0
@@ -12,6 +15,7 @@ def lookup_relationship(du, dv):
     if removal == 0:
         return f"{generational - 1} cousin"
     return f"{generational - 1} cousin {removal} removed"
+
 
 def calculate_relationship(u, v):
     '''
