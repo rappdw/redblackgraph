@@ -9,13 +9,11 @@ def avos(x, y):
     This product should return the value indicating how a is related to c
     '''
 
-    # The domain of this function is natural numbers
+    # An interesting case is presented if x or y is 1 or -1. In these cases the avos product
+    # represents the situation where a and b are the same vertex or b and c are the same vertex.
+    # In a sense, this is the avos identity
     if x <= 1 or y <= 1:
-        # there are special cases if either operand is 0 or 1
-        # n *avos* 0 = n if n is even
-        # n *avos* 1 = n if n is odd
-        # 0 otherwise
-        return x if (y == 0 and x % 2 == 0) or (y == 1 and x % 2 == 1) else 0
+        return 0 if x == 0 or y == 0 else x if y == 1 or y == -1 else y
 
     # There are some edge cases that need to be considered, namely what is meant
     generationNumber = generation(y)

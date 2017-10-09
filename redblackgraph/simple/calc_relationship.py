@@ -2,18 +2,15 @@ from redblackgraph.simple import generation
 
 
 def lookup_relationship(du, dv):
+    '''
+    This is a very rudimentary implementation of a Consanguinity lookup and doesn't handle many cases
+    correctly.
+    :param du: generational distance from u to common ancestor
+    :param dv: generational distance from v to common ancester
+    :return: a string designating relationship
+    '''
     removal = abs(du - dv)
     generational = min(du, dv)
-
-    # TODO: Not providing direct ancestry representation
-
-    if generational == 1:
-        assert removal == 0
-        return "siblings"
-    if generational == 2 and not removal == 0:
-        return "aunt/uncle"
-    if removal == 0:
-        return f"{generational - 1} cousin"
     return f"{generational - 1} cousin {removal} removed"
 
 
@@ -26,7 +23,7 @@ def calculate_relationship(u, v):
     :return: (Relationship designation, common ancestor vertex)
     '''
 
-    common_ancestor, (x, y) = min([e for e in enumerate(zip(u, v)) if e[1][0] > 1 and e[1][1] > 1],
+    common_ancestor, (x, y) = min([e for e in enumerate(zip(u, v)) if not e[1][0] == 0 and not e[1][1] == 0],
                                   key=lambda x: x[1][0] + x[1][1],
                                   default=(-1, (0, 0)))
 
