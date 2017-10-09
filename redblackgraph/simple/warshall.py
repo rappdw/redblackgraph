@@ -1,5 +1,5 @@
-from redblackgraph.simple import generation
-from redblackgraph.simple import avos
+from redblackgraph.simple import avos, generation
+from .util import nz_min
 
 
 def warshall(M):
@@ -15,9 +15,6 @@ def warshall(M):
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if W[i][k] > 1 and W[k][j] > 1:
-                    W[i][j] = min(W[i][j], avos(W[i][k], W[k][j])) if not W[i][j] == 0 else avos(W[i][k], W[k][j])
-                else:
-                    W[i][j] = W[i][j]
+                W[i][j] = nz_min(W[i][j], avos(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
     return W, generation(diameter)

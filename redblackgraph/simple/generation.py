@@ -19,6 +19,6 @@ def get_traversal_path(pedigree_number):
     path = []
     mask = 1
     while (x > 1):
-        path.insert(0, 'b') if x & mask else path.insert(0, 'r')
+        path.insert(0, 'b' if x & mask else 'r')
         x >>= 1
     return path
