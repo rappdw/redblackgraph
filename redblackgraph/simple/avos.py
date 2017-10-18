@@ -15,6 +15,5 @@ def avos(x, y):
     if x <= 1 or y <= 1:
         return 0 if x == 0 or y == 0 else x if y == 1 or y == -1 else y
 
-    # There are some edge cases that need to be considered, namely what is meant
     generationNumber = generation(y)
     return (y & (2 ** generationNumber - 1)) | (x << generationNumber)

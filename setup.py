@@ -44,8 +44,12 @@ setup(
     #   py_modules=["my_module"],
 
     install_requires=[
-        'numpy==1.13.3',
+        'numpy',
         'scipy==1.0.0rc1'
+    ],
+
+    dependency_links=[
+        "git+git://github.com/rappdw/numpy.git@5067a7e41edbf0e8fd0084a9f737f04cb5e076b7#egg=rbnumpy"
     ],
 
     extras_require={
