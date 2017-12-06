@@ -5,7 +5,7 @@ Implementation of optimized einsum.
 from __future__ import division, absolute_import, print_function
 
 from numpy.core.multiarray import c_einsum
-from redblackgraph.core.redblackmutliarray import c_einsum2
+from redblackgraph.rb_multiarray import c_einsum_avos
 
 from numpy.core.numeric import asanyarray, tensordot
 
@@ -1082,7 +1082,7 @@ def einsum(*operands, **kwargs):
     # If no optimization, run pure einsum
     if optimize_arg is False:
         if avos:
-            return c_einsum2(*operands, **kwargs)
+            return c_einsum_avos(*operands, **kwargs)
         else:
             return c_einsum(*operands, **kwargs)
 
@@ -1146,7 +1146,7 @@ def einsum(*operands, **kwargs):
             if (tensor_result != results_index) or handle_out:
                 if handle_out:
                     einsum_kwargs["out"] = out_array
-                new_view = c_einsum2(tensor_result + '->' + results_index, new_view,
+                new_view = c_einsum_avos(tensor_result + '->' + results_index, new_view,
                                      **einsum_kwargs) if avos else c_einsum(tensor_result + '->' + results_index,
                                                                             new_view, **einsum_kwargs)
 
@@ -1157,7 +1157,7 @@ def einsum(*operands, **kwargs):
                 einsum_kwargs["out"] = out_array
 
             # Do the contraction
-            new_view = c_einsum2(einsum_str, *tmp_operands, **einsum_kwargs) if avos else c_einsum(einsum_str,
+            new_view = c_einsum_avos(einsum_str, *tmp_operands, **einsum_kwargs) if avos else c_einsum(einsum_str,
                                                                                                    *tmp_operands,
                                                                                                    **einsum_kwargs)
 

@@ -1,84 +1,106 @@
 import versioneer
-from setuptools import setup, find_packages, Extension
-from numpy.distutils.misc_util import get_numpy_include_dirs
-from numpy.distutils.conv_template import process_file as process_c_file
-
-from codecs import open
+import os
 from os import path
+import subprocess
 
-here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
 
-sparse_tools = Extension('_redblacksparsetools',
-                         sources=['redblackgraph/core/src/redblacksparsetools/sparsetools.cxx', 'redblackgraph/core/src/redblacksparsetools/rbm.cxx'],
-                         include_dirs=get_numpy_include_dirs())
+def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import Configuration
 
-redblack_numpy = Extension('_redblackmultiarry',
-                         sources=['redblackgraph/core/src/redblackmultiarray/redblack.c'],
-                         include_dirs=get_numpy_include_dirs(),
-                         extra_compile_args=['-msse3'],
-                         extra_link_args=['-Wl,-framework', '-Wl,Accelerate'])
+    config = Configuration('redblackgraph',
+                           parent_package,
+                           top_path)
+    config.add_extension('rb_multiarray',
+                         [
+                             'redblackgraph/core/src/multiarray/redblack.c.src'
+                         ],
+                         include_dirs=['redblackgraph/core/src/multiarray'])
 
-processed_src = process_c_file('redblackgraph/core/src/redblackmultiarray/redblack.c.src')
-fid = open('redblackgraph/core/src/redblackmultiarray/redblack.c', 'w')
-fid.write(processed_src)
-fid.close()
+    config.add_extension('rb_sparsetools',
+                         [
+                            'redblackgraph/core/src/sparsetools/sparsetools.cxx',
+                            'redblackgraph/core/src/sparsetools/rbm.cxx'
+                         ],
+                         include_dirs=['redblackgraph/core/src/sparsetools'])
 
-setup(
-    name='redblackgraph',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
-    description='Linear algebra for a specialized ajacency matrix',
-    long_description=long_description,
-    url='',
+    return config
 
-    author='Daniel Rapp',
-    author_email='rappdw@gmail.com',
+if __name__ == "__main__":
+    from numpy.distutils.core import setup
 
-    license='MIT',
-    keywords='library',
+    here = path.abspath(path.dirname(__file__))
+    with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
 
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        # Set this topic to what works for you
-        'Topic :: Python :: Library',
-        # Pick your license as you wish (should match "license" above)
-        'License :: MIT',
-        'Programming Language :: Python :: 3.5',
-    ],
+    CLASSIFIERS = """\
+    Development Status :: 5 - Production/Stable
+    Intended Audience :: Science/Research
+    Intended Audience :: Developers
+    License :: OSI Approved
+    Programming Language :: C
+    Programming Language :: Python
+    Programming Language :: Python :: 2
+    Programming Language :: Python :: 2.7
+    Programming Language :: Python :: 3
+    Programming Language :: Python :: 3.4
+    Programming Language :: Python :: 3.5
+    Programming Language :: Python :: 3.6
+    Programming Language :: Python :: Implementation :: CPython
+    Topic :: Software Development
+    Topic :: Scientific/Engineering
+    Operating System :: Microsoft :: Windows
+    Operating System :: POSIX
+    Operating System :: Unix
+    Operating System :: MacOS
+    """
+    from distutils.command.sdist import sdist
 
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    # Alternatively, if you want to distribute just a my_module.py, uncomment
-    # this:
-    #   py_modules=["my_module"],
+    def check_submodules():
+        """ verify that the submodules are checked out and clean
+            use `git submodule update --init`; on failure
+        """
+        if not os.path.exists('.git'):
+            return
+        with open('.gitmodules') as f:
+            for l in f:
+                if 'path' in l:
+                    p = l.split('=')[-1].strip()
+                    if not os.path.exists(p):
+                        raise ValueError('Submodule %s missing' % p)
 
-    install_requires=[
-        'numpy==1.13.3',
-        'scipy==1.0.0'
-    ],
+        proc = subprocess.Popen(['git', 'submodule', 'status'],
+                                stdout=subprocess.PIPE)
+        status, _ = proc.communicate()
+        status = status.decode("ascii", "replace")
+        for line in status.splitlines():
+            if line.startswith('-') or line.startswith('+'):
+                raise ValueError('Submodule not clean: %s' % line)
 
-    extras_require={
-        'dev': [
-            'wheel==0.30.0',
-            'jupyter==1.0.0',
-            'jupyter_contrib_nbextensions==0.3.1',
-            'jupyter_nbextensions_configurator==0.2.7',
-            'matplotlib==2.1.0rc1',
-            'networkx==2.0',
-            'nxpd==0.2.0',
-            'sympy==1.1.1'
-        ],
-        'test': [
-            'pytest==3.2.2',
-            'pytest-cov==2.5.1'
-        ],
-    },
 
-    package_data={
-    },
+    class sdist_checked(sdist):
+        """ check submodules on sdist to prevent incomplete tarballs """
 
-    ext_modules=[sparse_tools, redblack_numpy]
-)
+        def run(self):
+            check_submodules()
+            sdist.run(self)
+
+
+    metadata = dict(
+        version=versioneer.get_version(),
+        maintainer = "Daniel Rapp",
+        maintainer_email = "rappdw@gmail.com",
+        description = 'Linear algebra for a specialized ajacency matrix',
+        long_description = long_description,
+        author = "Daniel Rapp",
+        download_url = "https://github.com/rappdw/redblackgraph",
+        license = 'MIT',
+        classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
+        platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
+        # test_suite='nose.collector',
+        cmdclass={"sdist": sdist_checked},
+        python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+        configuration=configuration
+    )
+
+    setup(**metadata)

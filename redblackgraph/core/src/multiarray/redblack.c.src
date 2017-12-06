@@ -9,47 +9,31 @@
  */
 
 
-#define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include "structmember.h"
-
-#define NPY_NO_DEPRECATED_API NPY_API_VERSION
-#define _MULTIARRAYMODULE
-#include <numpy/npy_common.h>
-#include <numpy/arrayobject.h>
-#include <numpy/halffloat.h>
-#include <numpy/npy_3kcompat.h>
-
-#include <ctype.h>
 #include <math.h>
 
-//#include "convert.h"
-//#include "common.h"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+// TODO: figure out how to set NPY_PY3K correctly, right now just force it to 1
+#define NPY_PY3K 1
+#include <numpy/npy_3kcompat.h>
+#include <numpy/arrayscalars.h>
 
-#ifdef NPY_HAVE_SSE_INTRINSICS
-#define EINSUM_USE_SSE1 1
+/**** this is in numpy src arrayscalars.h ****/
+#define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
+#define PyArrayScalar_True ((PyObject *)(&(_PyArrayScalar_BoolValues[1])))
+
+/**** this is in numpy src common.h ****/
+#ifdef NPY_ALLOW_THREADS
+#define NPY_BEGIN_THREADS_NDITER(iter) \
+        do { \
+            if (!NpyIter_IterationNeedsAPI(iter)) { \
+                NPY_BEGIN_THREADS_THRESHOLDED(NpyIter_GetIterSize(iter)); \
+            } \
+        } while(0)
 #else
-#define EINSUM_USE_SSE1 0
+#define NPY_BEGIN_THREADS_NDITER(iter)
 #endif
 
-/*
- * TODO: Only some SSE2 for float64 is implemented.
- */
-#ifdef NPY_HAVE_SSE2_INTRINSICS
-#define EINSUM_USE_SSE2 1
-#else
-#define EINSUM_USE_SSE2 0
-#endif
-
-#if EINSUM_USE_SSE1
-#include <xmmintrin.h>
-#endif
-
-#if EINSUM_USE_SSE2
-#include <emmintrin.h>
-#endif
-
-#define EINSUM_IS_SSE_ALIGNED(x) ((((npy_intp)x)&0xf) == 0)
 
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
@@ -66,7 +50,6 @@
 #define NPY_EINSUM_DBG_PRINT3(s, p1, p2, p3)
 #endif
 /**********************************************/
-
 
 /**begin repeat
  * #name = int, long, longlong#
@@ -2030,7 +2013,7 @@ PyArray_EinsteinSum2(char *subscripts, npy_intp nop,
     /* Initialize the output to all zeros and reset the iterator */
     ret = NpyIter_GetOperandArray(iter)[nop];
     Py_INCREF(ret);
-    PyArray_AssignZero(ret, NULL);
+    PyArray_FillWithScalar(ret, PyArrayScalar_False);
 
 
     /***************************/
@@ -2511,7 +2494,7 @@ finish:
 }
 
 static struct PyMethodDef array_module_methods[] = {
-    {"c_einsum2",
+    {"c_einsum_avos",
         (PyCFunction)array_einsum2,
         METH_VARARGS|METH_KEYWORDS, NULL},
     {NULL, NULL, 0, NULL}                /* sentinel */
@@ -2520,7 +2503,7 @@ static struct PyMethodDef array_module_methods[] = {
 #if defined(NPY_PY3K)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "redblackmultiarray",
+        "rb_multiarray",
         NULL,
         -1,
         array_module_methods,
@@ -2534,10 +2517,10 @@ static struct PyModuleDef moduledef = {
 /* Initialization function for the module */
 #if defined(NPY_PY3K)
 #define RETVAL m
-PyMODINIT_FUNC PyInit_redblackmultiarray(void) {
+PyMODINIT_FUNC PyInit_rb_multiarray(void) {
 #else
 #define RETVAL
-PyMODINIT_FUNC initredblackmultiarray(void) {
+PyMODINIT_FUNC initrb_multiarray(void) {
 #endif
     PyObject *m;
 
@@ -2545,7 +2528,7 @@ PyMODINIT_FUNC initredblackmultiarray(void) {
 #if defined(NPY_PY3K)
     m = PyModule_Create(&moduledef);
 #else
-    m = Py_InitModule("redblackmultiarray", array_module_methods);
+    m = Py_InitModule("rb_multiarray", array_module_methods);
 #endif
     if (!m) {
         goto err;
@@ -2553,7 +2536,7 @@ PyMODINIT_FUNC initredblackmultiarray(void) {
 
 #if defined(MS_WIN64) && defined(__GNUC__)
   PyErr_WarnEx(PyExc_Warning,
-        "As Numpy, RedBlackGraph built with MINGW-W64 on Windows 64 bits is experimental, " \
+        "As with Numpy, RedBlackGraph built with MINGW-W64 on Windows 64 bits is experimental, " \
         "and only available for \n" \
         "testing. You are advised not to use it for production. \n\n" \
         "CRASHES ARE TO BE EXPECTED - PLEASE REPORT THEM TO REDBLACKGRAPH DEVELOPERS",
@@ -2567,7 +2550,7 @@ PyMODINIT_FUNC initredblackmultiarray(void) {
  err:
     if (!PyErr_Occurred()) {
         PyErr_SetString(PyExc_RuntimeError,
-                        "cannot load redblackmultiarray module.");
+                        "cannot load rb_multiarray module.");
     }
     return RETVAL;
 }
