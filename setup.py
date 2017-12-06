@@ -1,6 +1,7 @@
 import versioneer
 from setuptools import setup, find_packages, Extension
 from numpy.distutils.misc_util import get_numpy_include_dirs
+from numpy.distutils.conv_template import process_file as process_c_file
 
 from codecs import open
 from os import path
@@ -9,9 +10,20 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-sparse_tools = Extension('_sparsetools',
-                         sources=['redblackgraph/sparsetools/sparsetools.cxx', 'redblackgraph/sparsetools/rbm.cxx'],
+sparse_tools = Extension('_redblacksparsetools',
+                         sources=['redblackgraph/core/src/redblacksparsetools/sparsetools.cxx', 'redblackgraph/core/src/redblacksparsetools/rbm.cxx'],
                          include_dirs=get_numpy_include_dirs())
+
+redblack_numpy = Extension('_redblackmultiarry',
+                         sources=['redblackgraph/core/src/redblackmultiarray/redblack.c'],
+                         include_dirs=get_numpy_include_dirs(),
+                         extra_compile_args=['-msse3'],
+                         extra_link_args=['-Wl,-framework', '-Wl,Accelerate'])
+
+processed_src = process_c_file('redblackgraph/core/src/redblackmultiarray/redblack.c.src')
+fid = open('redblackgraph/core/src/redblackmultiarray/redblack.c', 'w')
+fid.write(processed_src)
+fid.close()
 
 setup(
     name='redblackgraph',
@@ -44,12 +56,8 @@ setup(
     #   py_modules=["my_module"],
 
     install_requires=[
-        'numpy',
-        'scipy==1.0.0rc1'
-    ],
-
-    dependency_links=[
-        "git+git://github.com/rappdw/numpy.git@5067a7e41edbf0e8fd0084a9f737f04cb5e076b7#egg=rbnumpy"
+        'numpy==1.13.3',
+        'scipy==1.0.0'
     ],
 
     extras_require={
@@ -72,5 +80,5 @@ setup(
     package_data={
     },
 
-    ext_modules=[sparse_tools]
+    ext_modules=[sparse_tools, redblack_numpy]
 )

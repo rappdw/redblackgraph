@@ -13,3 +13,5 @@ redblackgraph/sparsetools/cmake-build-debug/
 .coverage
 _sparsetools.cpython-36m-x86_64-linux-gnu.so
 notebooks/.ipynb_checkpoints/
+redblackgraph/core/src/multiarray/redblack.c
+redblackgraph/__config__.py

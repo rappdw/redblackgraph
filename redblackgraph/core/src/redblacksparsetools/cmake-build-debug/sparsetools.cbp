@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="sparsetools"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sparsetools">
+				<Option output="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/sparsetools" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/drapp/sandbox/redBlackGraph/.venv/lib/python3.6/site-packages/numpy/core/include"/>
+					<Add directory="/Users/drapp/sandbox/redBlackGraph/.venv/include"/>
+					<Add directory="/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 sparsetools"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sparsetools/fast">
+				<Option output="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/sparsetools" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/drapp/sandbox/redBlackGraph/.venv/lib/python3.6/site-packages/numpy/core/include"/>
+					<Add directory="/Users/drapp/sandbox/redBlackGraph/.venv/include"/>
+					<Add directory="/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 sparsetools/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/bool_ops.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/complex_ops.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/rbm.cxx">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/rbm.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/rbm_impl.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/sparsetools.cxx">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/sparsetools.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/sparsetools_impl.h">
+			<Option target="sparsetools"/>
+		</Unit>
+		<Unit filename="/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
