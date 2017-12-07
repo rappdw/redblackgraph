@@ -1,11 +1,4 @@
 -r requirements.txt
-jupyter==1.0.0
-jupyter_contrib_nbextensions==0.3.1
-jupyter_nbextensions_configurator==0.2.7
-matplotlib==2.1.0rc1
-networkx==2.0
-nxpd==0.2.0
-sympy==1.1.1
 wheel==0.30.0
 pytest==3.2.2
 pytest-cov==2.5.1

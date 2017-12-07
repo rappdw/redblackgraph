@@ -8,7 +8,8 @@ RUN pip install -r /requirements.txt
 ###################
 
 ADD requirements-dev.txt /requirements-dev.txt
-RUN pip install -r /requirements-dev.txt
+ADD requirements-jupyter.txt /requirements-jupyter.txt
+RUN pip install -r /requirements-jupyter.txt
 
 # add less and vim (for debugging in container)
 RUN apt-get update && apt-get install -y \

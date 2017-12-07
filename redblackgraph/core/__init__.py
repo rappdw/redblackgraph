@@ -1,19 +1,7 @@
 from __future__ import division, absolute_import, print_function
 
-from .info import __doc__
-from numpy.version import version as __version__
-
-# disables OpenBLAS affinity setting of the main thread that limits
-# python threads or processes to one core
-import os
-env_added = []
-for envkey in ['OPENBLAS_MAIN_FREE', 'GOTOBLAS_MAIN_FREE']:
-    if envkey not in os.environ:
-        os.environ[envkey] = '1'
-        env_added.append(envkey)
-
 try:
-    from . import redblackmultiarray
+    from .. import rb_multiarray
 except ImportError as exc:
     msg = """
 Importing the multiarray redblackgraph extension module failed.  Most
@@ -24,15 +12,12 @@ files not under version control).  Otherwise reinstall redblackgraph.
 Original error was: %s
 """ % (exc,)
     raise ImportError(msg)
-finally:
-    for envkey in env_added:
-        del os.environ[envkey]
-del envkey
-del env_added
-del os
 
 from . import einsumfunc
 from .einsumfunc import *
+from . import redblack
+from .redblack import *
 
 __all__ = []
 __all__ += einsumfunc.__all__
+__all__ += redblack.__all__
