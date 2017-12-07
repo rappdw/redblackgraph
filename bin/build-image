@@ -31,7 +31,7 @@ def clean(project, mode, image_name):
 
 
 def get_default_project_name():
-    return os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))).lower()
 
 
 def image_operation(operation):
