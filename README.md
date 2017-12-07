@@ -8,10 +8,14 @@ Red Black Trees are binary trees such that each node has an extra bit, color (re
 1. `bin/build-image dev`
 2. `bin/run-image notebook`
 3. open the url in the log, e.g. http://localhost:8888/?token=1417275a25db329622eeee89e48e28dd6c1bae3edc3eb8d9
+4. Navigate to the notebooks sub-dir and explore detailed notebooks from there
 
-This module provides two implementations of Red Blakc Graph. 
-* `redblackgraph.simple` - a pure python implementation. This simple implementation is intended for illustrative purposes only. 
-* `redblackgraph.rbm` - an optimized implementation built on scipy's sparse matrix implementation. 
+This module provides serveral implementations of Red Black Graph. 
+* `redblackgraph.simple` - a pure python implementation. This simple implementation is intended for illustrative purposes only.
+* `redblackgraph.rbmatrix` - a Numpy C-API extension for efficient computation with the matrix multiplcation operator, @, overloaded to support Red Black Graph linear algebra. 
+* `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation. 
 
 # Usage Documentation
-TODO: see test cases for now, but will be adding documentation... 
+TODO: see test cases for now, but will be adding documentation...
+
+In particular, see: `redblackgraph/tests/test_redblack.py` 
