@@ -38,6 +38,10 @@ class TestRbMatrixOperations(object):
         assert_equal((A @ A) @ A, A_star)
 
         # test vector mat mul
+
+        # using rank 1 arrays can cause problems.
+        # See: https://www.coursera.org/learn/neural-networks-deep-learning/lecture/87MUx/a-note-on-python-numpy-vectors
+        # Safer to always use either a row vector or column vector
         u = rbg.rbarray([2, 0, 0, 0, 0], dtype=np.int64).reshape((1, 5))
         v = rbg.rbarray([0, 3, 0, 0, 0], dtype=np.int64).reshape((5, 1))
         u_lambda = np.array([2, 4, 5, 8, 0]).reshape((1, 5))
