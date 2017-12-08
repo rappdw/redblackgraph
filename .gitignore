@@ -14,6 +14,8 @@ redblackgraph/sparsetools/cmake-build-debug/
 _sparsetools.cpython-36m-x86_64-linux-gnu.so
 notebooks/.ipynb_checkpoints/
 redblackgraph/core/src/multiarray/redblack.c
+redblackgraph/core/src/multiarray/rbg_math.c
+redblackgraph/core/src/multiarray/rbg_math.h
 redblackgraph/__config__.py
 redblackgraph/rb_multiarray.*.so
 redblackgraph/rb_sparsetools.*.so

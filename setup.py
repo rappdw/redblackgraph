@@ -12,6 +12,8 @@ def configuration(parent_package='', top_path=None):
                            top_path)
     config.add_extension('rb_multiarray',
                          [
+                             'redblackgraph/core/src/multiarray/rbg_math.h.src',
+                             'redblackgraph/core/src/multiarray/rbg_math.c.src',
                              'redblackgraph/core/src/multiarray/redblack.c.src'
                          ],
                          include_dirs=['redblackgraph/core/src/multiarray'])

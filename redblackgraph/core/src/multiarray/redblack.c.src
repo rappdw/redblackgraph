@@ -34,6 +34,8 @@
 #define NPY_BEGIN_THREADS_NDITER(iter)
 #endif
 
+#include "rbg_math.h"
+
 
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
@@ -56,35 +58,6 @@
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-
-static @type@ @name@_nz_min(@type@ a, @type@ b)
-{
-    return a == 0 ? b : (b == 0 ? a : (a < b ? a : b));
-}
-
-static int @name@_generation(@type@ x)
-{
-    int targetlevel = 0;
-    while (x >>= 1) {
-        targetlevel += 1;
-    }
-    return targetlevel;
-}
-
-static @type@ @name@_avos(@type@ x, @type@ y)
-{
-    // An interesting case is presented if x or y is 1 or -1. In these cases the avos product
-    // represents the situation where a and b are the same vertex or b and c are the same vertex.
-    // In a sense, this is the avos identity
-    if (x <= 1 || y <= 1)
-    {
-        return (x == 0 || y == 0) ? 0 : (y <= 1 ? x : y);
-    }
-
-    int generationNumber = @name@_generation(y);
-    return (y & (@type@)pow(2, generationNumber) - 1) | (x << generationNumber);
-}
-
 
 /**begin repeat1
  * #nop = 1, 2, 3, 1000#
