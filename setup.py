@@ -16,12 +16,12 @@ def configuration(parent_package='', top_path=None):
                          ],
                          include_dirs=['redblackgraph/core/src/multiarray'])
 
-    config.add_extension('rb_sparsetools',
-                         [
-                            'redblackgraph/core/src/sparsetools/sparsetools.cxx',
-                            'redblackgraph/core/src/sparsetools/rbm.cxx'
-                         ],
-                         include_dirs=['redblackgraph/core/src/sparsetools'])
+    # config.add_extension('rb_sparsetools',
+    #                      [
+    #                         'redblackgraph/core/src/sparsetools/sparsetools.cxx',
+    #                         'redblackgraph/core/src/sparsetools/rbm.cxx'
+    #                      ],
+    #                      include_dirs=['redblackgraph/core/src/sparsetools'])
 
     return config
 
