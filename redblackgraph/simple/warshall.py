@@ -1,3 +1,4 @@
+import numpy as np
 from redblackgraph.simple import avos, generation
 from .util import nz_min
 
@@ -10,7 +11,7 @@ def warshall(M):
     # * Replaces innermost loop's: `W[i][j] = W[i][j] or (W[i][k] and W[k][j])`
     # * Adds diameter calculation
     n = len(M)
-    W = M
+    W = np.array(M, copy=True)
     diameter = 0
     for k in range(n):
         for i in range(n):

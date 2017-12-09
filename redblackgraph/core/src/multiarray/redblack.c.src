@@ -17,6 +17,7 @@
 #define NPY_PY3K 1
 #include <numpy/npy_3kcompat.h>
 #include <numpy/arrayscalars.h>
+#include <numpy/ufuncobject.h>
 
 /**** this is in numpy src arrayscalars.h ****/
 #define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
@@ -36,6 +37,10 @@
 
 #include "rbg_math.h"
 
+extern PyUFuncGenericFunction warshall_functions[];
+extern void *warshall_data[];
+extern char warshall_signatures[];
+extern char *warshall_signature;
 
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
@@ -2496,6 +2501,8 @@ PyMODINIT_FUNC PyInit_rb_multiarray(void) {
 PyMODINIT_FUNC initrb_multiarray(void) {
 #endif
     PyObject *m;
+    PyObject *d;
+    PyObject *f;
 
     /* Create the module and add the functions */
 #if defined(NPY_PY3K)
@@ -2517,6 +2524,22 @@ PyMODINIT_FUNC initrb_multiarray(void) {
 #endif
 
     import_array();
+    import_umath();
+
+    d = PyModule_GetDict(m);
+
+    f = PyUFunc_FromFuncAndDataAndSignature(warshall_functions,
+                    warshall_data, warshall_signatures,
+                    3, 1, 1, PyUFunc_None, "warshall",
+                    "warshall-floyd avos \n"
+                    "     \"(m,m)->(m,m)\" \n",
+                    0, warshall_signature);
+    PyDict_SetItemString(d, "warshall", f);
+    Py_DECREF(f);
+
+    if (PyErr_Occurred()) {
+        goto err;
+    }
 
     return RETVAL;
 

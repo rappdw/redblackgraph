@@ -1,0 +1,142 @@
+/* -*- c -*- */
+
+/*
+ *****************************************************************************
+ **                            INCLUDES                                     **
+ *****************************************************************************
+ */
+#include <Python.h>
+#include <math.h>
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+// TODO: figure out how to set NPY_PY3K correctly, right now just force it to 1
+#define NPY_PY3K 1
+#include <numpy/npy_3kcompat.h>
+#include <numpy/arrayscalars.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ufuncobject.h>
+
+/**** this is in numpy src arrayscalars.h ****/
+#define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
+#define PyArrayScalar_True ((PyObject *)(&(_PyArrayScalar_BoolValues[1])))
+
+/**** this is in numpy src common.h ****/
+#ifdef NPY_ALLOW_THREADS
+#define NPY_BEGIN_THREADS_NDITER(iter) \
+        do { \
+            if (!NpyIter_IterationNeedsAPI(iter)) { \
+                NPY_BEGIN_THREADS_THRESHOLDED(NpyIter_GetIterSize(iter)); \
+            } \
+        } while(0)
+#else
+#define NPY_BEGIN_THREADS_NDITER(iter)
+#endif
+
+#include "rbg_math.h"
+
+/*
+ *****************************************************************************
+ **                             UFUNC LOOPS                                 **
+ *****************************************************************************
+ */
+
+char *warshall_signature = "(m,m)->(m,m)";
+
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+
+static void
+@name@_warshall(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    npy_intp dN = *dimensions++;
+    npy_intp N_;
+    npy_intp s0 = *steps++;
+    npy_intp s1 = *steps++;
+
+    npy_intp dm = dimensions[0];
+    npy_intp dn = dimensions[0];
+    npy_intp dp = dimensions[0];
+    npy_intp m,n,p;
+    npy_intp is1_m=steps[0], is1_n=steps[1], is2_n=steps[0], is2_p=steps[1],
+         os_m=steps[2], os_p=steps[3];
+    npy_intp ib1_n = is1_n*dn;
+    npy_intp ib2_n = is2_n*dn;
+    npy_intp ib2_p = is2_p*dp;
+    npy_intp ob_p  = os_p *dp;
+    @type@ before;
+
+    // copy the input to the output
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[1] += s1) {
+        char *in=args[0];
+        char *op=args[1];
+        for (m = 0; m < dm; m++) {
+            for (p = 0; p < dp; p++) {
+                *(@type@ *)op = *(@type@ *)in;
+                op  +=  os_p;
+                in  +=  os_p;
+            }
+            op  +=  os_m - ob_p;
+            in  +=  os_m - ob_p;
+        }
+    }
+
+    // now run the Warshall-Floyd algorithm (avos modified)
+    for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
+        char *ip1=args[1], *ip2=args[1], *op=args[1];
+        for (m = 0; m < dm; m++) {
+            for (n = 0; n < dn; n++) {
+                @type@ val1 = (*(@type@ *)ip1);
+                for (p = 0; p < dp; p++) {
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos(val1, (*(@type@ *)ip2)));
+                    ip2 += is2_p;
+                    op  +=  os_p;
+                }
+                ip2 -= ib2_p;
+                op  -=  ob_p;
+                ip1 += is1_n;
+                ip2 += is2_n;
+            }
+            ip1 -= ib1_n;
+            ip2 -= ib2_n;
+            ip1 += is1_m;
+            op  +=  os_m;
+        }
+    }
+}
+
+/**end repeat**/
+
+
+PyUFuncGenericFunction warshall_functions[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    &@name@_warshall,
+/**end repeat**/
+};
+void *warshall_data[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    (void *)NULL,
+/**end repeat**/
+};
+
+char warshall_signatures[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    @type@, @type@, @type@,
+/**end repeat**/
+};
+
+

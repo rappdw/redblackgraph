@@ -1,7 +1,8 @@
-from numpy import ndarray, asarray, matrix
+import numpy as np
+from numpy import ndarray, asarray
 from redblackgraph.core.einsumfunc import einsum
 
-__all__ = ['rbarray', 'rbmatrix']
+__all__ = ['array', 'matrix']
 
 
 class _Avos():
@@ -46,29 +47,29 @@ class _Avos():
         raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
 
 
-class rbarray(_Avos, ndarray):
+class array(_Avos, ndarray):
     def __new__(cls, *args, **kwargs):
         return asarray(*args, **kwargs).view(cls)
 
     def __matmul__(self, other):
-        return super(rbarray, self).__matmul__(other).view(rbarray)
+        return super(array, self).__matmul__(other).view(array)
 
     def __rmatmul__(self, other):
-        return super(rbarray, self).__rmatmul__(other).view(rbarray)
+        return super(array, self).__rmatmul__(other).view(array)
 
     def __imatmul__(self, other):
-        return super(rbarray, self).__imatmul__(other).view(rbarray)
+        return super(array, self).__imatmul__(other).view(array)
 
 
-class rbmatrix(_Avos, matrix):
+class matrix(_Avos, np.matrix):
     def __new__(cls, data, dtype=None, copy=True):
-        return super(rbmatrix, cls).__new__(cls, data, dtype=dtype, copy=copy)
+        return super(matrix, cls).__new__(cls, data, dtype=dtype, copy=copy)
 
     def __matmul__(self, other):
-        return super(rbmatrix, self).__matmul__(other).view(rbmatrix)
+        return super(matrix, self).__matmul__(other).view(matrix)
 
     def __rmatmul__(self, other):
-        return super(rbmatrix, self).__rmatmul__(other).view(rbmatrix)
+        return super(matrix, self).__rmatmul__(other).view(matrix)
 
     def __imatmul__(self, other):
-        return super(rbmatrix, self).__imatmul__(other).view(rbmatrix)
+        return super(matrix, self).__imatmul__(other).view(matrix)
