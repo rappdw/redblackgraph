@@ -2530,9 +2530,9 @@ PyMODINIT_FUNC initrb_multiarray(void) {
 
     f = PyUFunc_FromFuncAndDataAndSignature(warshall_functions,
                     warshall_data, warshall_signatures,
-                    3, 1, 1, PyUFunc_None, "warshall",
+                    3, 1, 2, PyUFunc_None, "warshall",
                     "warshall-floyd avos \n"
-                    "     \"(m,m)->(m,m)\" \n",
+                    "     \"(m,m)->(m,m),()\" \n",
                     0, warshall_signature);
     PyDict_SetItemString(d, "warshall", f);
     Py_DECREF(f);
