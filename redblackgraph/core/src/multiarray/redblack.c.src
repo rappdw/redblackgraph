@@ -17,6 +17,7 @@
 #define NPY_PY3K 1
 #include <numpy/npy_3kcompat.h>
 #include <numpy/arrayscalars.h>
+#include <numpy/ufuncobject.h>
 
 /**** this is in numpy src arrayscalars.h ****/
 #define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
@@ -34,6 +35,12 @@
 #define NPY_BEGIN_THREADS_NDITER(iter)
 #endif
 
+#include "rbg_math.h"
+
+extern PyUFuncGenericFunction warshall_functions[];
+extern void *warshall_data[];
+extern char warshall_signatures[];
+extern char *warshall_signature;
 
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
@@ -56,35 +63,6 @@
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-
-static @type@ @name@_nz_min(@type@ a, @type@ b)
-{
-    return a == 0 ? b : (b == 0 ? a : (a < b ? a : b));
-}
-
-static int @name@_generation(@type@ x)
-{
-    int targetlevel = 0;
-    while (x >>= 1) {
-        targetlevel += 1;
-    }
-    return targetlevel;
-}
-
-static @type@ @name@_avos(@type@ x, @type@ y)
-{
-    // An interesting case is presented if x or y is 1 or -1. In these cases the avos product
-    // represents the situation where a and b are the same vertex or b and c are the same vertex.
-    // In a sense, this is the avos identity
-    if (x <= 1 || y <= 1)
-    {
-        return (x == 0 || y == 0) ? 0 : (y <= 1 ? x : y);
-    }
-
-    int generationNumber = @name@_generation(y);
-    return (y & (@type@)pow(2, generationNumber) - 1) | (x << generationNumber);
-}
-
 
 /**begin repeat1
  * #nop = 1, 2, 3, 1000#
@@ -2523,6 +2501,8 @@ PyMODINIT_FUNC PyInit_rb_multiarray(void) {
 PyMODINIT_FUNC initrb_multiarray(void) {
 #endif
     PyObject *m;
+    PyObject *d;
+    PyObject *f;
 
     /* Create the module and add the functions */
 #if defined(NPY_PY3K)
@@ -2544,6 +2524,22 @@ PyMODINIT_FUNC initrb_multiarray(void) {
 #endif
 
     import_array();
+    import_umath();
+
+    d = PyModule_GetDict(m);
+
+    f = PyUFunc_FromFuncAndDataAndSignature(warshall_functions,
+                    warshall_data, warshall_signatures,
+                    3, 1, 2, PyUFunc_None, "warshall",
+                    "warshall-floyd avos \n"
+                    "     \"(m,m)->(m,m),()\" \n",
+                    0, warshall_signature);
+    PyDict_SetItemString(d, "warshall", f);
+    Py_DECREF(f);
+
+    if (PyErr_Occurred()) {
+        goto err;
+    }
 
     return RETVAL;
 
