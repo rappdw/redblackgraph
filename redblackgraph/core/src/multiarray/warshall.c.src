@@ -71,6 +71,7 @@ static void
     @type@ diameter = 0;
 
     // copy the input to the output
+    // TODO: should just copy the data structure across enmasse
     for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[1] += s1) {
         char *in=args[0];
         char *op=args[1];

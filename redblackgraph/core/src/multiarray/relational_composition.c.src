@@ -1,0 +1,150 @@
+/* -*- c -*- */
+
+/*
+ *****************************************************************************
+ **                            INCLUDES                                     **
+ *****************************************************************************
+ */
+#include <Python.h>
+#include <math.h>
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+// TODO: figure out how to set NPY_PY3K correctly, right now just force it to 1
+#define NPY_PY3K 1
+#include <numpy/npy_3kcompat.h>
+#include <numpy/arrayscalars.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ufuncobject.h>
+
+/**** this is in numpy src arrayscalars.h ****/
+#define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
+#define PyArrayScalar_True ((PyObject *)(&(_PyArrayScalar_BoolValues[1])))
+
+/**** this is in numpy src common.h ****/
+#ifdef NPY_ALLOW_THREADS
+#define NPY_BEGIN_THREADS_NDITER(iter) \
+        do { \
+            if (!NpyIter_IterationNeedsAPI(iter)) { \
+                NPY_BEGIN_THREADS_THRESHOLDED(NpyIter_GetIterSize(iter)); \
+            } \
+        } while(0)
+#else
+#define NPY_BEGIN_THREADS_NDITER(iter)
+#endif
+
+#include "rbg_math.h"
+
+/*
+ *****************************************************************************
+ **                             UFUNC LOOPS                                 **
+ *****************************************************************************
+ */
+
+char *relational_composition_signature = "(n),(m,m),(n)->(n,n)";
+
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+
+static void
+@name@_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    // (n),(m,m),(n) -> (n,n)
+    //  a    b    c       d
+    npy_intp N_;
+    npy_intp dN = *dimensions++;
+    npy_intp dn = *dimensions++;
+    npy_intp dm = *dimensions++;
+
+    npy_intp a_N = *steps++;
+    npy_intp b_N = *steps++;
+    npy_intp c_N = *steps++;
+    npy_intp d_N = *steps++;
+
+    npy_intp a_n=steps[0], b_i=steps[1], b_j=steps[2], c_n=steps[3], o_i=steps[4], o_j=steps[5];
+
+    npy_intp ob_p = o_j * dn;
+    npy_intp ib_p = b_j * dm;
+    npy_intp m,n,p;
+
+    // copy the input to the output
+    for (N_ = 0; N_ < dN; N_++, args[1] += b_N, args[3] += d_N) {
+        char *in=args[1];
+        char *op=args[3];
+        for (m = 0; m < dn; m++) {
+            for (p = 0; p < dn; p++) {
+                if ((m < dn - 1) && (p < dn - 1)) {
+                    *(@type@ *)op = *(@type@ *)in;
+                    in  +=  b_j;
+                }
+                else {
+                    *(@type@ *)op = (@type@ *)0;
+                }
+                op  +=  o_j;
+            }
+            op  +=  o_i - ob_p;
+            in  +=  b_i - ib_p;
+        }
+    }
+//
+//    // now run the Warshall-Floyd algorithm (avos modified)
+//    for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
+//        char *ip1=args[1], *ip2=args[1], *op=args[1];
+//        for (m = 0; m < dm; m++) {
+//            for (n = 0; n < dn; n++) {
+//                @type@ val1 = (*(@type@ *)ip1);
+//                for (p = 0; p < dp; p++) {
+//                    *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos(val1, (*(@type@ *)ip2)));
+//                    if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
+//                    ip2 += is2_p;
+//                    op  +=  os_p;
+//                }
+//                ip2 -= ib2_p;
+//                op  -=  ob_p;
+//                ip1 += is1_n;
+//                ip2 += is2_n;
+//            }
+//            ip1 -= ib1_n;
+//            ip2 -= ib2_n;
+//            ip1 += is1_m;
+//            op  +=  os_m;
+//        }
+//    }
+//    *(npy_intp *)args[2] = @name@_generation(diameter);
+}
+
+/**end repeat**/
+
+
+PyUFuncGenericFunction relational_composition_functions[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    &@name@_relational_composition,
+/**end repeat**/
+};
+void *relational_composition_data[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    (void *)NULL,
+/**end repeat**/
+};
+
+char relational_composition_signatures[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    @type@, @type@, @type@, @type@,
+/**end repeat**/
+};
+
+

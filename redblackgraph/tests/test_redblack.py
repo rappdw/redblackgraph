@@ -64,12 +64,13 @@ class TestmatrixOperations(object):
                       [ 0,  0,  1,  0,  0],
                       [ 0,  0,  0, -1,  0],
                       [ 2,  4,  5,  8,  1]])
-        u = rb.array([[2, 0, 0, 0, 0]])
+        u = rb.array([[2, 0, 0, 0, 0, -1]])
         v = rb.array([[0],
                       [0],
                       [0],
                       [0],
-                      [0]])
+                      [0],
+                      [-1]])
         A_lambda = A.relational_composition(u, v, -1)
         assert A_lambda is not None
 
