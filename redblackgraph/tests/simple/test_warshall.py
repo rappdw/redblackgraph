@@ -1,4 +1,5 @@
 from redblackgraph.simple import warshall
+from numpy.testing import assert_equal
 
 
 def test_warshall():
@@ -6,4 +7,4 @@ def test_warshall():
     Arb = [[-1, 2, 3, 0, 0], [0, -1, 0, 2, 0], [0, 0, 1, 0, 0], [0, 0, 0, -1, 0], [2, 0, 0, 0, 1]]
     expected_results = ([[-1, 2, 3, 4, 0], [0, -1, 0, 2, 0], [0, 0, 1, 0, 0], [0, 0, 0, -1, 0], [2, 4, 5, 8, 1]], 3)
     Arb_plus = warshall(Arb)
-    assert Arb_plus == expected_results
+    assert_equal(Arb_plus, expected_results)
