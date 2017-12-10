@@ -9,25 +9,25 @@ class TestmatrixOperations(object):
 
     def test_avos(self):
         # test simple avos matmul
-        A = rb.array([[-1, 2, 3, 0, 0],
+        A = rb.array([[-1,  2,  3,  0,  0],
                       [ 0, -1,  0,  2,  0],
                       [ 0,  0,  1,  0,  0],
                       [ 0,  0,  0,  -1, 0],
                       [ 2,  0,  0,  0,  1]], dtype=np.int64)
-        S = rb.array([[-1, 2, 3, 4, 0],
+        S = rb.array([[-1,  2,  3,  4,  0],
                       [ 0, -1,  0,  2,  0],
                       [ 0,  0,  1,  0,  0],
                       [ 0,  0,  0, -1,  0],
                       [ 2,  4,  5,  0,  1]], dtype=np.int64)
         assert_equal(A @ A, S)
-        A = rb.matrix([[-1, 2, 3, 0, 0],
+        A = rb.matrix([[-1,  2,  3,  0,  0],
                        [ 0, -1,  0,  2,  0],
                        [ 0,  0,  1,  0,  0],
                        [ 0,  0,  0,  -1, 0],
                        [ 2,  0,  0,  0,  1]], dtype=np.int64)
         assert_equal(A @ A, S)
 
-        A_star = rb.array([[-1, 2, 3, 4, 0],
+        A_star = rb.array([[-1,  2,  3,  4,  0],
                            [ 0, -1,  0,  2,  0],
                            [ 0,  0,  1,  0,  0],
                            [ 0,  0,  0, -1,  0],
@@ -48,7 +48,7 @@ class TestmatrixOperations(object):
         v_lambda = np.array([5, 3, 0, 0, 9]).reshape((5, 1))
         assert_equal(u @ A_star, u_lambda)
         assert_equal(A_star @ v, v_lambda)
-        A_star = rb.matrix([[-1, 2, 3, 4, 0],
+        A_star = rb.matrix([[-1,  2,  3,  4,  0],
                             [ 0, -1,  0,  2,  0],
                             [ 0,  0,  1,  0,  0],
                             [ 0,  0,  0, -1,  0],
@@ -65,13 +65,25 @@ class TestmatrixOperations(object):
                       [ 0,  0,  0, -1,  0],
                       [ 2,  4,  5,  8,  1]])
         u = rb.array([[2, 0, 0, 0, 0]])
-        v = rb.array([[0], [0], [0], [0], [0]])
+        v = rb.array([[0],
+                      [0],
+                      [0],
+                      [0],
+                      [0]])
         A_lambda = A.relational_composition(u, v, -1)
         assert A_lambda is not None
 
     def test_warshall(self):
-        a = rb.array([[-1, 2, 3, 0, 0], [0, -1, 0, 2, 0], [0, 0, 1, 0, 0], [0, 0, 0, -1, 0], [2, 0, 0, 0, 1]])
-        expected = rb.array([[-1, 2, 3, 4, 0], [0, -1, 0, 2, 0], [0, 0, 1, 0, 0], [0, 0, 0, -1, 0], [2, 4, 5, 8, 1]])
+        a = rb.array([[-1,  2,  3,  0,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  0,  0,  0,  1]])
+        expected = rb.array([[-1,  2,  3,  4,  0],
+                             [ 0, -1,  0,  2,  0],
+                             [ 0,  0,  1,  0,  0],
+                             [ 0,  0,  0, -1,  0],
+                             [ 2,  4,  5,  8,  1]])
         results = rb.warshall(a)
         assert_equal(results[0], expected)
         assert_equal(results[1], 3)
