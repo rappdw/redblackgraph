@@ -71,8 +71,32 @@ class TestmatrixOperations(object):
                       [0],
                       [0],
                       [-1]])
-        A_lambda = A.relational_composition(u, v, -1)
-        assert A_lambda is not None
+        A_lambda = A.relational_composition(u, v)
+        expected = rb.array([[-1,  2,  3,  4,  0,  0],
+                             [ 0, -1,  0,  2,  0,  0],
+                             [ 0,  0,  1,  0,  0,  0],
+                             [ 0,  0,  0, -1,  0,  0],
+                             [ 2,  4,  5,  8,  1,  0],
+                             [ 2,  4,  5,  8,  0, -1]])
+        assert_equal(A_lambda, expected)
+
+        u = rb.array([[0, 0, 0, 0, 0, 0, 1]])
+        v = rb.array([[0],
+                      [3],
+                      [0],
+                      [0],
+                      [0],
+                      [0],
+                      [1]])
+        A_lambda_2 = A_lambda.relational_composition(u, v)
+        expected = rb.array([[-1,  2,  3,  4,  0,  0,  5],
+                             [ 0, -1,  0,  2,  0,  0,  3],
+                             [ 0,  0,  1,  0,  0,  0,  0],
+                             [ 0,  0,  0, -1,  0,  0,  0],
+                             [ 2,  4,  5,  8,  1,  0,  9],
+                             [ 2,  4,  5,  8,  0, -1,  9],
+                             [ 0,  0,  0,  0,  0,  0,  1]])
+        assert_equal(A_lambda_2, expected)
 
     def test_warshall(self):
         a = rb.array([[-1,  2,  3,  0,  0],

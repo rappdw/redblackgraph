@@ -69,50 +69,34 @@ static void
     npy_intp ib_p = b_j * dm;
     npy_intp m,n,p;
 
-    // copy the input to the output
     for (N_ = 0; N_ < dN; N_++, args[1] += b_N, args[3] += d_N) {
         char *in=args[1];
+        char *v=args[2];
         char *op=args[3];
         for (m = 0; m < dn; m++) {
+            char *u=args[0];
             for (p = 0; p < dn; p++) {
-                if ((m < dn - 1) && (p < dn - 1)) {
-                    *(@type@ *)op = *(@type@ *)in;
+                if ((m < dm) && (p < dm)) {
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)in, @name@_avos(*(@type@ *)u, *(@type@ *)v));
                     in  +=  b_j;
+                    u += a_n;
                 }
                 else {
-                    *(@type@ *)op = (@type@ *)0;
+                    if (m == dm) {
+                        *(@type@ *)op = *(@type@ *)u;
+                        u += a_n;
+                    }
+                    else if (p == dm) {
+                        *(@type@ *)op = *(@type@ *)v;
+                    }
                 }
                 op  +=  o_j;
             }
             op  +=  o_i - ob_p;
             in  +=  b_i - ib_p;
+            v += c_n;
         }
     }
-//
-//    // now run the Warshall-Floyd algorithm (avos modified)
-//    for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
-//        char *ip1=args[1], *ip2=args[1], *op=args[1];
-//        for (m = 0; m < dm; m++) {
-//            for (n = 0; n < dn; n++) {
-//                @type@ val1 = (*(@type@ *)ip1);
-//                for (p = 0; p < dp; p++) {
-//                    *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos(val1, (*(@type@ *)ip2)));
-//                    if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
-//                    ip2 += is2_p;
-//                    op  +=  os_p;
-//                }
-//                ip2 -= ib2_p;
-//                op  -=  ob_p;
-//                ip1 += is1_n;
-//                ip2 += is2_n;
-//            }
-//            ip1 -= ib1_n;
-//            ip2 -= ib2_n;
-//            ip1 += is1_m;
-//            op  +=  os_m;
-//        }
-//    }
-//    *(npy_intp *)args[2] = @name@_generation(diameter);
 }
 
 /**end repeat**/
