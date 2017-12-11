@@ -46,6 +46,9 @@ class _Avos():
                 return einsum('ij,jk', self, other, self, avos=True)
         raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
 
+    def transitive_closure(self):
+        return warshall(self)
+
     def relational_composition(self, u, v, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
