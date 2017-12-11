@@ -46,6 +46,15 @@ class _Avos():
                 return einsum('ij,jk', self, other, self, avos=True)
         raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
 
+    def cardinality(self):
+        trace = np.trace(self)
+        m = self.shape[0]
+        c_black = int((self.shape[0] + trace) / 2)
+        return {
+            'red': self.shape[0] - c_black,
+            'black': c_black
+        }
+
     def transitive_closure(self):
         return warshall(self)
 

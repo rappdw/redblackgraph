@@ -45,6 +45,9 @@ if __name__ == "__main__":
         for key in row.keys():
             A[i][key] = row[key]
     A_star = A.transitive_closure()
+    cardinality = A.cardinality()
+
+    print(f"Diameter: {A_star[1]}, # of male: {cardinality['red']}, # of female: {cardinality['black']}")
 
     inv_map = {v: k for k, v in p_ids.items()}
 
