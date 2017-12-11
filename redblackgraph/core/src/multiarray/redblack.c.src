@@ -42,6 +42,11 @@ extern void *warshall_data[];
 extern char warshall_signatures[];
 extern char *warshall_signature;
 
+extern PyUFuncGenericFunction relational_composition_functions[];
+extern void *relational_composition_data[];
+extern char relational_composition_signatures[];
+extern char *relational_composition_signature;
+
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
 
@@ -2535,6 +2540,15 @@ PyMODINIT_FUNC initrb_multiarray(void) {
                     "     \"(m,m)->(m,m),()\" \n",
                     0, warshall_signature);
     PyDict_SetItemString(d, "warshall", f);
+    Py_DECREF(f);
+
+    f = PyUFunc_FromFuncAndDataAndSignature(relational_composition_functions,
+                    relational_composition_data, relational_composition_signatures,
+                    3, 3, 1, PyUFunc_None, "relational_composition",
+                    "avos relational_composition \n"
+                    "     \"(n),(m,m),(n)->(n,n)\" \n",
+                    0, relational_composition_signature);
+    PyDict_SetItemString(d, "relational_composition", f);
     Py_DECREF(f);
 
     if (PyErr_Occurred()) {
