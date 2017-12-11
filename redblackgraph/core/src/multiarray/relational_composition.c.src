@@ -40,7 +40,7 @@
  *****************************************************************************
  */
 
-char *warshall_signature = "(m,m)->(m,m),()";
+char *relational_composition_signature = "(n),(m,m),(n)->(n,n)";
 
 /**begin repeat
  * #name = int, long, longlong#
@@ -49,82 +49,69 @@ char *warshall_signature = "(m,m)->(m,m),()";
  */
 
 static void
-@name@_warshall(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+@name@_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
 {
-    npy_intp dN = *dimensions++;
+    // (n),(m,m),(n) -> (n,n)
+    //  a    b    c       d
     npy_intp N_;
-    npy_intp s0 = *steps++;
-    npy_intp s1 = *steps++;
-    npy_intp s2 = *steps++;
+    npy_intp dN = *dimensions++;
+    npy_intp dn = *dimensions++;
+    npy_intp dm = *dimensions++;
 
-    npy_intp dm = dimensions[0];
-    npy_intp dn = dimensions[0];
-    npy_intp dp = dimensions[0];
+    npy_intp a_N = *steps++;
+    npy_intp b_N = *steps++;
+    npy_intp c_N = *steps++;
+    npy_intp d_N = *steps++;
+
+    npy_intp a_n=steps[0], b_i=steps[1], b_j=steps[2], c_n=steps[3], o_i=steps[4], o_j=steps[5];
+
+    npy_intp ob_p = o_j * dn;
+    npy_intp ib_p = b_j * dm;
     npy_intp m,n,p;
-    npy_intp is1_m=steps[0], is1_n=steps[1], is2_n=steps[0], is2_p=steps[1],
-         os_m=steps[2], os_p=steps[3];
-    npy_intp ib1_n = is1_n*dn;
-    npy_intp ib2_n = is2_n*dn;
-    npy_intp ib2_p = is2_p*dp;
-    npy_intp ob_p  = os_p *dp;
-    @type@ before;
-    @type@ diameter = 0;
 
-    // copy the input to the output
-    // TODO: should just copy the data structure across enmasse
-    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[1] += s1) {
-        char *in=args[0];
-        char *op=args[1];
-        for (m = 0; m < dm; m++) {
-            for (p = 0; p < dp; p++) {
-                *(@type@ *)op = *(@type@ *)in;
-                op  +=  os_p;
-                in  +=  os_p;
-            }
-            op  +=  os_m - ob_p;
-            in  +=  os_m - ob_p;
-        }
-    }
-
-    // now run the Warshall-Floyd algorithm (avos modified)
-    for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
-        char *ip1=args[1], *ip2=args[1], *op=args[1];
-        for (m = 0; m < dm; m++) {
-            for (n = 0; n < dn; n++) {
-                @type@ val1 = (*(@type@ *)ip1);
-                for (p = 0; p < dp; p++) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos(val1, (*(@type@ *)ip2)));
-                    if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
-                    ip2 += is2_p;
-                    op  +=  os_p;
+    for (N_ = 0; N_ < dN; N_++, args[1] += b_N, args[3] += d_N) {
+        char *in=args[1];
+        char *v=args[2];
+        char *op=args[3];
+        for (m = 0; m < dn; m++) {
+            char *u=args[0];
+            for (p = 0; p < dn; p++) {
+                if ((m < dm) && (p < dm)) {
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)in, @name@_avos(*(@type@ *)u, *(@type@ *)v));
+                    in  +=  b_j;
+                    u += a_n;
                 }
-                ip2 -= ib2_p;
-                op  -=  ob_p;
-                ip1 += is1_n;
-                ip2 += is2_n;
+                else {
+                    if (m == dm) {
+                        *(@type@ *)op = *(@type@ *)u;
+                        u += a_n;
+                    }
+                    else if (p == dm) {
+                        *(@type@ *)op = *(@type@ *)v;
+                    }
+                }
+                op  +=  o_j;
             }
-            ip1 -= ib1_n;
-            ip2 -= ib2_n;
-            ip1 += is1_m;
-            op  +=  os_m;
+            op  +=  o_i - ob_p;
+            in  +=  b_i - ib_p;
+            v += c_n;
         }
     }
-    *(npy_intp *)args[2] = @name@_generation(diameter);
 }
 
 /**end repeat**/
 
 
-PyUFuncGenericFunction warshall_functions[] = {
+PyUFuncGenericFunction relational_composition_functions[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-    &@name@_warshall,
+    &@name@_relational_composition,
 /**end repeat**/
 };
-void *warshall_data[] = {
+void *relational_composition_data[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = npy_int, npy_long, npy_longlong#
@@ -134,13 +121,13 @@ void *warshall_data[] = {
 /**end repeat**/
 };
 
-char warshall_signatures[] = {
+char relational_composition_signatures[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-    @type@, @type@, NPY_INT,
+    @type@, @type@, @type@, @type@,
 /**end repeat**/
 };
 

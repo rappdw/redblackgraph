@@ -15,6 +15,7 @@ def configuration(parent_package='', top_path=None):
                              'redblackgraph/core/src/multiarray/rbg_math.h.src',
                              'redblackgraph/core/src/multiarray/rbg_math.c.src',
                              'redblackgraph/core/src/multiarray/redblack.c.src',
+                             'redblackgraph/core/src/multiarray/relational_composition.c.src',
                              'redblackgraph/core/src/multiarray/warshall.c.src'
                          ],
                          include_dirs=['redblackgraph/core/src/multiarray'])

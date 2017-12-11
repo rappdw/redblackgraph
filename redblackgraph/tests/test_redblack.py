@@ -1,5 +1,5 @@
 import numpy as np
-import redblackgraph as rbg
+import redblackgraph as rb
 from numpy.testing import (
     run_module_suite, assert_equal
     )
@@ -9,29 +9,29 @@ class TestmatrixOperations(object):
 
     def test_avos(self):
         # test simple avos matmul
-        A = rbg.array([[-1,  2,  3,  0,  0],
-                         [ 0, -1,  0,  2,  0],
-                         [ 0,  0,  1,  0,  0],
-                         [ 0,  0,  0,  -1, 0],
-                         [ 2,  0,  0,  0,  1]], dtype=np.int64)
-        S = rbg.array([[-1,  2,  3,  4,  0],
+        A = rb.array([[-1,  2,  3,  0,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0,  -1, 0],
+                      [ 2,  0,  0,  0,  1]], dtype=np.int64)
+        S = rb.array([[-1,  2,  3,  4,  0],
                       [ 0, -1,  0,  2,  0],
                       [ 0,  0,  1,  0,  0],
                       [ 0,  0,  0, -1,  0],
                       [ 2,  4,  5,  0,  1]], dtype=np.int64)
         assert_equal(A @ A, S)
-        A = rbg.matrix([[-1,  2,  3,  0,  0],
-                          [ 0, -1,  0,  2,  0],
-                          [ 0,  0,  1,  0,  0],
-                          [ 0,  0,  0,  -1, 0],
-                          [ 2,  0,  0,  0,  1]], dtype=np.int64)
+        A = rb.matrix([[-1,  2,  3,  0,  0],
+                       [ 0, -1,  0,  2,  0],
+                       [ 0,  0,  1,  0,  0],
+                       [ 0,  0,  0,  -1, 0],
+                       [ 2,  0,  0,  0,  1]], dtype=np.int64)
         assert_equal(A @ A, S)
 
-        A_star = rbg.array([[-1,  2,  3,  4,  0],
-                              [ 0, -1,  0,  2,  0],
-                              [ 0,  0,  1,  0,  0],
-                              [ 0,  0,  0, -1,  0],
-                              [ 2,  4,  5,  8,  1]], dtype=np.int64)
+        A_star = rb.array([[-1,  2,  3,  4,  0],
+                           [ 0, -1,  0,  2,  0],
+                           [ 0,  0,  1,  0,  0],
+                           [ 0,  0,  0, -1,  0],
+                           [ 2,  4,  5,  8,  1]], dtype=np.int64)
         assert_equal(S @ A, A_star)
         assert_equal(A @ (A @ A), A_star)
         assert_equal(A @ A @ A, A_star)
@@ -42,21 +42,76 @@ class TestmatrixOperations(object):
         # using rank 1 arrays can cause problems.
         # See: https://www.coursera.org/learn/neural-networks-deep-learning/lecture/87MUx/a-note-on-python-numpy-vectors
         # Safer to always use either a row vector or column vector
-        u = rbg.array([2, 0, 0, 0, 0], dtype=np.int64).reshape((1, 5))
-        v = rbg.array([0, 3, 0, 0, 0], dtype=np.int64).reshape((5, 1))
+        u = rb.array([2, 0, 0, 0, 0], dtype=np.int64).reshape((1, 5))
+        v = rb.array([0, 3, 0, 0, 0], dtype=np.int64).reshape((5, 1))
         u_lambda = np.array([2, 4, 5, 8, 0]).reshape((1, 5))
         v_lambda = np.array([5, 3, 0, 0, 9]).reshape((5, 1))
         assert_equal(u @ A_star, u_lambda)
         assert_equal(A_star @ v, v_lambda)
-        A_star = rbg.matrix([[-1,  2,  3,  4,  0],
-                               [ 0, -1,  0,  2,  0],
-                               [ 0,  0,  1,  0,  0],
-                               [ 0,  0,  0, -1,  0],
-                               [ 2,  4,  5,  8,  1]], dtype=np.int64)
+        A_star = rb.matrix([[-1,  2,  3,  4,  0],
+                            [ 0, -1,  0,  2,  0],
+                            [ 0,  0,  1,  0,  0],
+                            [ 0,  0,  0, -1,  0],
+                            [ 2,  4,  5,  8,  1]], dtype=np.int64)
         bar = u @ A_star
         assert_equal(bar, u_lambda)
         assert_equal(A_star @ v, v_lambda)
         assert_equal(A @ A @ A @ v, v_lambda)
+
+    def test_relational_composition(self):
+        A = rb.array([[-1,  2,  3,  4,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  4,  5,  8,  1]])
+        u = rb.array([[2, 0, 0, 0, 0, -1]])
+        v = rb.array([[0],
+                      [0],
+                      [0],
+                      [0],
+                      [0],
+                      [-1]])
+        A_lambda = A.relational_composition(u, v)
+        expected = rb.array([[-1,  2,  3,  4,  0,  0],
+                             [ 0, -1,  0,  2,  0,  0],
+                             [ 0,  0,  1,  0,  0,  0],
+                             [ 0,  0,  0, -1,  0,  0],
+                             [ 2,  4,  5,  8,  1,  0],
+                             [ 2,  4,  5,  8,  0, -1]])
+        assert_equal(A_lambda, expected)
+
+        u = rb.array([[0, 0, 0, 0, 0, 0, 1]])
+        v = rb.array([[0],
+                      [3],
+                      [0],
+                      [0],
+                      [0],
+                      [0],
+                      [1]])
+        A_lambda_2 = A_lambda.relational_composition(u, v)
+        expected = rb.array([[-1,  2,  3,  4,  0,  0,  5],
+                             [ 0, -1,  0,  2,  0,  0,  3],
+                             [ 0,  0,  1,  0,  0,  0,  0],
+                             [ 0,  0,  0, -1,  0,  0,  0],
+                             [ 2,  4,  5,  8,  1,  0,  9],
+                             [ 2,  4,  5,  8,  0, -1,  9],
+                             [ 0,  0,  0,  0,  0,  0,  1]])
+        assert_equal(A_lambda_2, expected)
+
+    def test_warshall(self):
+        a = rb.array([[-1,  2,  3,  0,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  0,  0,  0,  1]])
+        expected = rb.array([[-1,  2,  3,  4,  0],
+                             [ 0, -1,  0,  2,  0],
+                             [ 0,  0,  1,  0,  0],
+                             [ 0,  0,  0, -1,  0],
+                             [ 2,  4,  5,  8,  1]])
+        results = rb.warshall(a)
+        assert_equal(results[0], expected)
+        assert_equal(results[1], 3)
 
 
 if __name__ == "__main__":
