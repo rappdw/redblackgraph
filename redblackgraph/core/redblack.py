@@ -100,6 +100,9 @@ class _Avos():
         # unfortunately, his proposal was never merged into Numpy, so the wrapper approach seems to be
         # best way to do this
 
+        # rather than using a wrapper, go a head and in the extra value in the u and v arrays and then
+        # let that determine the output size
+
         uc_lambda = u[:,:-1] @ A_star
         vc_lambda = A_star @ v[:-1,:]
         # add the last element from u,v into uc_lambda and vc_lambda and
@@ -107,15 +110,6 @@ class _Avos():
         uc_lambda = np.append(uc_lambda[0], u[0][-1]).view(type(u))
         vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], v[-1][0]).view(type(v))
 
-        # A_lambda.append(uc_lambda[0])
-        # for i in range(N):
-        #     A_lambda[i].append(vc_lambda[i][0])
-        #     for j in range(N):
-        #         if not uc_lambda[0][j] == 0:
-        #             A_lambda[i][j] = nz_min(avos(uc_lambda[0][j], vc_lambda[i][0]), A_lambda[i][j])
-        # A_lambda[N].append(u[0][N])
-
-        # return relational_composition(uc_lambda, A_star, vc_lambda, u[0][-1], np.empty((M+1, M+1)).view(type(self)))
         return relational_composition(uc_lambda, A_star, vc_lambda)
 
 class array(_Avos, ndarray):
