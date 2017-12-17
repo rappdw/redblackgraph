@@ -1,0 +1,2 @@
+git+git://github.com/numba/llvmlite.git@v0.21.0#egg=llvmlite
+git+git://github.com/numba/numba.git@0.36.1#egg=numba
