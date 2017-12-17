@@ -18,33 +18,20 @@ class _Avos():
                 return einsum('...i,i', self, other, avos=True)
             if other.ndim == 2:
                 return einsum('ij,jk', self, other, avos=True)
-        raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
+        raise ValueError(f"Unexpected dimensionality. self: {self.ndim}, other: {other.ndim}")
 
     def __rmatmul__(self, other):
         if self.ndim == 1:
             if other.ndim == 1:
-                return einsum('i,i', self, other, avos=True)
+                return einsum('i,i', other, self, avos=True)
             if other.ndim == 2:
-                return einsum('i,...ij', self, other, avos=True)
+                return einsum('...i,i', other, self, avos=True)
         if self.ndim == 2:
             if other.ndim == 1:
-                return einsum('...i,i', self, other, avos=True)
+                return einsum('i,...ij', other, self, avos=True)
             if other.ndim == 2:
-                return einsum('ij,jk', self, other, avos=True)
-        raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
-
-    def __imatmul__(self, other):
-        if self.ndim == 1:
-            if other.ndim == 1:
-                return einsum('i,i', self, other, self, avos=True)
-            if other.ndim == 2:
-                return einsum('i,...ij', self, other, self, avos=True)
-        if self.ndim == 2:
-            if other.ndim == 1:
-                return einsum('...i,i', self, other, self, avos=True)
-            if other.ndim == 2:
-                return einsum('ij,jk', self, other, self, avos=True)
-        raise ValueError(f"Unexpected dimensionality. self: {self.dim}, other: {other.dim}")
+                return einsum('ij,jk', other, self, avos=True)
+        raise ValueError(f"Unexpected dimensionality. self: {self.ndim}, other: {other.ndim}")
 
     def cardinality(self):
         trace = np.trace(self)
@@ -122,9 +109,6 @@ class array(_Avos, ndarray):
     def __rmatmul__(self, other):
         return super(array, self).__rmatmul__(other).view(array)
 
-    def __imatmul__(self, other):
-        return super(array, self).__imatmul__(other).view(array)
-
 
 class matrix(_Avos, np.matrix):
     def __new__(cls, data, dtype=None, copy=True):
@@ -135,6 +119,3 @@ class matrix(_Avos, np.matrix):
 
     def __rmatmul__(self, other):
         return super(matrix, self).__rmatmul__(other).view(matrix)
-
-    def __imatmul__(self, other):
-        return super(matrix, self).__imatmul__(other).view(matrix)

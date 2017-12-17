@@ -98,6 +98,18 @@ class TestmatrixOperations(object):
                              [ 0,  0,  0,  0,  0,  0,  1]])
         assert_equal(A_lambda_2, expected)
 
+    def test_cardinality(self):
+        A = rb.array([[-1, 2, 3, 4, 0, 0, 5],
+                      [0, -1, 0, 2, 0, 0, 3],
+                      [0, 0, 1, 0, 0, 0, 0],
+                      [0, 0, 0, -1, 0, 0, 0],
+                      [2, 4, 5, 8, 1, 0, 9],
+                      [2, 4, 5, 8, 0, -1, 9],
+                      [0, 0, 0, 0, 0, 0, 1]])
+        cardinality = A.cardinality()
+        assert_equal(cardinality['red'], 4)
+        assert_equal(cardinality['black'], 3)
+
     def test_warshall(self):
         a = rb.array([[-1,  2,  3,  0,  0],
                       [ 0, -1,  0,  2,  0],
@@ -109,9 +121,115 @@ class TestmatrixOperations(object):
                              [ 0,  0,  1,  0,  0],
                              [ 0,  0,  0, -1,  0],
                              [ 2,  4,  5,  8,  1]])
-        results = rb.warshall(a)
+        results = a.transitive_closure()
         assert_equal(results[0], expected)
         assert_equal(results[1], 3)
+
+    def test_vector_product(self):
+        # test rank-1 mutliplication
+        u = rb.array([2, 0, 0, 0, 1])
+        v = rb.array([3, 0, 1, 0, 0])
+        assert_equal(u @ v, 5)
+        # test rank-2 multiplication
+        u = rb.array([[2, 0, 0, 0, 1]])
+        v = rb.array([[3], [0], [1], [0], [0]])
+        assert_equal(u @ v, 5)
+        # test matrix multiplication
+        u = rb.matrix([[2, 0, 0, 0, 1]])
+        v = rb.matrix([[3], [0], [1], [0], [0]])
+        assert_equal(u @ v, 5)
+
+    def test_vector_matrix_product(self):
+        A = rb.array([[-1,  2,  3,  4,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  4,  5,  8,  1]])
+        # test rank-1 mutliplication
+        u = rb.array([0, 2, 3, 0, 0])
+        result = u @ A
+        expected = rb.array([0, 2, 3, 4, 0])
+        assert_equal(result, expected)
+
+        # test rank-2 multiplication
+        u = rb.array([[0, 2, 3, 0, 0]])
+        result = u @ A
+        assert_equal(result[0], expected)
+
+        A = rb.matrix([[-1,  2,  3,  4,  0],
+                       [ 0, -1,  0,  2,  0],
+                       [ 0,  0,  1,  0,  0],
+                       [ 0,  0,  0, -1,  0],
+                       [ 2,  4,  5,  8,  1]])
+        u = rb.array([0, 2, 3, 0, 0])
+        result = u @ A
+        assert_equal(result, expected)
+
+        u = rb.array([[0, 2, 3, 0, 0]])
+        result = u @ A
+        assert_equal(result[0], expected)
+
+        A = rb.array([[-1,  2,  3,  4,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  4,  5,  8,  1]])
+        v = rb.array([0, 0, 9, 0, 0])
+        # test rank-1 mutliplication
+        result = A @ v
+        expected = rb.array([25, 0, 9, 0, 41])
+        assert_equal(result, expected)
+
+        # test rank-2 multiplication
+        v = rb.array([[0], [0], [9], [0], [0]])
+        result = A @ v
+        assert_equal(result, expected.reshape((5, 1)))
+
+    def test_vector_matrix_rproduct(self):
+        A = rb.array([[-1,  2,  3,  4,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  4,  5,  8,  1]])
+        # test rank-1 mutliplication
+        u = np.array([0, 2, 3, 0, 0])
+        result = u @ A
+        expected = rb.array([0, 2, 3, 4, 0])
+        assert_equal(result, expected)
+
+        # test rank-2 multiplication
+        u = np.array([[0, 2, 3, 0, 0]])
+        result = u @ A
+        assert_equal(result[0], expected)
+
+        A = rb.matrix([[-1,  2,  3,  4,  0],
+                       [ 0, -1,  0,  2,  0],
+                       [ 0,  0,  1,  0,  0],
+                       [ 0,  0,  0, -1,  0],
+                       [ 2,  4,  5,  8,  1]])
+        u = np.array([0, 2, 3, 0, 0])
+        result = u @ A
+        assert_equal(result, expected.reshape((1,5)))
+
+        u = np.array([[0, 2, 3, 0, 0]])
+        result = u @ A
+        assert_equal(result[0], expected.reshape((1,5)))
+
+        A = np.array([[-1,  2,  3,  4,  0],
+                      [ 0, -1,  0,  2,  0],
+                      [ 0,  0,  1,  0,  0],
+                      [ 0,  0,  0, -1,  0],
+                      [ 2,  4,  5,  8,  1]])
+        v = rb.array([0, 0, 9, 0, 0])
+        # test rank-1 mutliplication
+        result = A @ v
+        expected = rb.array([25, 0, 9, 0, 41])
+        assert_equal(result, expected)
+
+        # test rank-2 multiplication
+        v = rb.array([[0], [0], [9], [0], [0]])
+        result = A @ v
+        assert_equal(result, expected.reshape((5, 1)))
 
 
 if __name__ == "__main__":
