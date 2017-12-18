@@ -1,11 +1,8 @@
 FROM python:3.6.3
 
 ADD requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
-
-###################
-# End of Base Image - If you make changes above this line, please reflect them in all other Dockerfiles
-###################
+ADD requirements-dev.txt /requirements-dev.txt
+RUN pip install -r /requirements-dev.txt
 
 # add the project to the container
 WORKDIR /workdir

@@ -16,11 +16,11 @@ Original error was: %s
 """ % (exc,)
     raise ImportError(msg)
 
-from . import einsumfunc
-from .einsumfunc import *
+from . import avos_einsumfunc
+from .avos_einsumfunc import *
 from . import redblack
 from .redblack import *
 
-__all__ += einsumfunc.__all__
+__all__ += avos_einsumfunc.__all__
 __all__ += redblack.__all__
 __all__ += ['warshall', 'relational_composition']

@@ -1,1 +1,40 @@
-GIT HASH: 6a5c18f
+GIT HASH: d8eabe7
+[1m============================= test session starts ==============================[0m
+platform darwin -- Python 3.6.3, pytest-3.2.2, py-1.5.2, pluggy-0.4.0
+rootdir: /Users/drapp/sandbox/redBlackGraph, inifile:
+plugins: cov-2.5.1
+collected 17 items
+
+redblackgraph/tests/test_einsum.py .
+redblackgraph/tests/test_loops.py .
+redblackgraph/tests/test_redblack.py .......
+redblackgraph/tests/simple/test_calc_relationship.py .
+redblackgraph/tests/simple/test_mat_avos.py ..
+redblackgraph/tests/simple/test_nz_min.py .
+redblackgraph/tests/simple/test_rel_composition.py .
+redblackgraph/tests/simple/test_vec_avos.py ..
+redblackgraph/tests/simple/test_warshall.py .
+
+---------- coverage: platform darwin, python 3.6.3-final-0 -----------
+Name                                        Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------
+redblackgraph/__init__.py                       7      0   100%
+redblackgraph/core/__init__.py                 15      3    80%   8-17
+redblackgraph/core/avos_einsumfunc.py           7      1    86%   8
+redblackgraph/core/rbm.py                       0      0   100%
+redblackgraph/core/redblack.py                 71      4    94%   21, 26, 34, 61
+redblackgraph/simple/__init__.py                8      0   100%
+redblackgraph/simple/avos.py                    6      0   100%
+redblackgraph/simple/calc_relationship.py      10      1    90%   31
+redblackgraph/simple/generation.py             15      7    53%   18-24
+redblackgraph/simple/mat_avos.py                4      0   100%
+redblackgraph/simple/rel_composition.py        16      0   100%
+redblackgraph/simple/util.py                   12      0   100%
+redblackgraph/simple/vec_avos.py                4      0   100%
+redblackgraph/simple/warshall.py               13      0   100%
+-------------------------------------------------------------------------
+TOTAL                                         188     16    91%
+
+[32mRequired test coverage of 80% reached. Total coverage: 91.49%
+[0m
+[32m[1m========================== 17 passed in 0.35 seconds ===========================[0m

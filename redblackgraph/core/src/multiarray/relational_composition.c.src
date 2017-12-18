@@ -69,9 +69,12 @@ static void
     npy_intp ib_p = b_j * dm;
     npy_intp m,n,p;
 
+    npy_intp idx = 0;
+
     for (N_ = 0; N_ < dN; N_++, args[1] += b_N, args[3] += d_N) {
         char *in=args[1];
         char *v=args[2];
+        char *u_val=args[0];
         char *op=args[3];
         for (m = 0; m < dn; m++) {
             char *u=args[0];
@@ -94,7 +97,19 @@ static void
             }
             op  +=  o_i - ob_p;
             in  +=  b_i - ib_p;
+            if (idx < dm && (*(@type@ *)v != 0) && (*(@type@ *)u_val != 0)) {
+                // This condition indicates a violation of the cycle constraint
+                // raise an exception
+                char s[100];
+                memset(s,0,100*sizeof(char));
+                sprintf(s,"Relational composition would result in a cycle. Idx: %i",idx);
+
+                PyErr_SetString(PyExc_ValueError, s);
+                return;
+            }
             v += c_n;
+            u_val += c_n;
+            idx += 1;
         }
     }
 }

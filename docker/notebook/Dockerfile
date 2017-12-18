@@ -1,14 +1,7 @@
 FROM python:3.6.3
 
-ADD requirements.txt /requirements.txt
+ADD requirements* /
 RUN pip install -r /requirements.txt
-
-###################
-# End of Base Image - If you make changes above this line, please reflect them in all other Dockerfiles
-###################
-
-ADD requirements-dev.txt /requirements-dev.txt
-ADD requirements-jupyter.txt /requirements-jupyter.txt
 RUN pip install -r /requirements-jupyter.txt
 
 # add less and vim (for debugging in container)
@@ -51,7 +44,7 @@ ENV SHELL=/bin/bash \
     LANGUAGE=en_US.UTF-8
 ENV HOME=/home/$NB_USER
 
-ADD docker/dev/fix-permissions /usr/local/bin/fix-permissions
+ADD docker/notebook/fix-permissions /usr/local/bin/fix-permissions
 # Create jovyan user with UID=1000 and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
 RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
@@ -72,12 +65,12 @@ EXPOSE 8888
 
 # As the entry point, install an editable version into the python environment and then
 # start the shell
-CMD /usr/local/bin/pip install -e /workdir && /bin/bash
+CMD dev-start-notebook.sh
 
 # Add local files as late as possible to avoid cache busting
-COPY docker/dev/dev-start-notebook.sh /usr/local/bin
-COPY docker/dev/start.sh /usr/local/bin/
-COPY docker/dev/start-notebook.sh /usr/local/bin/
-COPY docker/dev/start-singleuser.sh /usr/local/bin/
-COPY docker/dev/jupyter_notebook_config.py /etc/jupyter/
+COPY docker/notebook/dev-start-notebook.sh /usr/local/bin
+COPY docker/notebook/start.sh /usr/local/bin/
+COPY docker/notebook/start-notebook.sh /usr/local/bin/
+COPY docker/notebook/start-singleuser.sh /usr/local/bin/
+COPY docker/notebook/jupyter_notebook_config.py /etc/jupyter/
 RUN fix-permissions /etc/jupyter/
