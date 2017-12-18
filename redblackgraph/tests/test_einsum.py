@@ -1,10 +1,6 @@
 import numpy as np
 from redblackgraph import einsum
-
-from numpy.testing import (
-    run_module_suite, assert_, assert_equal, assert_array_equal,
-    assert_almost_equal, assert_raises, suppress_warnings
-    )
+from numpy.testing import (assert_equal)
 
 def test_avos():
     # test simple avos matmul

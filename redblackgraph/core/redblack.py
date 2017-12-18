@@ -92,6 +92,7 @@ class _Avos():
 
         uc_lambda = u[:,:-1] @ A_star
         vc_lambda = A_star @ v[:-1,:]
+
         # add the last element from u,v into uc_lambda and vc_lambda and
         # collapse these down to rank 1 arrays, as that is what gufunc is expecting
         uc_lambda = np.append(uc_lambda[0], u[0][-1]).view(type(u))
