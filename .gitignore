@@ -4,6 +4,7 @@ dist/
 build/
 .cache/
 .eggs/
+*.pyc
 **/__pycache__
 redblackgraph/about.py
 redblackgraph.egg-info/
