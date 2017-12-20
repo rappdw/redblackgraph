@@ -19,9 +19,4 @@ This module provides serveral implementations of Red Black Graph.
 * `redblackgraph.matrix` and `redblackgrpah.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support Red Black Graph linear algebra. 
 * `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation. 
 
-# Usage Documentation
-TODO: see test cases for now, but will be adding documentation...
-
-In particular, see: `redblackgraph/tests/test_redblack.py`
-
 **Note:** conforms to and utilizes [dockerutils](https://github.com/rappdw/docker-utils) conventions. 
