@@ -98,6 +98,52 @@ class TestmatrixOperations(object):
                              [ 0,  0,  0,  0,  0,  0,  1]])
         assert_equal(A_lambda_2, expected)
 
+    def test_my_use_case(self):
+        #       D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
+        A1 = rb.array([[-1, 2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D
+                       [0, -1,  0,  0,  0,  2,  3,  0,  0,  0,  0,  0,  0,  0],  # E
+                       [0,  0,  1,  0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0],  # R
+                       [0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # M
+                       [0,  2,  0,  3, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # H
+                       [0,  0,  0,  0,  0, -1,  0,  0,  0,  0,  2,  3,  0,  0],  # Mi
+                       [0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0],  # A
+                       [0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0],  # I
+                       [0,  0,  0,  0,  0,  0,  0,  0, -1,  3,  0,  0,  0,  0],  # Do
+                       [0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0],  # Ev
+                       [0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,  0],  # G
+                       [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0],  # Ma
+                       [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0],  # S
+                       [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
+                      ], dtype=np.int32)
+        #               D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J
+        u = rb.array([[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]], dtype=np.int32)
+        v = rb.array([[0],  # D
+                      [0],  # E
+                      [2],  # R
+                      [0],  # M
+                      [0],  # H
+                      [0],  # Mi
+                      [0],  # A
+                      [0],  # I
+                      [2],  # Do
+                      [0],  # Ev
+                      [0],  # G
+                      [0],  # Ma
+                      [0],  # S
+                      [0],  # Em
+                      [-1]],# J
+                     dtype=np.int32)
+        A_lambda = A1.relational_composition(u, v, compute_closure=True)
+        assert A_lambda[0][12] == 12
+        assert A_lambda[0][13] == 13
+        assert A_lambda[0][14] == 6
+        assert A_lambda[2][12] == 4
+        assert A_lambda[2][13] == 5
+        assert A_lambda[2][14] == 2
+        assert A_lambda[8][12] == 4
+        assert A_lambda[8][13] == 5
+        assert A_lambda[8][14] == 2
+
     def test_cardinality(self):
         A = rb.array([[-1, 2, 3, 4, 0, 0, 5],
                       [0, -1, 0, 2, 0, 0, 3],

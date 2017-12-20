@@ -22,6 +22,6 @@ def relational_composition(u, A, v):
         A_lambda[i].append(vc_lambda[i][0])
         for j in range(N):
             if not uc_lambda[0][j] == 0:
-                A_lambda[i][j] = nz_min(avos(uc_lambda[0][j], vc_lambda[i][0]), A_lambda[i][j])
+                A_lambda[i][j] = nz_min(avos(vc_lambda[i][0], uc_lambda[0][j]), A_lambda[i][j])
     A_lambda[N].append(u[0][N])
     return A_lambda

@@ -80,7 +80,7 @@ static void
             char *u=args[0];
             for (p = 0; p < dn; p++) {
                 if ((m < dm) && (p < dm)) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)in, @name@_avos(*(@type@ *)u, *(@type@ *)v));
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)in, @name@_avos(*(@type@ *)v, *(@type@ *)u));
                     in  +=  b_j;
                     u += a_n;
                 }
