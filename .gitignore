@@ -25,3 +25,8 @@ redblackgraph/rb_sparsetools.*.so
 redblackgraph/tests/resources/closure.results.csv
 redblackgraph/tests/resources/composition.results.csv
 _version.py.bld
+notebooks/*.pdf
+notebooks/*.tex
+notebooks/*.aux
+notebooks/*.log
+notebooks/*.out
