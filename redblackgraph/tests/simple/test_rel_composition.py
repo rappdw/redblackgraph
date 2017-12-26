@@ -8,9 +8,9 @@ def test_relational_composition():
          [0, 0, 1, 0, 0],
          [0, 0, 0, -1, 0],
          [2, 4, 5, 8, 1]]
-    u = [[2, 0, 0, 0, 0, -1]]
-    v = [[0], [0], [0], [0], [0], [-1]]
-    A_lambda = relational_composition(u, A, v)
+    u = [[2, 0, 0, 0, 0]]
+    v = [[0], [0], [0], [0], [0]]
+    A_lambda = relational_composition(u, A, v, -1)
     assert A_lambda == [[-1, 2, 3, 4, 0, 0],
                         [0, -1, 0, 2, 0, 0],
                         [0, 0, 1, 0, 0, 0],
@@ -19,9 +19,9 @@ def test_relational_composition():
                         [2, 4, 5, 8, 0, -1]]
 
     # Using the A_lambda that was generated... Add in the "great-grandmother" to the siblings represented by vertex 4 and 5
-    u = [[0, 0, 0, 0, 0, 0, 1]]
-    v = [[0], [3], [0], [0], [0], [0], [1]]
-    A_lambda = relational_composition(u, A_lambda, v)
+    u = [[0, 0, 0, 0, 0, 0]]
+    v = [[0], [3], [0], [0], [0], [0]]
+    A_lambda = relational_composition(u, A_lambda, v, 1)
     assert A_lambda == [[-1, 2, 3, 4, 0, 0, 5],
                         [0, -1, 0, 2, 0, 0, 3],
                         [0, 0, 1, 0, 0, 0, 0],
@@ -48,7 +48,7 @@ def test_my_use_case():
           [  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
          ]
     #      D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J
-    u = [[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]]
+    u = [[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3]]
     v = [[ 0], # D
      [ 0], # E
      [ 2], # R
@@ -63,8 +63,8 @@ def test_my_use_case():
      [ 0], # Ma
      [ 0], # S
      [ 0], # Em
-     [-1]] # J
-    A_lambda = relational_composition(u, A1, v)
+     ]
+    A_lambda = relational_composition(u, A1, v, -1)
     assert A_lambda[0][12] == 12
     assert A_lambda[0][13] == 13
     assert A_lambda[0][14] == 6

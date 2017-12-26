@@ -1,29 +1,29 @@
 from redblackgraph.simple import generation
 
 
-def lookup_relationship(du, dv):
+def lookup_relationship(da, db):
     '''
     This is a very rudimentary implementation of a Consanguinity lookup and doesn't handle many cases
     correctly.
-    :param du: generational distance from u to common ancestor
-    :param dv: generational distance from v to common ancester
+    :param da: generational distance from u to common ancestor
+    :param db: generational distance from v to common ancester
     :return: a string designating relationship
     '''
-    removal = abs(du - dv)
-    generational = min(du, dv)
+    removal = abs(da - db)
+    generational = min(da, db)
     return f"{generational - 1} cousin {removal} removed"
 
 
-def calculate_relationship(u, v):
+def calculate_relationship(a, b):
     '''
     Determine if a relationship exists between u, v where u, v are row vectors of the transitive closure
     of a Red Black adjacency matrix
-    :param u: row vector for vertex u
-    :param v: row vector for vertex v
+    :param a: row vector for vertex u
+    :param b: row vector for vertex v
     :return: (Relationship designation, common ancestor vertex)
     '''
 
-    common_ancestor, (x, y) = min([e for e in enumerate(zip(u, v)) if not e[1][0] == 0 and not e[1][1] == 0],
+    common_ancestor, (x, y) = min([e for e in enumerate(zip(a, b)) if not e[1][0] == 0 and not e[1][1] == 0],
                                   key=lambda x: x[1][0] + x[1][1],
                                   default=(-1, (0, 0)))
 
