@@ -66,7 +66,7 @@ RUN wget https://github.com/jgm/pandoc/releases/download/2.0.5/pandoc-2.0.5-1-am
     && dpkg -i pandoc-2.0.5-1-amd64.deb \
     && rm pandoc-2.0.5-1-amd64.deb
 
-ADD docker/notebook/convert.sh /usr/local/bin
+ADD docker/notebook/gen-latex.py /usr/local/bin
 
 # As the entry point, install an editable version into the python environment and then
 # start the shell
