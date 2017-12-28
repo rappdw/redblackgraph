@@ -11,11 +11,11 @@ def test_loop():
     A_star = A.transitive_closure()[0]
 
     # what happens if we perform a relational_composition that causes a loop
-    u = rb.array([0, 0, 0, 0, 3, 1])
-    v = rb.array([0, 0, 0, 3, 0, 1])
+    u = rb.array([0, 0, 0, 0, 3])
+    v = rb.array([0, 0, 0, 3, 0])
 
     try:
-        A_lambda = A_star.relational_composition(u, v)
+        A_lambda = A_star.relational_composition(u, v, 1)
         print(A_lambda)
         assert False
     except ValueError:

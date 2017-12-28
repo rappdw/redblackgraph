@@ -64,14 +64,14 @@ class TestmatrixOperations(object):
                       [ 0,  0,  1,  0,  0],
                       [ 0,  0,  0, -1,  0],
                       [ 2,  4,  5,  8,  1]])
-        u = rb.array([[2, 0, 0, 0, 0, -1]])
+        u = rb.array([[2, 0, 0, 0, 0]])
         v = rb.array([[0],
                       [0],
                       [0],
                       [0],
                       [0],
-                      [-1]])
-        A_lambda = A.relational_composition(u, v)
+                      ])
+        A_lambda = A.relational_composition(u, v, -1)
         expected = rb.array([[-1,  2,  3,  4,  0,  0],
                              [ 0, -1,  0,  2,  0,  0],
                              [ 0,  0,  1,  0,  0,  0],
@@ -80,15 +80,15 @@ class TestmatrixOperations(object):
                              [ 2,  4,  5,  8,  0, -1]])
         assert_equal(A_lambda, expected)
 
-        u = rb.array([[0, 0, 0, 0, 0, 0, 1]])
+        u = rb.array([[0, 0, 0, 0, 0, 0]])
         v = rb.array([[0],
                       [3],
                       [0],
                       [0],
                       [0],
                       [0],
-                      [1]])
-        A_lambda_2 = A_lambda.relational_composition(u, v)
+                      ])
+        A_lambda_2 = A_lambda.relational_composition(u, v, 1)
         expected = rb.array([[-1,  2,  3,  4,  0,  0,  5],
                              [ 0, -1,  0,  2,  0,  0,  3],
                              [ 0,  0,  1,  0,  0,  0,  0],
@@ -115,8 +115,8 @@ class TestmatrixOperations(object):
                        [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0],  # S
                        [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
                       ], dtype=np.int32)
-        #               D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J
-        u = rb.array([[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]], dtype=np.int32)
+        #               D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
+        u = rb.array([[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3]], dtype=np.int32)
         v = rb.array([[0],  # D
                       [0],  # E
                       [2],  # R
@@ -130,10 +130,10 @@ class TestmatrixOperations(object):
                       [0],  # G
                       [0],  # Ma
                       [0],  # S
-                      [0],  # Em
-                      [-1]],# J
+                      [0]   # Em
+                      ],
                      dtype=np.int32)
-        A_lambda = A1.relational_composition(u, v, compute_closure=True)
+        A_lambda = A1.relational_composition(u, v, -1, compute_closure=True)
         assert A_lambda[0][12] == 12
         assert A_lambda[0][13] == 13
         assert A_lambda[0][14] == 6

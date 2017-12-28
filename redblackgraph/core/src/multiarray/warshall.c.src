@@ -55,7 +55,7 @@ static void
     npy_intp N_;
     npy_intp s0 = *steps++;
     npy_intp s1 = *steps++;
-    npy_intp s2 = *steps++;
+    /*npy_intp s2 = **/steps++;
 
     npy_intp dm = dimensions[0];
     npy_intp dn = dimensions[0];
@@ -67,7 +67,6 @@ static void
     npy_intp ib2_n = is2_n*dn;
     npy_intp ib2_p = is2_p*dp;
     npy_intp ob_p  = os_p *dp;
-    @type@ before;
     @type@ diameter = 0;
 
     // copy the input to the output

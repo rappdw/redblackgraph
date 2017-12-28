@@ -45,7 +45,7 @@ class _Avos():
     def transitive_closure(self):
         return warshall(self)
 
-    def relational_composition(self, u, v, compute_closure=False):
+    def relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
         u, v represent a vertex, lambda, not currently represented in self, compose A_{\lambda}
@@ -80,8 +80,7 @@ class _Avos():
         assert Nu[0] == 1
         assert Nv[1] == 1
         assert Nu[1] == Nv[0]
-        assert Nu[1] == M + 1
-        assert u[0][-1] == v[-1][0]
+        assert Nu[1] == M
 
         # see discussion: https://stackoverflow.com/questions/26285595/generalized-universal-function-in-numpy
         # unfortunately, his proposal was never merged into Numpy, so the wrapper approach seems to be
@@ -90,13 +89,13 @@ class _Avos():
         # rather than using a wrapper, go a head and in the extra value in the u and v arrays and then
         # let that determine the output size
 
-        uc_lambda = u[:,:-1] @ A_star
-        vc_lambda = A_star @ v[:-1,:]
+        uc_lambda = u @ A_star
+        vc_lambda = A_star @ v
 
         # add the last element from u,v into uc_lambda and vc_lambda and
         # collapse these down to rank 1 arrays, as that is what gufunc is expecting
-        uc_lambda = np.append(uc_lambda[0], u[0][-1]).view(type(u))
-        vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], v[-1][0]).view(type(v))
+        uc_lambda = np.append(uc_lambda[0], c).view(type(u))
+        vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], c).view(type(v))
 
         return relational_composition(uc_lambda, A_star, vc_lambda)
 

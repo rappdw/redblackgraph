@@ -94,7 +94,7 @@ if __name__ == "__main__":
         version=versioneer.get_version(),
         maintainer = "Daniel Rapp",
         maintainer_email = "rappdw@gmail.com",
-        description = 'Linear algebra for a specialized ajacency matrix',
+        description = 'Red Black Graphs',
         long_description = long_description,
         author = "Daniel Rapp",
         download_url = "https://github.com/rappdw/redblackgraph",
@@ -103,7 +103,6 @@ if __name__ == "__main__":
         platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         # test_suite='nose.collector',
         cmdclass={"sdist": sdist_checked},
-        python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
         configuration=configuration
     )
 

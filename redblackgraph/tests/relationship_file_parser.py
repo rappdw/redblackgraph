@@ -83,18 +83,18 @@ if __name__ == "__main__":
     write_resutls("resources/closure.results.csv", inv_map, A_list, m)
 
     # Now perform a relational composition
-    u = np.zeros((1, m + 1), dtype=np.int32).view(rb.array)
+    u = np.zeros((1, m), dtype=np.int32).view(rb.array)
     u[0][p_ids[('D', 'R', '1963')]] = 2
     u[0][p_ids[('B', 'V', '1960')]] = 3
-    v = np.zeros((m + 1, 1), dtype=np.int32).view(rb.array)
+    v = np.zeros((m + 1), dtype=np.int32).view(rb.array)
     inv_map[m] = ('B', 'M-R', '2001')
 
     start_time = time.time()
     for i in range(100):
-        A_lambda = A_star[0].relational_composition(u, v)
+        A_lambda = A_star[0].relational_composition(u, v, 1)
     duration_numpy = time.time() - start_time
     print(f"Average execution time for composition - Numpy: {duration_numpy/100}")
 
-    A_lambda = A_star[0].relational_composition(u, v)
+    A_lambda = A_star[0].relational_composition(u, v, 1)
     A_list = A_lambda.tolist()
     write_resutls("resources/composition.results.csv", inv_map, A_list, m + 1)

@@ -58,16 +58,16 @@ static void
     npy_intp dn = *dimensions++;
     npy_intp dm = *dimensions++;
 
-    npy_intp a_N = *steps++;
+    /*npy_intp a_N = **/steps++;
     npy_intp b_N = *steps++;
-    npy_intp c_N = *steps++;
+    /*npy_intp c_N = **/steps++;
     npy_intp d_N = *steps++;
 
     npy_intp a_n=steps[0], b_i=steps[1], b_j=steps[2], c_n=steps[3], o_i=steps[4], o_j=steps[5];
 
     npy_intp ob_p = o_j * dn;
     npy_intp ib_p = b_j * dm;
-    npy_intp m,n,p;
+    npy_intp m,p;
 
     npy_intp idx = 0;
 
@@ -102,7 +102,7 @@ static void
                 // raise an exception
                 char s[100];
                 memset(s,0,100*sizeof(char));
-                sprintf(s,"Relational composition would result in a cycle. Idx: %i",idx);
+                sprintf(s,"Relational composition would result in a cycle. Idx: %li",idx);
 
                 PyErr_SetString(PyExc_ValueError, s);
                 return;
