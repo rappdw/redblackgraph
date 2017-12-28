@@ -2,8 +2,6 @@
 #include <math.h>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-// TODO: figure out how to set NPY_PY3K correctly, right now just force it to 1
-#define NPY_PY3K 1
 #include <numpy/npy_3kcompat.h>
 #include <numpy/arrayscalars.h>
 
