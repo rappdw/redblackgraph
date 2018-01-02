@@ -3,7 +3,7 @@ from redblackgraph.simple.util import nz_min
 import copy
 
 
-def relational_composition(u, R, v, color):
+def vertex_relational_composition(u, R, v, color):
     '''
     Given simple row vector u, transitively closed matrix R, and simple column vector v where
     u and v represent a vertex, lambda, not currently represented in R, compose R_{\lambda}
@@ -22,7 +22,34 @@ def relational_composition(u, R, v, color):
     for i in range(N):
         R_lambda[i].append(vc_lambda[i][0])
         for j in range(N):
-            if not uc_lambda[0][j] == 0:
+            if uc_lambda[0][j] != 0:
                 R_lambda[i][j] = nz_min(avos(vc_lambda[i][0], uc_lambda[0][j]), R_lambda[i][j])
     R_lambda[N].append(color)
+    return R_lambda
+
+def edge_relational_composition(R, alpha, beta, relationship):
+    '''
+    Given a transitively closed graph, two vertices in that graph, alpha and beta, and the
+    relationship from alpha to beta, compose R'', which is the transitive closure with the
+    new edge included
+    :param R:
+    :param alpha: a vertex in the graph (row index)
+    :param beta: a vertex in the grpah (column index)
+    :param relationship: the relationship (beta's pedigree number in alpha's pedigree)
+    :return: transitive closure of the grpah, R, with new edge
+    '''
+    N = len(R)
+    u_lambda = [R[alpha]]
+    # v_lambda = [[row[beta]] for row in R]
+    u_lambda[0][beta] = relationship
+    # v_lambda[alpha][0] = relationship
+    u_lambda = mat_avos(u_lambda, R)
+    # v_lambda = mat_avos(R, v_lambda)
+    R_lambda = copy.deepcopy(R)
+    R_lambda[alpha] = u_lambda[0]
+    for i in range(N):
+        # R_lambda[i][beta] = v_lambda[i][0]
+        for j in range(N):
+            if R_lambda[alpha][j] != 0:
+                R_lambda[i][j] = nz_min(avos(R_lambda[i][alpha], R_lambda[alpha][j]), R_lambda[i][j])
     return R_lambda
