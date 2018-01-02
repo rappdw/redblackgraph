@@ -40,15 +40,11 @@ def edge_relational_composition(R, alpha, beta, relationship):
     '''
     N = len(R)
     u_lambda = [R[alpha]]
-    # v_lambda = [[row[beta]] for row in R]
     u_lambda[0][beta] = relationship
-    # v_lambda[alpha][0] = relationship
     u_lambda = mat_avos(u_lambda, R)
-    # v_lambda = mat_avos(R, v_lambda)
     R_lambda = copy.deepcopy(R)
     R_lambda[alpha] = u_lambda[0]
     for i in range(N):
-        # R_lambda[i][beta] = v_lambda[i][0]
         for j in range(N):
             if R_lambda[alpha][j] != 0:
                 R_lambda[i][j] = nz_min(avos(R_lambda[i][alpha], R_lambda[alpha][j]), R_lambda[i][j])

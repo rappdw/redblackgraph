@@ -1,7 +1,7 @@
-from redblackgraph.simple import relational_composition
+from redblackgraph.simple import vertex_relational_composition, edge_relational_composition
 
 
-def test_relational_composition():
+def test_vertex_relational_composition():
     # use the A+ from the example in our notebook, add in a sibling to the last vertex in the graph
     A = [[-1, 2, 3, 4, 0],
          [0, -1, 0, 2, 0],
@@ -10,7 +10,7 @@ def test_relational_composition():
          [2, 4, 5, 8, 1]]
     u = [[2, 0, 0, 0, 0]]
     v = [[0], [0], [0], [0], [0]]
-    A_lambda = relational_composition(u, A, v, -1)
+    A_lambda = vertex_relational_composition(u, A, v, -1)
     assert A_lambda == [[-1, 2, 3, 4, 0, 0],
                         [0, -1, 0, 2, 0, 0],
                         [0, 0, 1, 0, 0, 0],
@@ -21,7 +21,7 @@ def test_relational_composition():
     # Using the A_lambda that was generated... Add in the "great-grandmother" to the siblings represented by vertex 4 and 5
     u = [[0, 0, 0, 0, 0, 0]]
     v = [[0], [3], [0], [0], [0], [0]]
-    A_lambda = relational_composition(u, A_lambda, v, 1)
+    A_lambda = vertex_relational_composition(u, A_lambda, v, 1)
     assert A_lambda == [[-1, 2, 3, 4, 0, 0, 5],
                         [0, -1, 0, 2, 0, 0, 3],
                         [0, 0, 1, 0, 0, 0, 0],
@@ -64,7 +64,7 @@ def test_my_use_case():
      [ 0], # S
      [ 0], # Em
      ]
-    A_lambda = relational_composition(u, A1, v, -1)
+    A_lambda = vertex_relational_composition(u, A1, v, -1)
     assert A_lambda[0][12] == 12
     assert A_lambda[0][13] == 13
     assert A_lambda[0][14] == 6
@@ -75,3 +75,16 @@ def test_my_use_case():
     assert A_lambda[8][13] == 5
     assert A_lambda[8][14] == 2
 
+def test_edge_relational_composition():
+    R = [[-1, 0, 3, 0, 0],
+         [ 0,-1, 0, 2, 0],
+         [ 0, 0, 1, 0, 0],
+         [ 0, 0, 0,-1, 0],
+         [ 2, 0, 5, 0, 1]]
+    R_lambda = edge_relational_composition(R, 0, 1, 2)
+    R_expected = [[-1, 2, 3, 4, 0],
+                  [ 0,-1, 0, 2, 0],
+                  [ 0, 0, 1, 0, 0],
+                  [ 0, 0, 0,-1, 0],
+                  [ 2, 4, 5, 8, 1]]
+    assert R_lambda == R_expected

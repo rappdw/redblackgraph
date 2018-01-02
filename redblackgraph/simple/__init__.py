@@ -5,4 +5,4 @@ from .warshall import warshall
 from .vec_avos import vec_avos
 from .mat_avos import mat_avos
 from .calc_relationship import calculate_relationship
-from .rel_composition import relational_composition
+from .rel_composition import vertex_relational_composition, edge_relational_composition
