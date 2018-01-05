@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import ndarray, asarray
-from . import einsum, warshall, vertex_relational_composition
+from . import einsum, warshall, vertex_relational_composition, edge_relational_composition
 
 __all__ = ['array', 'matrix']
 
@@ -48,19 +48,19 @@ class _Avos():
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
-        u, v represent a vertex, lambda, not currently represented in self, compose A_{\lambda}
+        u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
         which is the transitive closure for this graph with lambda included
         :param u: simple row vector for new vertex, lambda
         :param v: simple column vector for new vertex, lambda
         :param c: color of the new vertex, either -1 or 1
-        :param compute_closure: if True, compute the closure of A prior to performing the relational composition
-        :return: transitive closure for Red BLack graph with lambda, new_diameter
+        :param compute_closure: if True, compute the closure of R prior to performing the relational composition
+        :return: transitive closure for Red BLack graph with lambda
         '''
         if compute_closure:
             # todo: should we determine if the composition increases the diameter, and if so, how would we implement
-            A_star, _ = warshall(self)
+            R_star, _ = warshall(self)
         else:
-            A_star = self
+            R_star = self
 
         # if u/v are rank 1 arrays, reshape them
         if len(u.shape) == 1:
@@ -74,7 +74,7 @@ class _Avos():
 
         # validate the constraints, e.g. u/v are row/column vectors sized 1 more than this matrix
         # the last dimension of u/v is the same, u/v are not rank 1 arrays
-        M = A_star.shape[0]
+        M = R_star.shape[0]
         Nu = u.shape
         Nv = v.shape
         assert Nu[0] == 1
@@ -89,15 +89,38 @@ class _Avos():
         # rather than using a wrapper, go a head and in the extra value in the u and v arrays and then
         # let that determine the output size
 
-        uc_lambda = u @ A_star
-        vc_lambda = A_star @ v
+        uc_lambda = u @ R_star
+        vc_lambda = R_star @ v
 
         # add the last element from u,v into uc_lambda and vc_lambda and
         # collapse these down to rank 1 arrays, as that is what gufunc is expecting
         uc_lambda = np.append(uc_lambda[0], c).view(type(u))
         vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], c).view(type(v))
 
-        return vertex_relational_composition(uc_lambda, A_star, vc_lambda)
+        return vertex_relational_composition(uc_lambda, R_star, vc_lambda)
+
+    def edge_relational_composition(self, alpha, beta, np, compute_closure=False):
+        '''
+        Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
+        compose R_{\lambda} which is the transitive closure for this graph with the edge added
+        :param alpha: index in self that is the source of relationship np
+        :param beta: index in self that is the targe of relationship np
+        :param np: the pedigree number of the relationship from alpha to beta
+        :param compute_closure: if True, compute the closure of R prior to performing the relational composition
+        :return: transitive closure for Red BLack graph with lambda, new_diameter
+        '''
+        if compute_closure:
+            # todo: should we determine if the composition increases the diameter, and if so, how would we implement
+            R_star, _ = warshall(self)
+        else:
+            R_star = self
+
+        # loop prevention
+        if R_star[beta][alpha] != 0:
+            raise ValueError("Relational composition would result in a cycle.")
+
+        return edge_relational_composition(R_star, alpha, beta, np)
+
 
 class array(_Avos, ndarray):
     def __new__(cls, *args, **kwargs):

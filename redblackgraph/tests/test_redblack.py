@@ -277,6 +277,20 @@ class TestmatrixOperations(object):
         result = A @ v
         assert_equal(result, expected.reshape((5, 1)))
 
+    def test_edge_relational_composition(self):
+        R = rb.array([[-1, 0, 3, 0, 0],
+                      [ 0,-1, 0, 2, 0],
+                      [ 0, 0, 1, 0, 0],
+                      [ 0, 0, 0,-1, 0],
+                      [ 2, 0, 5, 0, 1]])
+        R_lambda = R.edge_relational_composition(0, 1, 2)
+        expected = rb.array([[-1, 2, 3, 4, 0],
+                             [ 0,-1, 0, 2, 0],
+                             [ 0, 0, 1, 0, 0],
+                             [ 0, 0, 0,-1, 0],
+                             [ 2, 4, 5, 8, 1]])
+        assert_equal(R_lambda, expected)
+
 
 if __name__ == "__main__":
     run_module_suite()

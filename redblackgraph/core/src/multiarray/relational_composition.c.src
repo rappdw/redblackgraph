@@ -39,6 +39,7 @@
  */
 
 char *vertex_relational_composition_signature = "(n),(m,m),(n)->(n,n)";
+char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
 
 /**begin repeat
  * #name = int, long, longlong#
@@ -112,6 +113,122 @@ static void
     }
 }
 
+static void
+@name@_output_alpha_row(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, @type@ beta, @type@ np)
+{
+    @type@ r = 0;
+    const char *ip0 = (char*)ip0_, *ip1 = (char*)ip1_;
+    npy_intp i;
+    for (i = 0; i < n; i++) {
+        @type@ lhs = *(@type@ *)ip0;
+        if (i == beta) {
+            lhs = np;
+        }
+        r = @name@_nz_min(r, @name@_avos(lhs, *(@type@ *)ip1));
+        ip0 += is0;
+        ip1 += is1;
+    }
+    *(@type@ *)op = r;
+}
+
+static void
+@name@_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
+{
+    /* pointers to data for input and output arrays */
+    char *ip1 = args[0];
+    char *ip2 = args[0];
+    @type@ alpha = *(@type@ *)args[1];
+    @type@ beta = *(@type@ *)args[2];
+    @type@ np = *(@type@ *)args[3];
+    char *op = args[4];
+
+    /* lengths of core dimensions */
+    npy_intp dm = dimensions[0];
+    npy_intp dn = dimensions[0];
+    npy_intp dp = dimensions[0];
+
+    /* striding over core dimensions */
+    npy_intp is1_m = steps[0];
+    npy_intp is1_n = steps[1];
+    npy_intp is2_n = steps[0];
+    npy_intp is2_p = steps[1];
+    npy_intp os_m = steps[2];
+    npy_intp os_p = steps[3];
+
+    /* core dimensions counters */
+    npy_intp m, p;
+
+    /* Step 1, set output row_alpha with (input row_alpha +_beta np) avos R */
+    ip1 += is1_m * alpha;
+    op += os_m * alpha;
+    for (p = 0; p < dp; p++) {
+        @name@_output_alpha_row(ip1, is1_n, ip2, is2_n, op, dn, beta, np);
+        /* advance to next column of 2nd input array and output array */
+        ip2 += is2_p;
+        op += os_p;
+    }
+
+    /* reset ip1, ip2, op */
+    ip1 = args[4];
+    ip1 += os_m * alpha;
+    op = args[4];
+    ip2 = args[0];
+
+    /* Step 2, copy input to output, transitivelyl closing any new columns as necessary */
+    for (m = 0; m < dm; m++) {
+        @type@ lhs = *(@type@ *)(ip2 + is2_p * alpha);
+        if (m != alpha) {
+            for (p = 0; p < dp; p++) {
+                if (*(@type@ *)ip1 != 0) {
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)ip2, @name@_avos(lhs, *(@type@ *)ip1));
+                }
+                else {
+                    *(@type@ *)op = *(@type@ *)ip2;
+                }
+
+                /* advance to next column of the alpha row, 2nd input array and output array */
+                ip1 += is1_n;
+                ip2 += is2_p;
+                op  +=  os_p;
+            }
+
+            /* reset to first column of the alpha row, 2nd input array and output array */
+            ip1 -= is1_n * p;
+            ip2 -= is2_p * p;
+            op -= os_p * p;
+
+        }
+        /* advance to next row of 1st input array and output array */
+        ip2 += is1_m;
+        op += os_m;
+    }
+}
+
+static void
+@name@_gufunc_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    /* outer dimensions counter */
+    npy_intp N_;
+
+    /* length of flattened outer dimensions */
+    npy_intp dN = dimensions[0];
+
+    /* striding over flattened outer dimensions for input and output arrays */
+    npy_intp s0 = steps[0];
+    npy_intp s1 = steps[1];
+    npy_intp s2 = steps[2];
+    npy_intp s3 = steps[3];
+    npy_intp s4 = steps[4];
+
+    /*
+     * loop through outer dimensions, performing matrix multiply on
+     * core dimensions for each loop
+     */
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[4] += s4) {
+        @name@_edge_relational_composition(args, dimensions+1, steps+5);
+    }
+}
+
 /**end repeat**/
 
 
@@ -144,4 +261,32 @@ char vertex_relational_composition_signatures[] = {
 /**end repeat**/
 };
 
+PyUFuncGenericFunction edge_relational_composition_functions[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    &@name@_gufunc_edge_relational_composition,
+/**end repeat**/
+};
+void *edge_relational_composition_data[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = npy_int, npy_long, npy_longlong#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    (void *)NULL,
+/**end repeat**/
+};
+
+char edge_relational_composition_signatures[] = {
+/**begin repeat
+ * #name = int, long, longlong#
+ * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
+ * #temptype = npy_int, npy_long, npy_longlong#
+ */
+    @type@, @type@, @type@, @type@, @type@,
+/**end repeat**/
+};
 

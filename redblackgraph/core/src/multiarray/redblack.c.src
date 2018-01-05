@@ -45,6 +45,11 @@ extern void *vertex_relational_composition_data[];
 extern char vertex_relational_composition_signatures[];
 extern char *vertex_relational_composition_signature;
 
+extern PyUFuncGenericFunction edge_relational_composition_functions[];
+extern void *edge_relational_composition_data[];
+extern char edge_relational_composition_signatures[];
+extern char *edge_relational_composition_signature;
+
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
 
@@ -2547,6 +2552,15 @@ PyMODINIT_FUNC initrb_multiarray(void) {
                     "     \"(n),(m,m),(n)->(n,n)\" \n",
                     0, vertex_relational_composition_signature);
     PyDict_SetItemString(d, "vertex_relational_composition", f);
+    Py_DECREF(f);
+
+    f = PyUFunc_FromFuncAndDataAndSignature(edge_relational_composition_functions,
+                    edge_relational_composition_data, edge_relational_composition_signatures,
+                    3, 4, 1, PyUFunc_None, "edge_relational_composition",
+                    "avos edge_relational_composition \n"
+                    "     \"(n),(),(),()->(n,n)\" \n",
+                    0, edge_relational_composition_signature);
+    PyDict_SetItemString(d, "edge_relational_composition", f);
     Py_DECREF(f);
 
     if (PyErr_Occurred()) {
