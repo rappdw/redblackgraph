@@ -98,7 +98,7 @@ class TestmatrixOperations(object):
                              [ 0,  0,  0,  0,  0,  0,  1]])
         assert_equal(A_lambda_2, expected)
 
-    def test_my_use_case(self):
+    def test_my_use_case_vertex(self):
         #       D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
         A1 = rb.array([[-1, 2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D
                        [0, -1,  0,  0,  0,  2,  3,  0,  0,  0,  0,  0,  0,  0],  # E
@@ -290,6 +290,38 @@ class TestmatrixOperations(object):
                              [ 0, 0, 0,-1, 0],
                              [ 2, 4, 5, 8, 1]])
         assert_equal(R_lambda, expected)
+
+    def test_my_use_case_edge(self):
+        #                D  E  R  M  H  Mi A  I Do Ev  G Ma  S Em  J
+        R1 = rb.array([[-1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # D
+                       [ 0,-1, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0],  # E
+                       [ 0, 0, 1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0],  # R
+                       [ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # M
+                       [ 0, 2, 0, 3,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # H
+                       [ 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 2, 3, 0, 0, 0],  # Mi
+                       [ 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],  # A
+                       [ 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # I
+                       [ 0, 0, 0, 0, 0, 0, 0, 0,-1, 3, 0, 0, 0, 0, 2],  # Do
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # Ev
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0],  # G
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # Ma
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0],  # S
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],  # Em
+                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3,-1]   # J
+                       ])
+        R = R1.transitive_closure()[0]
+        # Missing edge is R -> J, 2
+        A_lambda = R.edge_relational_composition(2, 14, 2)
+        assert A_lambda[0][12] == 12
+        assert A_lambda[0][13] == 13
+        assert A_lambda[0][14] == 6
+        assert A_lambda[2][12] == 4
+        assert A_lambda[2][13] == 5
+        assert A_lambda[2][14] == 2
+        assert A_lambda[8][12] == 4
+        assert A_lambda[8][13] == 5
+        assert A_lambda[8][14] == 2
+
 
 
 if __name__ == "__main__":
