@@ -4,7 +4,7 @@ __all__ = []
 
 try:
     from .. import rb_multiarray
-    from ..rb_multiarray import warshall, relational_composition
+    from ..rb_multiarray import warshall, vertex_relational_composition
 except ImportError as exc:
     msg = """
 Importing the multiarray redblackgraph extension module failed.  Most
@@ -23,4 +23,4 @@ from .redblack import *
 
 __all__ += avos_einsumfunc.__all__
 __all__ += redblack.__all__
-__all__ += ['warshall', 'relational_composition']
+__all__ += ['warshall', 'vertex_relational_composition']

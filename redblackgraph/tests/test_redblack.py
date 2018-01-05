@@ -71,7 +71,7 @@ class TestmatrixOperations(object):
                       [0],
                       [0],
                       ])
-        A_lambda = A.relational_composition(u, v, -1)
+        A_lambda = A.vertex_relational_composition(u, v, -1)
         expected = rb.array([[-1,  2,  3,  4,  0,  0],
                              [ 0, -1,  0,  2,  0,  0],
                              [ 0,  0,  1,  0,  0,  0],
@@ -88,7 +88,7 @@ class TestmatrixOperations(object):
                       [0],
                       [0],
                       ])
-        A_lambda_2 = A_lambda.relational_composition(u, v, 1)
+        A_lambda_2 = A_lambda.vertex_relational_composition(u, v, 1)
         expected = rb.array([[-1,  2,  3,  4,  0,  0,  5],
                              [ 0, -1,  0,  2,  0,  0,  3],
                              [ 0,  0,  1,  0,  0,  0,  0],
@@ -133,7 +133,7 @@ class TestmatrixOperations(object):
                       [0]   # Em
                       ],
                      dtype=np.int32)
-        A_lambda = A1.relational_composition(u, v, -1, compute_closure=True)
+        A_lambda = A1.vertex_relational_composition(u, v, -1, compute_closure=True)
         assert A_lambda[0][12] == 12
         assert A_lambda[0][13] == 13
         assert A_lambda[0][14] == 6

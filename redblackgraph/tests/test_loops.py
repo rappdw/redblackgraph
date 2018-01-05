@@ -15,7 +15,7 @@ def test_loop():
     v = rb.array([0, 0, 0, 3, 0])
 
     try:
-        A_lambda = A_star.relational_composition(u, v, 1)
+        A_lambda = A_star.vertex_relational_composition(u, v, 1)
         print(A_lambda)
         assert False
     except ValueError:

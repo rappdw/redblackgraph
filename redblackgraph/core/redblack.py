@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import ndarray, asarray
-from . import einsum, warshall, relational_composition
+from . import einsum, warshall, vertex_relational_composition
 
 __all__ = ['array', 'matrix']
 
@@ -45,7 +45,7 @@ class _Avos():
     def transitive_closure(self):
         return warshall(self)
 
-    def relational_composition(self, u, v, c, compute_closure=False):
+    def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
         u, v represent a vertex, lambda, not currently represented in self, compose A_{\lambda}
@@ -97,7 +97,7 @@ class _Avos():
         uc_lambda = np.append(uc_lambda[0], c).view(type(u))
         vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], c).view(type(v))
 
-        return relational_composition(uc_lambda, A_star, vc_lambda)
+        return vertex_relational_composition(uc_lambda, A_star, vc_lambda)
 
 class array(_Avos, ndarray):
     def __new__(cls, *args, **kwargs):

@@ -38,7 +38,7 @@
  *****************************************************************************
  */
 
-char *relational_composition_signature = "(n),(m,m),(n)->(n,n)";
+char *vertex_relational_composition_signature = "(n),(m,m),(n)->(n,n)";
 
 /**begin repeat
  * #name = int, long, longlong#
@@ -47,7 +47,7 @@ char *relational_composition_signature = "(n),(m,m),(n)->(n,n)";
  */
 
 static void
-@name@_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+@name@_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
 {
     // (n),(m,m),(n) -> (n,n)
     //  a    b    c       d
@@ -115,16 +115,16 @@ static void
 /**end repeat**/
 
 
-PyUFuncGenericFunction relational_composition_functions[] = {
+PyUFuncGenericFunction vertex_relational_composition_functions[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-    &@name@_relational_composition,
+    &@name@_vertex_relational_composition,
 /**end repeat**/
 };
-void *relational_composition_data[] = {
+void *vertex_relational_composition_data[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = npy_int, npy_long, npy_longlong#
@@ -134,7 +134,7 @@ void *relational_composition_data[] = {
 /**end repeat**/
 };
 
-char relational_composition_signatures[] = {
+char vertex_relational_composition_signatures[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#

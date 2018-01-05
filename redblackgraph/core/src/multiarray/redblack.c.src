@@ -40,10 +40,10 @@ extern void *warshall_data[];
 extern char warshall_signatures[];
 extern char *warshall_signature;
 
-extern PyUFuncGenericFunction relational_composition_functions[];
-extern void *relational_composition_data[];
-extern char relational_composition_signatures[];
-extern char *relational_composition_signature;
+extern PyUFuncGenericFunction vertex_relational_composition_functions[];
+extern void *vertex_relational_composition_data[];
+extern char vertex_relational_composition_signatures[];
+extern char *vertex_relational_composition_signature;
 
 /********** PRINTF DEBUG TRACING **************/
 #define NPY_EINSUM_DBG_TRACING 0
@@ -2540,13 +2540,13 @@ PyMODINIT_FUNC initrb_multiarray(void) {
     PyDict_SetItemString(d, "warshall", f);
     Py_DECREF(f);
 
-    f = PyUFunc_FromFuncAndDataAndSignature(relational_composition_functions,
-                    relational_composition_data, relational_composition_signatures,
-                    3, 3, 1, PyUFunc_None, "relational_composition",
-                    "avos relational_composition \n"
+    f = PyUFunc_FromFuncAndDataAndSignature(vertex_relational_composition_functions,
+                    vertex_relational_composition_data, vertex_relational_composition_signatures,
+                    3, 3, 1, PyUFunc_None, "vertex_relational_composition",
+                    "avos vertex_relational_composition \n"
                     "     \"(n),(m,m),(n)->(n,n)\" \n",
-                    0, relational_composition_signature);
-    PyDict_SetItemString(d, "relational_composition", f);
+                    0, vertex_relational_composition_signature);
+    PyDict_SetItemString(d, "vertex_relational_composition", f);
     Py_DECREF(f);
 
     if (PyErr_Occurred()) {
