@@ -206,6 +206,33 @@ static void
 }
 
 static void
+@name@_vertex_relational_composition2(char **args, npy_intp *dimensions, npy_intp *steps)
+{
+    /* pointers to data for input and output arrays */
+    char *ip1 = args[0];
+    char *ip2 = args[1];
+    char *ip3 = args[2];
+    @type@ self = *(@type@ *)args[3];
+    char *op = args[4];
+
+    /* lengths of core dimensions */
+    npy_intp dm = dimensions[0];
+    npy_intp dn = dimensions[0];
+    npy_intp dp = dimensions[0];
+
+    /* striding over core dimensions */
+    npy_intp is1_n = steps[0];
+    npy_intp is2_ni = steps[1];
+    npy_intp is2_nj = steps[2];
+    npy_intp is3_n = steps[3];
+    npy_intp os_ni = steps[4];
+    npy_intp os_nj = steps[5];
+
+    printf("dm: %i, self: %i, is1_n: %i, is2_ni: %i, is2_nj: %i, is3_n: %i, os_ni: %i, os_nj: %i\n", dm, self, is1_n, is2_ni, is2_nj, is3_n, os_ni, os_nj);
+
+}
+
+static void
 @name@_gufunc_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
 {
     /* outer dimensions counter */
@@ -228,9 +255,9 @@ static void
      * loop through outer dimensions, performing matrix multiply on
      * core dimensions for each loop
      */
-//    for (N_ = 0; N_ < dN; N_++, args[0] += s1, args[4] += s4) {
-//        @name@_vertex_relational_composition2(args, dimensions+1, steps+5);
-//    }
+    for (N_ = 0; N_ < dN; N_++, args[0] += s1, args[4] += s4) {
+        @name@_vertex_relational_composition2(args, dimensions+1, steps+5);
+    }
 }
 
 
