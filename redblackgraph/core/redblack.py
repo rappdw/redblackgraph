@@ -114,8 +114,8 @@ class _Avos():
             R_star, _ = warshall(self)
         else:
             R_star = self
-
-        return vertex_relational_composition2(u, R_star, v, c)
+        out = np.empty(shape=(R_star.shape[0]+1, R_star.shape[1]+1), dtype=R_star.dtype)
+        return vertex_relational_composition2(u, R_star, v, c, out)
 
     def edge_relational_composition(self, alpha, beta, np, compute_closure=False):
         '''

@@ -39,7 +39,7 @@
  */
 
 char *vertex_relational_composition_signature = "(n),(m,m),(n)->(n,n)";
-char *vertex_relational_composition2_signature = "(n),(n,n),(n),()->(n,n)";
+char *vertex_relational_composition2_signature = "(n),(n,n),(n),()->(m,m)";
 char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
 //char *edge_relational_composition2_signature = "(),(n,n),(),()->(n,n)"; // for symmetry
 
@@ -235,7 +235,7 @@ static void
     npy_intp n;
 
     /* Step 1, set output R_\lambda[n+1] = u avos R (add the new row for vertex_\lambda) */
-    op += os_i * (dn - 1); // this should be dn... dn-1 is just for testing until we get the computed dimensions working
+    op += os_i * dn;
     for (n = 0; n < dn; n++) {
         @name@_vector_avos(ipu, isu_n, ipR, isR_i, op, dn, 0, 0);
         /* advance to next column of R and R_lambda (output) */
@@ -243,12 +243,16 @@ static void
         op += os_j;
     }
 
+    /* Set the self element in the added row */
+    *(@type@ *)op = self;
+
+
     /* reset op */
     ipR = args[1];
     op = args[4];
 
     /* Step 2, set output R_\lambda[:][n+1] = R avos v (add the new column for vertex_\lambda) */
-    op += os_j * (dn - 1); // This should be dn... dn-1 is just for testing untl computed dimensions working
+    op += os_j * dn;
     for (n = 0; n < dn; n++) {
         @name@_vector_avos(ipR, isR_j, ipv, isv_n, op, dn, 0, 0);
         /* advance to next row of R and R_lambda*/
@@ -280,21 +284,22 @@ static void
     }
 
     /* reset u, v */
-    ipu = args[0];
-    ipv = args[2];
+    ipu = args[4] + os_i * dn;
+    ipv = args[4] + os_j * dn;
 
     /* Step 4, transitively close R_\lambda */
+    // ipv and ipu need to be set to the row/column we added above
     for (m = 0; m < dn; m++) {
         for (p = 0; p < dn; p++) {
             *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR, @name@_avos(*(@type@ *)ipv, *(@type@ *)ipu));
             ipR += isR_j;
-            ipu += isu_n;
+            ipu += isR_j;
             op += os_j;
         }
         op  += os_i - os_j;
         ipR += isR_i - isR_j;
-        ipv += isv_n;
-        ipu -= isu_n * dn;
+        ipv += os_i;
+        ipu -= isR_j * dn;
     }
 }
 
