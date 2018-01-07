@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import ndarray, asarray
-from . import einsum, warshall, vertex_relational_composition, edge_relational_composition
+from . import einsum, warshall, vertex_relational_composition, vertex_relational_composition2, edge_relational_composition
 
 __all__ = ['array', 'matrix']
 
@@ -98,6 +98,24 @@ class _Avos():
         vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], c).view(type(v))
 
         return vertex_relational_composition(uc_lambda, R_star, vc_lambda)
+
+    def vertex_relational_composition2(self, u, v, c, compute_closure=False):
+        '''
+        Given simple row vector u, and simple column vector v where
+        u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
+        which is the transitive closure for this graph with lambda included
+        :param u: simple row vector for new vertex, lambda
+        :param v: simple column vector for new vertex, lambda
+        :param c: color of the new vertex, either -1 or 1
+        :param compute_closure: if True, compute the closure of R prior to performing the relational composition
+        :return: transitive closure for Red BLack graph with lambda
+        '''
+        if compute_closure:
+            R_star, _ = warshall(self)
+        else:
+            R_star = self
+
+        return vertex_relational_composition2(u, R_star, v, c)
 
     def edge_relational_composition(self, alpha, beta, np, compute_closure=False):
         '''

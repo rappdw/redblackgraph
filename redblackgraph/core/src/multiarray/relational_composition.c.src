@@ -209,18 +209,20 @@ static void
 @name@_gufunc_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
 {
     /* outer dimensions counter */
-//    npy_intp N_;
+    npy_intp N_;
 
     /* length of flattened outer dimensions */
-//    npy_intp dN = dimensions[0];
+    npy_intp dN = dimensions[0];
 
     /* striding over flattened outer dimensions for input and output arrays */
     // (n),(n,n),(n),()->(n+1,n+1)
-//    npy_intp s0 = steps[0];
-//    npy_intp s1 = steps[1];
-//    npy_intp s2 = steps[2];
-//    npy_intp s3 = steps[3];
-//    npy_intp s4 = steps[4];
+    npy_intp s0 = steps[0];
+    npy_intp s1 = steps[1];
+    npy_intp s2 = steps[2];
+    npy_intp s3 = steps[3];
+    npy_intp s4 = steps[4];
+
+    printf("dN: %i, s0: %i, s1: %i, s2: %i, s3: %i, s4: %i\n", dN, s0, s1, s2, s3, s4);
 
     /*
      * loop through outer dimensions, performing matrix multiply on
