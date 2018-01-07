@@ -230,8 +230,6 @@ static void
     npy_intp os_i = steps[4]; // stride over Output rows
     npy_intp os_j = steps[5]; // stride over Output columns
 
-    printf("dn: %i, dm: %i, self: %i, isu_n: %i, isR_i: %i, isR_j: %i, isv_n: %i, os_i: %i, os_j: %i\n", dn, dm, self, isu_n, isR_i, isR_j, isv_n, os_i, os_j);
-
     /* core dimensions counters */
     npy_intp n;
 
