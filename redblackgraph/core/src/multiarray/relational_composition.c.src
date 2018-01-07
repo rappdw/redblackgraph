@@ -41,6 +41,7 @@
 char *vertex_relational_composition_signature = "(n),(m,m),(n)->(n,n)";
 char *vertex_relational_composition2_signature = "(n),(n,n),(n),()->(n,n)";
 char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
+//char *edge_relational_composition2_signature = "(),(n,n),(),()->(n,n)"; // for symmetry
 
 /**begin repeat
  * #name = int, long, longlong#
@@ -122,7 +123,7 @@ static void
     npy_intp i;
     for (i = 0; i < n; i++) {
         @type@ lhs = *(@type@ *)ip0;
-        if (i == beta) {
+        if (np != 0 && i == beta) {
             lhs = np;
         }
         r = @name@_nz_min(r, @name@_avos(lhs, *(@type@ *)ip1));
@@ -209,26 +210,36 @@ static void
 @name@_vertex_relational_composition2(char **args, npy_intp *dimensions, npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
-    char *ip1 = args[0];
-    char *ip2 = args[1];
-    char *ip3 = args[2];
+    char *ipu = args[0];
+    char *ipR = args[1];
+    char *ipv = args[2];
     @type@ self = *(@type@ *)args[3];
     char *op = args[4];
 
     /* lengths of core dimensions */
-    npy_intp dm = dimensions[0];
     npy_intp dn = dimensions[0];
-    npy_intp dp = dimensions[0];
 
     /* striding over core dimensions */
-    npy_intp is1_n = steps[0];
-    npy_intp is2_ni = steps[1];
-    npy_intp is2_nj = steps[2];
-    npy_intp is3_n = steps[3];
-    npy_intp os_ni = steps[4];
-    npy_intp os_nj = steps[5];
+    npy_intp isu_n = steps[0]; // stride over u elements
+    npy_intp isR_i = steps[1]; // stride over R rows
+    npy_intp isR_j = steps[2]; // stride over R columns
+    npy_intp isv_n = steps[3]; // stride over v elements
+    npy_intp os_i = steps[4]; // stride over Output rows
+    npy_intp os_j = steps[5]; // stride over Output columns
 
-    printf("dm: %i, self: %i, is1_n: %i, is2_ni: %i, is2_nj: %i, is3_n: %i, os_ni: %i, os_nj: %i\n", dm, self, is1_n, is2_ni, is2_nj, is3_n, os_ni, os_nj);
+    printf("dm: %i, self: %i, isu_n: %i, isR_i: %i, isR_j: %i, isv_n: %i, os_i: %i, os_j: %i\n", dn, self, isu_n, isR_i, isR_j, isv_n, os_i, os_j);
+
+    /* core dimensions counters */
+    npy_intp n;
+
+    /* Step 1, set output R_\lambda[n+1] = u avos R (add the new row for vertex_\lambda) */
+    op += os_i * (dn - 1); // this should be dn... dn-1 is just for testing until we get the computed dimensions working
+    for (n = 0; n < dn; n++) {
+        @name@_output_row_matrix_avos(ipu, isu_n, ipR, isR_i, op, dn, 0, 0);
+        /* advance to next column of R and R_lambda (output) */
+        ipR += isR_j;
+        op += os_j;
+    }
 
 }
 
@@ -248,8 +259,6 @@ static void
     npy_intp s2 = steps[2];
     npy_intp s3 = steps[3];
     npy_intp s4 = steps[4];
-
-    printf("dN: %i, s0: %i, s1: %i, s2: %i, s3: %i, s4: %i\n", dN, s0, s1, s2, s3, s4);
 
     /*
      * loop through outer dimensions, performing matrix multiply on
