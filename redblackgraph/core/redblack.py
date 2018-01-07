@@ -45,7 +45,7 @@ class _Avos():
     def transitive_closure(self):
         return warshall(self)
 
-    def vertex_relational_composition(self, u, v, c, compute_closure=False):
+    def vertex_relational_composition2(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
         u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
@@ -99,7 +99,7 @@ class _Avos():
 
         return vertex_relational_composition(uc_lambda, R_star, vc_lambda)
 
-    def vertex_relational_composition2(self, u, v, c, compute_closure=False):
+    def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
         u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
@@ -114,8 +114,19 @@ class _Avos():
             R_star, _ = warshall(self)
         else:
             R_star = self
-        out = np.empty(shape=(R_star.shape[0]+1, R_star.shape[1]+1), dtype=R_star.dtype)
-        return vertex_relational_composition2(u, R_star, v, c, out)
+
+        # u and v should be rank 1
+        if len(u.shape) > 1:
+            u = u.reshape((1, R_star.shape[0]))[0]
+        if len(v.shape) > 1:
+            v = v.reshape((1, R_star.shape[1]))[0]
+
+        out = np.empty(shape=(R_star.shape[0] + 1, R_star.shape[1] + 1), dtype=R_star.dtype).view(type(self))
+        try:
+            return vertex_relational_composition2(u, R_star, v, c, out)
+        except ValueError as e:
+            print(out)
+            raise e
 
     def edge_relational_composition(self, alpha, beta, np, compute_closure=False):
         '''

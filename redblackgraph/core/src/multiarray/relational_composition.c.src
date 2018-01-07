@@ -220,6 +220,7 @@ static void
 
     /* lengths of core dimensions */
     npy_intp dn = dimensions[0];
+    npy_intp dm = dimensions[1];
 
     /* striding over core dimensions */
     npy_intp isu_n = steps[0]; // stride over u elements
@@ -229,7 +230,7 @@ static void
     npy_intp os_i = steps[4]; // stride over Output rows
     npy_intp os_j = steps[5]; // stride over Output columns
 
-    printf("dm: %i, self: %i, isu_n: %i, isR_i: %i, isR_j: %i, isv_n: %i, os_i: %i, os_j: %i\n", dn, self, isu_n, isR_i, isR_j, isv_n, os_i, os_j);
+    printf("dn: %i, dm: %i, self: %i, isu_n: %i, isR_i: %i, isR_j: %i, isv_n: %i, os_i: %i, os_j: %i\n", dn, dm, self, isu_n, isR_i, isR_j, isv_n, os_i, os_j);
 
     /* core dimensions counters */
     npy_intp n;
@@ -264,8 +265,9 @@ static void
     ipR = args[1];
     op = args[4];
 
-    /* output dimension counters */
-    npy_intp m, p;
+    // ipv and ipu need to be set to the row/column we added above
+    ipu = args[4] + os_i * dn;
+    ipv = args[4] + os_j * dn;
 
     /* Step 3, check for cycle constraint violation */
     for (n = 0; n < dn; n++) {
@@ -274,32 +276,43 @@ static void
             // raise an exception
             char s[100];
             memset(s, 0, 100*sizeof(char));
-            sprintf(s,"Relational composition would result in a cycle. Idx: %li", n);
+            sprintf(s,"Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", n, *(@type@ *)ipu, *(@type@ *)ipv);
 
             PyErr_SetString(PyExc_ValueError, s);
             return;
         }
-        ipu += isu_n;
-        ipv += isv_n;
+        ipu += os_j;
+        ipv += os_i;
     }
 
-    /* reset u, v */
+    /* Step 4, transitively close R_\lambda */
+
+    // output dimension counters
+    npy_intp m, p;
+
+    // ipv and ipu need to be set to the row/column we added above
     ipu = args[4] + os_i * dn;
     ipv = args[4] + os_j * dn;
 
-    /* Step 4, transitively close R_\lambda */
-    // ipv and ipu need to be set to the row/column we added above
     for (m = 0; m < dn; m++) {
         for (p = 0; p < dn; p++) {
             *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR, @name@_avos(*(@type@ *)ipv, *(@type@ *)ipu));
+
+            // advance to next column of u, R and output
             ipR += isR_j;
-            ipu += isR_j;
+            ipu += os_j;
             op += os_j;
         }
-        op  += os_i - os_j;
-        ipR += isR_i - isR_j;
+
+        // reset to first column of u, R and output
+        ipR -= isR_j * p;
+        ipu -= os_j * p;
+        op -= os_j * p;
+
+        // advance to the next row of R, v and output
+        ipR += isR_i;
         ipv += os_i;
-        ipu -= isR_j * dn;
+        op += os_i;
     }
 }
 
