@@ -116,13 +116,15 @@ static void
 }
 
 static void
-@name@_output_row_matrix_avos(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, @type@ beta, @type@ np)
+@name@_vector_avos(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, @type@ beta, @type@ np)
 {
     @type@ r = 0;
     const char *ip0 = (char*)ip0_, *ip1 = (char*)ip1_;
     npy_intp i;
     for (i = 0; i < n; i++) {
         @type@ lhs = *(@type@ *)ip0;
+        // if np is non-zero, then replace it as the LHS for column beta, otherwise this is a
+        // straight avos product
         if (np != 0 && i == beta) {
             lhs = np;
         }
@@ -164,7 +166,7 @@ static void
     ip1 += is1_m * alpha;
     op += os_m * alpha;
     for (p = 0; p < dp; p++) {
-        @name@_output_row_matrix_avos(ip1, is1_n, ip2, is2_n, op, dn, beta, np);
+        @name@_vector_avos(ip1, is1_n, ip2, is2_n, op, dn, beta, np);
         /* advance to next column of 2nd input array and output array */
         ip2 += is2_p;
         op += os_p;
@@ -235,12 +237,28 @@ static void
     /* Step 1, set output R_\lambda[n+1] = u avos R (add the new row for vertex_\lambda) */
     op += os_i * (dn - 1); // this should be dn... dn-1 is just for testing until we get the computed dimensions working
     for (n = 0; n < dn; n++) {
-        @name@_output_row_matrix_avos(ipu, isu_n, ipR, isR_i, op, dn, 0, 0);
+        @name@_vector_avos(ipu, isu_n, ipR, isR_i, op, dn, 0, 0);
         /* advance to next column of R and R_lambda (output) */
         ipR += isR_j;
         op += os_j;
     }
 
+    /* reset op */
+    ipR = args[1];
+    op = args[4];
+
+    /* Step 2, set output R_\lambda[:][n+1] = R avos v (add the new column for vertex_\lambda) */
+    op += os_j * (dn - 1); // This should be dn... dn-1 is just for testing untl computed dimensions working
+    for (n = 0; n < dn; n++) {
+        @name@_vector_avos(ipR, isR_j, ipv, isv_n, op, dn, 0, 0);
+        /* advance to next row of R and R_lambda*/
+        ipR += isR_i;
+        op += os_i;
+    }
+
+    /* reset op */
+    ipR = args[1];
+    op = args[4];
 }
 
 static void
