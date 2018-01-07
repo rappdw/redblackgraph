@@ -259,6 +259,43 @@ static void
     /* reset op */
     ipR = args[1];
     op = args[4];
+
+    /* output dimension counters */
+    npy_intp m, p;
+
+    /* Step 3, check for cycle constraint violation */
+    for (n = 0; n < dn; n++) {
+        if ((*(@type@ *)ipv != 0) && (*(@type@ *)ipu != 0)) {
+            // This condition indicates a violation of the cycle constraint
+            // raise an exception
+            char s[100];
+            memset(s, 0, 100*sizeof(char));
+            sprintf(s,"Relational composition would result in a cycle. Idx: %li", n);
+
+            PyErr_SetString(PyExc_ValueError, s);
+            return;
+        }
+        ipu += isu_n;
+        ipv += isv_n;
+    }
+
+    /* reset u, v */
+    ipu = args[0];
+    ipv = args[2];
+
+    /* Step 4, transitively close R_\lambda */
+    for (m = 0; m < dn; m++) {
+        for (p = 0; p < dn; p++) {
+            *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR, @name@_avos(*(@type@ *)ipv, *(@type@ *)ipu));
+            ipR += isR_j;
+            ipu += isu_n;
+            op += os_j;
+        }
+        op  += os_i - os_j;
+        ipR += isR_i - isR_j;
+        ipv += isv_n;
+        ipu -= isu_n * dn;
+    }
 }
 
 static void
