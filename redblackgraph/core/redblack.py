@@ -57,47 +57,18 @@ class _Avos():
         :return: transitive closure for Red BLack graph with lambda
         '''
         if compute_closure:
-            # todo: should we determine if the composition increases the diameter, and if so, how would we implement
             R_star, _ = warshall(self)
         else:
             R_star = self
 
-        # if u/v are rank 1 arrays, reshape them
-        if len(u.shape) == 1:
-            u = u.reshape(1, u.shape[0])
-        if len(v.shape) == 1:
-            v = v.reshape(v.shape[0], 1)
+        # u and v should be rank 1
+        if len(u.shape) > 1:
+            u = u.reshape((1, R_star.shape[0]))[0]
+        if len(v.shape) > 1:
+            v = v.reshape((1, R_star.shape[1]))[0]
 
-        # discussion: this perhaps should all be implemented in a c-extension, either an API or a gufunc.
-        # however, the overhead of making the calls required to set this up in python is minimal compared
-        # to the linalg execution. Plus the code is much more readable and understandable in python.
-
-        # validate the constraints, e.g. u/v are row/column vectors sized 1 more than this matrix
-        # the last dimension of u/v is the same, u/v are not rank 1 arrays
-        M = R_star.shape[0]
-        Nu = u.shape
-        Nv = v.shape
-        assert Nu[0] == 1
-        assert Nv[1] == 1
-        assert Nu[1] == Nv[0]
-        assert Nu[1] == M
-
-        # see discussion: https://stackoverflow.com/questions/26285595/generalized-universal-function-in-numpy
-        # unfortunately, his proposal was never merged into Numpy, so the wrapper approach seems to be
-        # best way to do this
-
-        # rather than using a wrapper, go a head and in the extra value in the u and v arrays and then
-        # let that determine the output size
-
-        uc_lambda = u @ R_star
-        vc_lambda = R_star @ v
-
-        # add the last element from u,v into uc_lambda and vc_lambda and
-        # collapse these down to rank 1 arrays, as that is what gufunc is expecting
-        uc_lambda = np.append(uc_lambda[0], c).view(type(u))
-        vc_lambda = np.append(vc_lambda.reshape(1, vc_lambda.shape[0])[0], c).view(type(v))
-
-        return vertex_relational_composition(uc_lambda, R_star, vc_lambda)
+        out = np.empty(shape=(R_star.shape[0] + 1, R_star.shape[1] + 1), dtype=R_star.dtype).view(type(self))
+        return vertex_relational_composition(u, R_star, v, c, out)
 
     def edge_relational_composition(self, alpha, beta, np, compute_closure=False):
         '''

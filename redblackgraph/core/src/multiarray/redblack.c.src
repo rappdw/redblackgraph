@@ -2547,9 +2547,9 @@ PyMODINIT_FUNC initrb_multiarray(void) {
 
     f = PyUFunc_FromFuncAndDataAndSignature(vertex_relational_composition_functions,
                     vertex_relational_composition_data, vertex_relational_composition_signatures,
-                    3, 3, 1, PyUFunc_None, "vertex_relational_composition",
+                    3, 4, 1, PyUFunc_None, "vertex_relational_composition",
                     "avos vertex_relational_composition \n"
-                    "     \"(n),(m,m),(n)->(n,n)\" \n",
+                    "     \"(n),(n,n),(n),()->(n,n)\" \n",
                     0, vertex_relational_composition_signature);
     PyDict_SetItemString(d, "vertex_relational_composition", f);
     Py_DECREF(f);
