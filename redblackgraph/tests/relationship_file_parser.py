@@ -1,9 +1,7 @@
 import csv
 from collections import defaultdict
-import time
 import numpy as np
 import redblackgraph as rb
-from redblackgraph.simple.warshall import warshall
 
 
 def get_person_id(p, d):
@@ -59,42 +57,22 @@ if __name__ == "__main__":
             A[i][key] = row[key]
 
     # compute the transitive closure: Compare execution tie of Numpy and pure Python
-    start_time = time.time()
-    for i in range(100):
-        A_star = A.transitive_closure()
-    duration_numpy = time.time() - start_time
-    A_star = A.transitive_closure()
-
-    duration_python = 1.5 * 3
-    if False:
-        start_time = time.time()
-        for i in range(3):
-            A_star = warshall(A)
-        duration_python = time.time() - start_time
+    A_star, diameter = A.transitive_closure()
 
     cardinality = A.cardinality()
 
-    print(f"Diameter: {A_star[1]}, # of male: {cardinality['red']}, # of female: {cardinality['black']}, "
-          f"Average execution time for closure - Python: {duration_python/3}, Numpy: {duration_numpy/100}")
-
     # write out the results
     inv_map = {v: k for k, v in p_ids.items()}
-    A_list = A_star[0].tolist()
+    A_list = A_star.tolist()
     write_resutls("resources/closure.results.csv", inv_map, A_list, m)
 
     # Now perform a relational composition
-    u = np.zeros((1, m), dtype=np.int32).view(rb.array)
-    u[0][p_ids[('D', 'R', '1963')]] = 2
-    u[0][p_ids[('B', 'V', '1960')]] = 3
-    v = np.zeros((m + 1), dtype=np.int32).view(rb.array)
+    u = np.zeros((m,), dtype=np.int32).view(rb.array)
+    u[p_ids[('D', 'R', '1963')]] = 2
+    u[p_ids[('B', 'V', '1960')]] = 3
+    v = np.zeros((m,), dtype=np.int32).view(rb.array)
     inv_map[m] = ('B', 'M-R', '2001')
 
-    start_time = time.time()
-    for i in range(100):
-        A_lambda = A_star[0].vertex_relational_composition(u, v, 1)
-    duration_numpy = time.time() - start_time
-    print(f"Average execution time for composition - Numpy: {duration_numpy/100}")
-
-    A_lambda = A_star[0].vertex_relational_composition(u, v, 1)
+    A_lambda = A_star.vertex_relational_composition(u, v, 1)
     A_list = A_lambda.tolist()
     write_resutls("resources/composition.results.csv", inv_map, A_list, m + 1)
