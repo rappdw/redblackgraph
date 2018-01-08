@@ -38,8 +38,7 @@
  *****************************************************************************
  */
 
-char *vertex_relational_composition_signature = "(n),(m,m),(n)->(n,n)";
-char *vertex_relational_composition2_signature = "(n),(n,n),(n),()->(m,m)";
+char *vertex_relational_composition_signature = "(n),(n,n),(n),()->(m,m)";
 char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
 //char *edge_relational_composition2_signature = "(),(n,n),(),()->(n,n)"; // for symmetry
 
@@ -48,72 +47,6 @@ char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-
-static void
-@name@_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
-{
-    // (n),(m,m),(n) -> (n,n)
-    //  a    b    c       d
-    npy_intp N_;
-    npy_intp dN = *dimensions++;
-    npy_intp dn = *dimensions++;
-    npy_intp dm = *dimensions++;
-
-    /*npy_intp a_N = **/steps++;
-    npy_intp b_N = *steps++;
-    /*npy_intp c_N = **/steps++;
-    npy_intp d_N = *steps++;
-
-    npy_intp a_n=steps[0], b_i=steps[1], b_j=steps[2], c_n=steps[3], o_i=steps[4], o_j=steps[5];
-
-    npy_intp ob_p = o_j * dn;
-    npy_intp ib_p = b_j * dm;
-    npy_intp m,p;
-
-    npy_intp idx = 0;
-
-    for (N_ = 0; N_ < dN; N_++, args[1] += b_N, args[3] += d_N) {
-        char *in=args[1];
-        char *v=args[2];
-        char *u_val=args[0];
-        char *op=args[3];
-        for (m = 0; m < dn; m++) {
-            char *u=args[0];
-            for (p = 0; p < dn; p++) {
-                if ((m < dm) && (p < dm)) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)in, @name@_avos(*(@type@ *)v, *(@type@ *)u));
-                    in  +=  b_j;
-                    u += a_n;
-                }
-                else {
-                    if (m == dm) {
-                        *(@type@ *)op = *(@type@ *)u;
-                        u += a_n;
-                    }
-                    else if (p == dm) {
-                        *(@type@ *)op = *(@type@ *)v;
-                    }
-                }
-                op  +=  o_j;
-            }
-            op  +=  o_i - ob_p;
-            in  +=  b_i - ib_p;
-            if (idx < dm && (*(@type@ *)v != 0) && (*(@type@ *)u_val != 0)) {
-                // This condition indicates a violation of the cycle constraint
-                // raise an exception
-                char s[100];
-                memset(s,0,100*sizeof(char));
-                sprintf(s,"Relational composition would result in a cycle. Idx: %li",idx);
-
-                PyErr_SetString(PyExc_ValueError, s);
-                return;
-            }
-            v += c_n;
-            u_val += c_n;
-            idx += 1;
-        }
-    }
-}
 
 static void
 @name@_vector_avos(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, @type@ beta, @type@ np)
@@ -209,7 +142,7 @@ static void
 }
 
 static void
-@name@_vertex_relational_composition2(char **args, npy_intp *dimensions, npy_intp *steps)
+@name@_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
     char *ipu = args[0];
@@ -336,7 +269,7 @@ static void
      * core dimensions for each loop
      */
     for (N_ = 0; N_ < dN; N_++, args[0] += s1, args[4] += s4) {
-        @name@_vertex_relational_composition2(args, dimensions+1, steps+5);
+        @name@_vertex_relational_composition(args, dimensions+1, steps+5);
     }
 }
 
@@ -375,7 +308,7 @@ PyUFuncGenericFunction vertex_relational_composition_functions[] = {
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-    &@name@_vertex_relational_composition,
+    &@name@_gufunc_vertex_relational_composition,
 /**end repeat**/
 };
 void *vertex_relational_composition_data[] = {
@@ -389,35 +322,6 @@ void *vertex_relational_composition_data[] = {
 };
 
 char vertex_relational_composition_signatures[] = {
-/**begin repeat
- * #name = int, long, longlong#
- * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
- * #temptype = npy_int, npy_long, npy_longlong#
- */
-    @type@, @type@, @type@, @type@,
-/**end repeat**/
-};
-
-PyUFuncGenericFunction vertex_relational_composition2_functions[] = {
-/**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
- */
-    &@name@_gufunc_vertex_relational_composition,
-/**end repeat**/
-};
-void *vertex_relational_composition2_data[] = {
-/**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
- */
-    (void *)NULL,
-/**end repeat**/
-};
-
-char vertex_relational_composition2_signatures[] = {
 /**begin repeat
  * #name = int, long, longlong#
  * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
