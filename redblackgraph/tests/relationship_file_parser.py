@@ -5,18 +5,30 @@ import redblackgraph as rb
 
 
 def get_person_id(p, d):
-    if not p in d:
-        d[p] = d['p_id']
-        d['p_id'] += 1
-    return d[p]
+    """
+    Given a person/bdate tuple, return the person_id (either looking up the person if
+    already created an id, or generate a new one).
+
+    If the person tuple is empty, returns None
+    :param p: person tuple, given name, surname
+    :param d: birthdate
+    :return:
+    """
+    if p[0] or p[1]:
+        if not p in d:
+            d[p] = d['p_id']
+            d['p_id'] += 1
+        return d[p]
+    return None
 
 def add_person(p_id, c, d, f_id=None, m_id=None):
-    row = d[p_id]
-    row[p_id] = c
-    if not f_id is None:
-        row[f_id] = 2
-    if not m_id is None:
-        row[m_id] = 3
+    if p_id is not None:
+        row = d[p_id]
+        row[p_id] = c
+        if not f_id is None:
+            row[f_id] = 2
+        if not m_id is None:
+            row[m_id] = 3
 
 def write_resutls(filename, inv_map, A_list, m):
     with open(filename, "w") as csvfile:
@@ -48,6 +60,8 @@ if __name__ == "__main__":
             add_person(p_id, int(row[3]), rows, f_id, m_id)
             add_person(f_id, -1, rows)
             add_person(m_id, 1, rows)
+    inv_map = {v: k for k, v in p_ids.items()}
+
     # create an numpy array with the correct shape and load it with the tuples
     m = len(rows)
     A = np.zeros((m, m), dtype=np.int32).view(rb.array)
@@ -56,13 +70,14 @@ if __name__ == "__main__":
         for key in row.keys():
             A[i][key] = row[key]
 
+    write_resutls("resources/r.csv", inv_map, A.tolist(), m)
+
     # compute the transitive closure: Compare execution tie of Numpy and pure Python
     A_star, diameter = A.transitive_closure()
 
     cardinality = A.cardinality()
 
     # write out the results
-    inv_map = {v: k for k, v in p_ids.items()}
     A_list = A_star.tolist()
     write_resutls("resources/closure.results.csv", inv_map, A_list, m)
 
