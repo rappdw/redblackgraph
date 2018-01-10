@@ -1,3 +1,13 @@
+"""
+Relationship File IO is a collection of utilities to parse an input csv file
+into a RB Graph.
+
+The input file format consists of multiple rows of thw following format:
+#First Name,Surname,Birthyear,Gender,Father FN,Father Sn,Father By,Mother FN,Mother Sn,Mother By
+
+While it's possible for a given column (aside from gender) to be missing, it is required that
+each individual in the input file can be uniquely identified by the tuple (FN,Sn,By)
+"""
 import csv
 from collections import defaultdict
 from typing import Tuple, Optional
