@@ -43,13 +43,14 @@ def find_components_extended(A):
                             u[k] = u[j]
                             q[row_component_number] -= 1
                             q[u[j]] += 1
+                    if i > j:
+                        u[i] = u[j]
+                        q[u[j]] += 1
+                        q[row_component_number] -= 1
                     component_number -= 1
                     row_component_number = u[j]
-                    if i > j:
-                        u[i] = row_component_number
-                        q[row_component_number] += 1
         v[i] = row_max
-    return (u, v, q)
+    return (u, v, {k:v for k,v in q.items() if v != 0})
 
 def triangularize(A):
     """

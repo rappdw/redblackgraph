@@ -1,12 +1,9 @@
 def find_components(A):
     """
-    Given an input adjacency matrix (assumed to be transitively closed), compute the connected
-    components
-    :param A: input adjacency matrix
-    :return: a tuple of:
-      [0] - a vector with matching length of A with the elements holding the connected component id of
+    Given an input adjacency matrix compute the connected components
+    :param A: input adjacency matrix (transitively closed)
+    :return: a vector with matching length of A with the elements holding the connected component id of
     the identified connected components
-      [1] - the number of connected components identified
     """
     u = [0] * len(A)
     component_number = 1
@@ -30,4 +27,4 @@ def find_components(A):
                     component_number -= 1
                     row_component_number = u[j]
                     u[i] = row_component_number
-    return (u, component_number)
+    return u
