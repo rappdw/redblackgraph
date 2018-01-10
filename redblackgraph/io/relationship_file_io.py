@@ -116,18 +116,18 @@ class RedBlackGraphWriter:
 
 
 if __name__ == "__main__":
-    reader = RelationshipFileReader("../tests/resources/person-relationship.csv")
+    reader = RelationshipFileReader("../../tests/resources/person-relationship.csv")
     R = reader()
 
     writer = RedBlackGraphWriter(reader.get_vertex_key())
-    writer(R, output_file="../tests/resources/r.csv")
+    writer(R, output_file="../../tests/resources/r.csv")
 
     # compute the transitive closure
     R_star, diameter = R.transitive_closure()
     cardinality = R.cardinality()
 
     # write out the results
-    writer(R_star, output_file="../tests/resources/closure.results.csv")
+    writer(R_star, output_file="../../tests/resources/closure.results.csv")
     components = smp.find_components(R_star.tolist())
     print(f"Found {components[1]} connected components")
 
@@ -139,6 +139,6 @@ if __name__ == "__main__":
     writer.append_vertex_key(('B', 'M-R', '2001'))
 
     R_lambda = R_star.vertex_relational_composition(u, v, 1)
-    writer(R_lambda, output_file="../tests/resources/composition.results.csv")
+    writer(R_lambda, output_file="../../tests/resources/composition.results.csv")
     components = smp.find_components(R_lambda.tolist())
     print(f"Found {components[1]} connected components")
