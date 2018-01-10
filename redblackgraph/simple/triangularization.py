@@ -72,8 +72,10 @@ def triangularize(A):
     # from the permutation basis, create the permutation matrix
     n = len(permutation_basis)
     P = np.zeros(shape=(n, n), dtype=np.int32)
+    P_transpose = np.zeros(shape=(n, n), dtype=np.int32)
     for idx, element in enumerate(permutation_basis):
         P[idx][element[3]] = 1
+        P_transpose[element[3]][idx] = 1
 
     # triagularize A
-    return (P @ A @ np.transpose(P)).tolist()
+    return (P @ A @ P_transpose).tolist()
