@@ -28,3 +28,5 @@ def test_find_components():
                           [ 0, 0, 0, 0, 0, 0,-1]]
 
     assert A_star_canonical == expected_canonical
+
+    #TODO: add test case to ensure we've fixed the "row merges two components" use case

@@ -1,7 +1,7 @@
 import numpy as np
 
 from collections import defaultdict
-
+from typing import Tuple
 
 def find_components_extended(A):
     """
@@ -15,49 +15,47 @@ def find_components_extended(A):
       row - labeled v
       [2] - a dictionary keyed by component id and valued by size of component
     """
-    u = [0] * len(A)
-    v = [0] * len(A)
+    n = len(A)
+    u = [0] * n
+    v = [0] * n
     q = defaultdict(lambda: 0)
     component_number = 1
     u[0] = component_number
     q[component_number] += 1
-    for i in range(len(A)):
+    for i in range(n):
         row_max = -2
         if u[i] == 0:
             component_number += 1
             u[i] = component_number
             q[component_number] += 1
         row_component_number = u[i]
-        for j in range(len(A)):
+        for j in range(n):
             if A[i][j] != 0:
                 row_max = max(A[i][j], row_max)
                 if u[j] == 0:
                     u[j] = row_component_number
                     q[row_component_number] += 1
                 elif u[j] != row_component_number:
-                    # we've encountered an "overlapping" row, the row number really should
-                    # be what we just found in u[j] and we'll need to reverse any changes
-                    # we've made up to this point
-                    for k in range(j):
+                    # There are a couple cases here. We implicitely assume a new row
+                    # is a new component, so we need to back that out (iterate from 0
+                    # to j), but we could also encounter a row that "merges" two
+                    # components (need to sweep the entire u vector)
+                    for k in range(n):
                         if u[k] == row_component_number:
                             u[k] = u[j]
                             q[row_component_number] -= 1
                             q[u[j]] += 1
-                    if i > j:
-                        u[i] = u[j]
-                        q[u[j]] += 1
-                        q[row_component_number] -= 1
                     component_number -= 1
                     row_component_number = u[j]
         v[i] = row_max
     return (u, v, {k:v for k,v in q.items() if v != 0})
 
-def triangularize(A):
+def get_triangularization_permutation_matrices(A):
     """
     u, v, and q are computed via find_components_extended, and then used to compute a
-    permutation matrix, P, and then return P @ A @ P
+    permutation matrix, P, and P_transpose
     :param A:
-    :return: a triangular matrix that is symmetrical to A (a relabeling of the graph vertices)
+    :return: the permutation matrices that will triangularize A
     """
     u, v, q = find_components_extended(A)
 
@@ -76,6 +74,19 @@ def triangularize(A):
     for idx, element in enumerate(permutation_basis):
         P[idx][element[3]] = 1
         P_transpose[element[3]][idx] = 1
+    return P, P_transpose
+
+
+def triangularize(A, P: Tuple=None):
+    """
+    triangularize the matrix. Uses P and P_transpose if provided, otherwise computes
+    the permutation matrices
+    :param A:
+    :param P: the transposition matrices (P and P_transpose)
+    :return: a triangular matrix that is symmetrical to A (a relabeling of the graph vertices)
+    """
+    if not P:
+        P = get_triangularization_permutation_matrices(A)
 
     # triagularize A
-    return (P @ A @ P_transpose).tolist()
+    return (P[0] @ A @ P[1]).tolist()
