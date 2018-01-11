@@ -160,7 +160,7 @@ class RedBlackGraphWriter:
         if self.vertex_key:
             worksheet.freeze_panes(1, 1)
             worksheet.set_column('A:A', self._calc_width(max_key))
-            if a > 1:
+            if a > 0:
                 worksheet.set_column(f'B:{COLUMNS[a-1]}{COLUMNS[b]}', column_width)
                 worksheet.set_column(f'{COLUMNS[a-1]}{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
             else:
