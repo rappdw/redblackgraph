@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import ndarray, asarray
 from . import einsum, warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.simple import find_components, triangularize
 
 __all__ = ['array', 'matrix']
 
@@ -91,6 +92,12 @@ class _Avos():
             raise ValueError("Relational composition would result in a cycle.")
 
         return edge_relational_composition(R_star, alpha, beta, np)
+
+    def find_components(self):
+        return np.array(find_components(self.tolist()))
+
+    def triangularize(self):
+        return np.array(triangularize(self.tolist())).view(type(self))
 
 
 class array(_Avos, ndarray):

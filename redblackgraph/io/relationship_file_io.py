@@ -14,7 +14,10 @@ from typing import Tuple, Optional
 
 import numpy as np
 import redblackgraph as rb
-import redblackgraph.simple as smp
+import xlsxwriter
+
+ROTATE_90 = 'rotate-90'
+COLUMNS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class PersonIdentifier:
@@ -104,51 +107,67 @@ class RelationshipFileReader:
 class RedBlackGraphWriter:
     def __init__(self, vertex_key=None):
         self.vertex_key = vertex_key
+
+    @staticmethod
+    def _open_workbook(output_file):
+        workbook = xlsxwriter.Workbook(output_file)
+        formats = {
+            ROTATE_90: workbook.add_format({'rotation': 90})
+        }
+        return (workbook, formats)
+
+    @staticmethod
+    def _calc_width(len_of_max_string):
+        return max(len_of_max_string + 0.83, 2.67)
     
     def __call__(self, *args, **kwargs):
+        workbook, formats = self._open_workbook(kwargs.get('output_file', '/tmp/rbg.csv'))
+        worksheet = workbook.add_worksheet()
+        worksheet.set_default_row(hide_unused_rows=True)
         R = args[0].tolist()
-        m = len(R)
-        with open(kwargs.get('output_file', '/tmp/rbg.csv'), "w") as csvfile:
-            writer = csv.writer(csvfile)
+        n = len(R)
+        row = 0
+
+        max_key = 0
+        max_np = 0
+
+        if self.vertex_key:
+            column = 0
+            worksheet.write(row, column, ' ')
+            column += 1
+            for column_idx in range(n):
+                cell_data = f"{self.vertex_key[column_idx][0]}{self.vertex_key[column_idx][1]} " \
+                            f"- {self.vertex_key[column_idx][2]}"
+                max_key = max(max_key, len(cell_data))
+                worksheet.write(row, column_idx + column, cell_data, formats[ROTATE_90])
+            row += 1
+
+        for row_idx in range(n):
+            column = 0
             if self.vertex_key:
-                header = [' '] + \
-                         [f"{self.vertex_key[x][0]}{self.vertex_key[x][1]} - {self.vertex_key[x][2]}" for x in range(m)]
-                writer.writerow(header)
-            for i in range(m):
-                if self.vertex_key:
-                    row = [f"{self.vertex_key[i][0]}{self.vertex_key[i][1]} - {self.vertex_key[i][2]}"] + R[i]
-                else:
-                    row = R[i]
-                writer.writerow(row)
+                cell_data = f"{self.vertex_key[row_idx][0]}{self.vertex_key[row_idx][1]} " \
+                            f"- {self.vertex_key[row_idx][2]}"
+                worksheet.write(row + row_idx, 0, cell_data)
+                column += 1
+            for column_idx in range(n):
+                cell_data = R[row_idx][column_idx]
+                max_np = max(max_np, cell_data)
+                worksheet.write(row + row_idx, column + column_idx, cell_data)
+        a = n // 26
+        b = n % 26
+        column_width = self._calc_width(len(f"{max_np}"))
+        if self.vertex_key:
+            worksheet.freeze_panes(1, 1)
+            worksheet.set_column('A:A', self._calc_width(max_key))
+            if a > 1:
+                worksheet.set_column(f'B:{COLUMNS[a-1]}{COLUMNS[b]}', column_width)
+                worksheet.set_column(f'{COLUMNS[a-1]}{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
+            else:
+                worksheet.set_column(f'B:{COLUMNS[b]}', column_width)
+                worksheet.set_column(f'{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
+        else:
+            worksheet.set_column(f'A:{COLUMNS[b]}', column_width)
+            worksheet.set_column(f'{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
 
     def append_vertex_key(self, key):
         self.vertex_key[len(self.vertex_key)] = key
-
-
-if __name__ == "__main__":
-    reader = RelationshipFileReader("../../tests/resources/person-relationship.csv")
-    R = reader()
-
-    writer = RedBlackGraphWriter(reader.get_vertex_key())
-    writer(R, output_file="../../tests/resources/r.csv")
-
-    # compute the transitive closure
-    R_star, diameter = R.transitive_closure()
-    cardinality = R.cardinality()
-
-    # write out the results
-    writer(R_star, output_file="../../tests/resources/closure.results.csv")
-    components = smp.find_components(R_star.tolist())
-    print(f"Found {components[1]} connected components")
-
-    # Now perform a relational composition
-    u = np.zeros((R.shape[0],), dtype=np.int32).view(rb.array)
-    u[reader.get_person_id(('D', 'R', '1963'))] = 2
-    u[reader.get_person_id(('B', 'V', '1960'))] = 3
-    v = np.zeros((R.shape[0],), dtype=np.int32).view(rb.array)
-    writer.append_vertex_key(('B', 'M-R', '2001'))
-
-    R_lambda = R_star.vertex_relational_composition(u, v, 1)
-    writer(R_lambda, output_file="../../tests/resources/composition.results.csv")
-    components = smp.find_components(R_lambda.tolist())
-    print(f"Found {components[1]} connected components")

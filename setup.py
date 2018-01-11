@@ -103,7 +103,17 @@ if __name__ == "__main__":
         platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         # test_suite='nose.collector',
         cmdclass={"sdist": sdist_checked},
-        configuration=configuration
+        configuration=configuration,
+        requires=[
+            'XlsxWriter'
+        ],
+        extras_require={
+            'dev': [
+                'pytest',
+                'pytest-cov',
+                'pylint'
+            ]
+        }
     )
 
     setup(**metadata)

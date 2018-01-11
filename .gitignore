@@ -30,3 +30,4 @@ notebooks/*.tex
 notebooks/*.aux
 notebooks/*.log
 notebooks/*.out
+notebooks/Rapp-FamilyHistory/*.xlsx
