@@ -126,7 +126,7 @@ class RedBlackGraphWriter:
         worksheet.set_default_row(hide_unused_rows=True)
         R = args[0].tolist()
         n = len(R)
-        key_transpose = kwargs.get('key_transpose', np.arange(n))
+        key_permutation = kwargs.get('key_permutation', np.arange(n))
         row = 0
 
         max_key = 0
@@ -137,7 +137,7 @@ class RedBlackGraphWriter:
             worksheet.write(row, column, ' ')
             column += 1
             for column_idx in range(n):
-                vertex_key = self.vertex_key[key_transpose[column_idx]]
+                vertex_key = self.vertex_key[key_permutation[column_idx]]
                 cell_data = f"{vertex_key[0]}{vertex_key[1]} - {vertex_key[2]}"
                 max_key = max(max_key, len(cell_data))
                 worksheet.write(row, column_idx + column, cell_data, formats[ROTATE_90])
@@ -146,7 +146,7 @@ class RedBlackGraphWriter:
         for row_idx in range(n):
             column = 0
             if self.vertex_key:
-                vertex_key = self.vertex_key[key_transpose[row_idx]]
+                vertex_key = self.vertex_key[key_permutation[row_idx]]
                 cell_data = f"{vertex_key[0]}{vertex_key[1]} - {vertex_key[2]}"
                 worksheet.write(row + row_idx, 0, cell_data)
                 column += 1

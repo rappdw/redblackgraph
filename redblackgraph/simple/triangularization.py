@@ -71,10 +71,12 @@ def get_triangularization_permutation_matrices(A):
     n = len(permutation_basis)
     P = np.zeros(shape=(n, n), dtype=np.int32)
     P_transpose = np.zeros(shape=(n, n), dtype=np.int32)
+    label_permutation = np.arange(n)
     for idx, element in enumerate(permutation_basis):
+        label_permutation[idx] = element[3]
         P[idx][element[3]] = 1
         P_transpose[element[3]][idx] = 1
-    return P, P_transpose
+    return P, P_transpose, label_permutation
 
 
 def triangularize(A, P: Tuple=None):
