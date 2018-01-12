@@ -71,6 +71,7 @@ def get_triangularization_permutation_matrices(A):
     n = len(permutation_basis)
     P = np.zeros(shape=(n, n), dtype=np.int32)
     P_transpose = np.zeros(shape=(n, n), dtype=np.int32)
+    # label_permutation can be calculated as P @ np.arrange(n), but since we are running the index do it here
     label_permutation = np.arange(n)
     for idx, element in enumerate(permutation_basis):
         label_permutation[idx] = element[3]
