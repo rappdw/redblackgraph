@@ -6,7 +6,8 @@ del get_versions
 from . import core
 from .core import *
 from .io import RelationshipFileReader, RedBlackGraphWriter
+from .util import print
 
 __all__ = ['__version__']
 __all__.extend(core.__all__)
-__all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter'])
+__all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter', 'print'])
