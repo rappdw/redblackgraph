@@ -41,7 +41,7 @@ class PersonIdentifier:
         return None
     
     def get_vertex_key(self):
-        return {v: k for k, v in self.person_dictionary.items()}
+        return {v: k for k, v in self.person_dictionary.items() if k != 'p_id'}
 
 
 class GraphBuilder:
