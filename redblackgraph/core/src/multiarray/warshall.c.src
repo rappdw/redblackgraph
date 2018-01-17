@@ -127,23 +127,26 @@ static void
     for (k = 0; k < dn; k++) {
         for (i = 0; i < dn; i++) {
             for (j = 0; j < dn; j++) {
+                printf("i: %i, j: %i, k: %i, W[i][j]: %li, W[i][k]: %li, W[k][j]: %li\n", i, j, k, *(@type@ *)op, (*(@type@ *)ipR1, (*(@type@ *)ipR2);
                 *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
                 if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
-                /* advance to the next column of R2 and output */
+                // advance column of output, advance column of R2
                 ipR2 += isR_j;
                 op  +=  os_j;
             }
-            /* Reset to first column of R2, advance to next row of R1 and next row of output (should be there already) */
-            ipR2 -= isR_j * dn;
+            // advance to next row and first column of output, advance row of R1, reset R2 to first column
+            op -= os_j * dn;
+            op += os_i;
             ipR1 += isR_i;
+            ipR2 -= isR_j * dn;
         }
-        /* Reinitialize output, reset to first row of R1 and advance to next column of R1, and first column of the next row of R2 */
+        // reset output, reset R1 to first row and set to column k, advance to next row and first column of R2
         op = args[1];
         ipR1 = args[1] + k * isR_j;
-        ipR2 = args[1] + dn * isR_i;
+        ipR2 += isR_i;
     }
-    *(npy_intp *)args[2] = @name@_generation(diameter);
+    *(npy_intp *)args[2] = 42; //@name@_generation(diameter);
 }
 
 static void
