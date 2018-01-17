@@ -171,4 +171,4 @@ class RedBlackGraphWriter:
             worksheet.set_column(f'{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
 
     def append_vertex_key(self, key):
-        self.vertex_key[len(self.vertex_key) - 1] = key
+        self.vertex_key[len(self.vertex_key)] = key
