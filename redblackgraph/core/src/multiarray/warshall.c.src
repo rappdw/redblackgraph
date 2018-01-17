@@ -5,6 +5,7 @@
  **                            INCLUDES                                     **
  *****************************************************************************
  */
+#include <stdio.h>
 #include <Python.h>
 #include <math.h>
 
@@ -68,20 +69,7 @@ static void
     @type@ diameter = 0;
 
     // copy the input to the output
-    // TODO: should just copy the data structure across enmasse
-    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[1] += s1) {
-        char *in=args[0];
-        char *op=args[1];
-        for (m = 0; m < dm; m++) {
-            for (p = 0; p < dp; p++) {
-                *(@type@ *)op = *(@type@ *)in;
-                op  +=  os_p;
-                in  +=  os_p;
-            }
-            op  +=  os_m - ob_p;
-            in  +=  os_m - ob_p;
-        }
-    }
+    memcpy(args[1], args[0], dm * is1_m);
 
     // now run the Warshall-Floyd algorithm (avos modified)
     for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
