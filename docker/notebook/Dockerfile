@@ -1,7 +1,7 @@
 FROM rappdw/docker-ds:latest
 
 ADD requirements.txt /tmp/requirements.txt
-ADD docker/notebook/gen-latex.py /usr/local/bin
+ADD docker/notebook/gen-latex.* /usr/local/bin/
 
 RUN /bin/bash -c "source /home/jovyan/.venvs/notebook/bin/activate; pip install -r /tmp/requirements.txt" \
     && ln -s /workdir/notebooks notebooks \
