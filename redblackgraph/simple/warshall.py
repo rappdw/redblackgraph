@@ -16,15 +16,6 @@ def warshall(M):
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                # output = nz_min(output, avos(ipR1, ipR2))
                 W[i][j] = nz_min(W[i][j], avos(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
-                # advance column of output
-                # advance column of ipR2
-            # advance row of output
-            # advance row of ipR1
-            # reset to coumn 0 of ipR2
-        # reset output
-        # reset ipR1 to row 0, and column k
-        # advance row of ipR2, reset to column 0
     return W, generation(diameter)

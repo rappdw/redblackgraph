@@ -48,56 +48,6 @@ char *warshall_signature = "(m,m)->(m,m),()";
  */
 
 static void
-@name@_warshall_orig(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
-{
-    npy_intp dN = *dimensions++;
-    npy_intp N_;
-    npy_intp s0 = *steps++;
-    npy_intp s1 = *steps++;
-    /*npy_intp s2 = **/steps++;
-
-    npy_intp dm = dimensions[0];
-    npy_intp dn = dimensions[0];
-    npy_intp dp = dimensions[0];
-    npy_intp m,n,p;
-    npy_intp is1_m=steps[0], is1_n=steps[1], is2_n=steps[0], is2_p=steps[1],
-         os_m=steps[2], os_p=steps[3];
-    npy_intp ib1_n = is1_n*dn;
-    npy_intp ib2_n = is2_n*dn;
-    npy_intp ib2_p = is2_p*dp;
-    npy_intp ob_p  = os_p *dp;
-    @type@ diameter = 0;
-
-    // copy the input to the output
-    memcpy(args[1], args[0], dm * is1_m);
-
-    // now run the Warshall-Floyd algorithm (avos modified)
-    for (N_ = 0; N_ < dN; N_++, args[1] += s1) {
-        char *ip1=args[1], *ip2=args[1], *op=args[1];
-        for (m = 0; m < dm; m++) {
-            for (n = 0; n < dn; n++) {
-                @type@ val1 = (*(@type@ *)ip1);
-                for (p = 0; p < dp; p++) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos(val1, (*(@type@ *)ip2)));
-                    if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
-                    ip2 += is2_p;
-                    op  +=  os_p;
-                }
-                ip2 -= ib2_p;
-                op  -=  ob_p;
-                ip1 += is1_n;
-                ip2 += is2_n;
-            }
-            ip1 -= ib1_n;
-            ip2 -= ib2_n;
-            ip1 += is1_m;
-            op  +=  os_m;
-        }
-    }
-    *(npy_intp *)args[2] = @name@_generation(diameter);
-}
-
-static void
 @name@_warshall(char **args, npy_intp *dimensions, npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
@@ -127,7 +77,6 @@ static void
     for (k = 0; k < dn; k++) {
         for (i = 0; i < dn; i++) {
             for (j = 0; j < dn; j++) {
-                printf("i: %i, j: %i, k: %i, W[i][j]: %li, W[i][k]: %li, W[k][j]: %li\n", i, j, k, *(@type@ *)op, (*(@type@ *)ipR1, (*(@type@ *)ipR2);
                 *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
                 if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
@@ -143,10 +92,10 @@ static void
         }
         // reset output, reset R1 to first row and set to column k, advance to next row and first column of R2
         op = args[1];
-        ipR1 = args[1] + k * isR_j;
+        ipR1 = args[1] + (k + 1) * isR_j;
         ipR2 += isR_i;
     }
-    *(npy_intp *)args[2] = 42; //@name@_generation(diameter);
+    *(npy_intp *)args[2] = @name@_generation(diameter);
 }
 
 static void
