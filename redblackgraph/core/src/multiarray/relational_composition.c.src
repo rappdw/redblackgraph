@@ -72,72 +72,93 @@ static void
 @name@_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
-    char *ip1 = args[0];
-    char *ip2 = args[0];
+    char *ipR1 = args[0]; // first pointer to R
+    char *ipR2 = args[0]; // second pointer to R
     @type@ alpha = *(@type@ *)args[1];
     @type@ beta = *(@type@ *)args[2];
     @type@ np = *(@type@ *)args[3];
     char *op = args[4];
 
     /* lengths of core dimensions */
-    npy_intp dm = dimensions[0];
     npy_intp dn = dimensions[0];
-    npy_intp dp = dimensions[0];
 
     /* striding over core dimensions */
-    npy_intp is1_m = steps[0];
-    npy_intp is1_n = steps[1];
-    npy_intp is2_n = steps[0];
-    npy_intp is2_p = steps[1];
-    npy_intp os_m = steps[2];
-    npy_intp os_p = steps[3];
+    npy_intp isR_i = steps[0];
+    npy_intp isR_j = steps[1];
+    npy_intp os_i = steps[2];
+    npy_intp os_j = steps[3];
 
     /* core dimensions counters */
     npy_intp m, p;
 
     /* Step 1, set output row_alpha with (input row_alpha +_beta np) avos R */
-    ip1 += is1_m * alpha;
-    op += os_m * alpha;
-    for (p = 0; p < dp; p++) {
-        @name@_vector_avos(ip1, is1_n, ip2, is2_n, op, dn, beta, np);
+    ipR1 += isR_i * alpha;
+    op += os_i * alpha;
+    for (p = 0; p < dn; p++) {
+        @name@_vector_avos(ipR1, isR_j, ipR2, isR_i, op, dn, beta, np);
         /* advance to next column of 2nd input array and output array */
-        ip2 += is2_p;
-        op += os_p;
+        ipR2 += isR_j;
+        op += os_j;
     }
 
-    /* reset ip1, ip2, op */
-    ip1 = args[4];
-    ip1 += os_m * alpha;
+    /* reset ipR1, ipR2, op */
+    ipR1 = args[4];
+    ipR1 += os_i * alpha;
     op = args[4];
-    ip2 = args[0];
+    ipR2 = args[0];
 
     /* Step 2, copy input to output, transitively closing any new columns as necessary */
-    for (m = 0; m < dm; m++) {
-        @type@ lhs = *(@type@ *)(ip2 + is2_p * alpha);
+    for (m = 0; m < dn; m++) {
+        @type@ lhs = *(@type@ *)(ipR2 + isR_j * alpha);
         if (m != alpha) {
-            for (p = 0; p < dp; p++) {
-                if (*(@type@ *)ip1 != 0) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)ip2, @name@_avos(lhs, *(@type@ *)ip1));
+            for (p = 0; p < dn; p++) {
+                if (*(@type@ *)ipR1 != 0) {
+                    *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR2, @name@_avos(lhs, *(@type@ *)ipR1));
                 }
                 else {
-                    *(@type@ *)op = *(@type@ *)ip2;
+                    *(@type@ *)op = *(@type@ *)ipR2;
                 }
 
                 /* advance to next column of the alpha row, 2nd input array and output array */
-                ip1 += is1_n;
-                ip2 += is2_p;
-                op  +=  os_p;
+                ipR1 += isR_j;
+                ipR2 += isR_j;
+                op  +=  os_j;
             }
 
             /* reset to first column of the alpha row, 2nd input array and output array */
-            ip1 -= is1_n * p;
-            ip2 -= is2_p * p;
-            op -= os_p * p;
+            ipR1 -= isR_j * p;
+            ipR2 -= isR_j * p;
+            op -= os_j * p;
 
         }
         /* advance to next row of 1st input array and output array */
-        ip2 += is1_m;
-        op += os_m;
+        ipR2 += isR_i;
+        op += os_i;
+    }
+}
+
+static void
+@name@_gufunc_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    /* outer dimensions counter */
+    npy_intp N_;
+
+    /* length of flattened outer dimensions */
+    npy_intp dN = dimensions[0];
+
+    /* striding over flattened outer dimensions for input and output arrays */
+    npy_intp s0 = steps[0];
+    // npy_intp s1 = steps[1];
+    // npy_intp s2 = steps[2];
+    // npy_intp s3 = steps[3];
+    npy_intp s4 = steps[4];
+
+    /*
+     * loop through outer dimensions, performing matrix multiply on
+     * core dimensions for each loop
+     */
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[4] += s4) {
+        @name@_edge_relational_composition(args, dimensions+1, steps+5);
     }
 }
 
@@ -153,7 +174,7 @@ static void
 
     /* lengths of core dimensions */
     npy_intp dn = dimensions[0];
-    npy_intp dm = dimensions[1];
+    // npy_intp dm = dimensions[1];
 
     /* striding over core dimensions */
     npy_intp isu_n = steps[0]; // stride over u elements
@@ -259,35 +280,9 @@ static void
     /* striding over flattened outer dimensions for input and output arrays */
     // (n),(n,n),(n),()->(n+1,n+1)
     npy_intp s0 = steps[0];
-    npy_intp s1 = steps[1];
-    npy_intp s2 = steps[2];
-    npy_intp s3 = steps[3];
-    npy_intp s4 = steps[4];
-
-    /*
-     * loop through outer dimensions, performing matrix multiply on
-     * core dimensions for each loop
-     */
-    for (N_ = 0; N_ < dN; N_++, args[0] += s1, args[4] += s4) {
-        @name@_vertex_relational_composition(args, dimensions+1, steps+5);
-    }
-}
-
-
-static void
-@name@_gufunc_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
-{
-    /* outer dimensions counter */
-    npy_intp N_;
-
-    /* length of flattened outer dimensions */
-    npy_intp dN = dimensions[0];
-
-    /* striding over flattened outer dimensions for input and output arrays */
-    npy_intp s0 = steps[0];
-    npy_intp s1 = steps[1];
-    npy_intp s2 = steps[2];
-    npy_intp s3 = steps[3];
+    // npy_intp s1 = steps[1];
+    // npy_intp s2 = steps[2];
+    // npy_intp s3 = steps[3];
     npy_intp s4 = steps[4];
 
     /*
@@ -295,9 +290,10 @@ static void
      * core dimensions for each loop
      */
     for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[4] += s4) {
-        @name@_edge_relational_composition(args, dimensions+1, steps+5);
+        @name@_vertex_relational_composition(args, dimensions+1, steps+5);
     }
 }
+
 
 /**end repeat**/
 
