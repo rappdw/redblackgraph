@@ -48,7 +48,7 @@ char *warshall_signature = "(m,m)->(m,m),()";
  */
 
 static void
-@name@_warshall(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+@name@_warshall_orig(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
 {
     npy_intp dN = *dimensions++;
     npy_intp N_;
@@ -97,6 +97,79 @@ static void
     *(npy_intp *)args[2] = @name@_generation(diameter);
 }
 
+static void
+@name@_warshall(char **args, npy_intp *dimensions, npy_intp *steps)
+{
+    /* pointers to data for input and output arrays */
+    char *ipR1 = args[1]; // first pointer to R
+    char *ipR2 = args[1]; // second pointer to R
+    char *op = args[1];
+
+    /* lengths of core dimensions */
+    npy_intp dn = dimensions[0];
+
+    /* striding over core dimensions */
+    npy_intp isR_i = steps[0];
+    npy_intp isR_j = steps[1];
+    npy_intp os_i = steps[2];
+    npy_intp os_j = steps[3];
+
+    /* core dimensions counters */
+    npy_intp i, j, k;
+
+    /* diameter holder */
+    npy_intp diameter = 0;
+
+    /* Step 1, copy input matrix to output matrix */
+    memcpy(args[1], args[0], dn * isR_i);
+
+    /* Step 2, run Floyd-Warshall over the output matrix */
+    for (k = 0; k < dn; k++) {
+        for (i = 0; i < dn; i++) {
+            for (j = 0; j < dn; j++) {
+                *(@type@ *)op = @name@_nz_min(*(@type@ *)op, @name@_avos((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
+                if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
+
+                /* advance to the next column of R2 and output */
+                ipR2 += isR_j;
+                op  +=  os_j;
+            }
+            /* Reset to first column of R2, advance to next row of R1 and next row of output (should be there already) */
+            ipR2 -= isR_j * dn;
+            ipR1 += isR_i;
+        }
+        /* Reinitialize output, reset to first row of R1 and advance to next column of R1, and first column of the next row of R2 */
+        op = args[1];
+        ipR1 = args[1] + k * isR_j;
+        ipR2 = args[1] + dn * isR_i;
+    }
+    *(npy_intp *)args[2] = @name@_generation(diameter);
+}
+
+static void
+@name@_gufunc_warshall(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    /* outer dimensions counter */
+    npy_intp N_;
+
+    /* length of flattened outer dimensions */
+    npy_intp dN = dimensions[0];
+
+    /* striding over flattened outer dimensions for input and output arrays */
+    // (m,m)->(m,m),()
+    npy_intp s0 = steps[0];
+    npy_intp s1 = steps[1];
+    // npy_intp s2 = steps[2];
+
+    /*
+     * loop through outer dimensions, performing matrix multiply on
+     * core dimensions for each loop
+     */
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[1] += s1) {
+        @name@_warshall(args, dimensions+1, steps+3);
+    }
+}
+
 /**end repeat**/
 
 
@@ -106,7 +179,7 @@ PyUFuncGenericFunction warshall_functions[] = {
  * #type = npy_int, npy_long, npy_longlong#
  * #temptype = npy_int, npy_long, npy_longlong#
  */
-    &@name@_warshall,
+    &@name@_gufunc_warshall,
 /**end repeat**/
 };
 void *warshall_data[] = {
