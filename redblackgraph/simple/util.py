@@ -14,10 +14,14 @@ def nz_min(*args, **kwargs):
     default = kwargs.get("default", 0)
     if len(args) == 1:
         args = args[0]
-    mini = None
+    mini = 0
     for i in args:
         k_i = key(i)
         k_mini = key(mini)
-        if mini == None or k_mini == 0 or (k_i < k_mini and not k_i == 0):
+        if not k_mini:
+            mini = i
+        elif k_i == -k_mini:
+            mini = 0
+        elif k_i < k_mini and not k_i == 0:
             mini = i
     return default if mini is None else mini

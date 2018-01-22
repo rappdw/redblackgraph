@@ -15,7 +15,7 @@
 
 NPY_NO_EXPORT @type@ @name@_nz_min(@type@ a, @type@ b)
 {
-    return a == 0 ? b : (b == 0 ? a : (a < b ? a : b));
+    return a == 0 ? b : (b == 0 ? a : (a == -b ? 0 : (a < b ? a : b)));
 }
 
 NPY_NO_EXPORT int @name@_generation(@type@ x)
