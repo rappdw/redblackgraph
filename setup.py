@@ -105,7 +105,8 @@ if __name__ == "__main__":
         cmdclass={"sdist": sdist_checked},
         configuration=configuration,
         requires=[
-            'XlsxWriter'
+            'XlsxWriter',
+            'numpy'
         ],
         extras_require={
             'dev': [
