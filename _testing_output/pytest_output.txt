@@ -1,40 +1,57 @@
-GIT HASH: cce6d4a
+GIT_HASH: 9f31913
 [1m============================= test session starts ==============================[0m
-platform darwin -- Python 3.6.4, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
-rootdir: /Users/drapp/sandbox/redblackgraph, inifile:
+platform linux -- Python 3.6.5, pytest-3.5.0, py-1.5.3, pluggy-0.6.0
+rootdir: /workdir, inifile:
 plugins: cov-2.5.1
-collected 23 items
+collected 26 items
 
-redblackgraph/tests/test_einsum.py .[36m                                     [  4%][0m
-redblackgraph/tests/test_loops.py .[36m                                      [  8%][0m
-redblackgraph/tests/test_redblack.py ..........[36m                          [ 52%][0m
-redblackgraph/tests/simple/test_calc_relationship.py .[36m                   [ 56%][0m
-redblackgraph/tests/simple/test_mat_avos.py ..[36m                           [ 65%][0m
-redblackgraph/tests/simple/test_nz_min.py .[36m                              [ 69%][0m
-redblackgraph/tests/simple/test_rel_composition.py ....[36m                  [ 86%][0m
-redblackgraph/tests/simple/test_vec_avos.py ..[36m                           [ 95%][0m
-redblackgraph/tests/simple/test_warshall.py .[36m                            [100%][0m
+tests/test_einsum.py .[36m                                                   [  3%][0m
+tests/test_loops.py .[36m                                                    [  7%][0m
+tests/test_redblack.py ...........[36m                                       [ 50%][0m
+tests/simple/test_calc_relationship.py .[36m                                 [ 53%][0m
+tests/simple/test_components.py .[36m                                        [ 57%][0m
+tests/simple/test_mat_avos.py ..[36m                                         [ 65%][0m
+tests/simple/test_nz_min.py .[36m                                            [ 69%][0m
+tests/simple/test_rel_composition.py ....[36m                                [ 84%][0m
+tests/simple/test_vec_avos.py ..[36m                                         [ 92%][0m
+tests/simple/test_warshall.py .[36m                                          [ 96%][0m
+tests/util/test_relationship_file_io.py .[36m                                [100%][0m
 
----------- coverage: platform darwin, python 3.6.4-final-0 -----------
-Name                                        Stmts   Miss  Cover   Missing
--------------------------------------------------------------------------
-redblackgraph/__init__.py                       7      0   100%
-redblackgraph/core/__init__.py                 15      3    80%   8-17
-redblackgraph/core/avos_einsumfunc.py           7      1    86%   8
-redblackgraph/core/rbm.py                       0      0   100%
-redblackgraph/core/redblack.py                 67      5    93%   21, 26, 34, 85, 91
-redblackgraph/simple/__init__.py                8      0   100%
-redblackgraph/simple/avos.py                    9      0   100%
-redblackgraph/simple/calc_relationship.py      10      1    90%   32
-redblackgraph/simple/generation.py             15      7    53%   21-27
-redblackgraph/simple/mat_avos.py                4      0   100%
-redblackgraph/simple/rel_composition.py        28      0   100%
-redblackgraph/simple/util.py                   12      0   100%
-redblackgraph/simple/vec_avos.py                4      0   100%
-redblackgraph/simple/warshall.py               13      0   100%
--------------------------------------------------------------------------
-TOTAL                                         199     17    91%
+----------- coverage: platform linux, python 3.6.5-final-0 -----------
+Name                                         Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------
+redblackgraph/__init__.py                        9      0   100%
+redblackgraph/core/__init__.py                  15      3    80%   8-17
+redblackgraph/core/avos_einsumfunc.py            7      1    86%   8
+redblackgraph/core/rbm.py                        0      0   100%
+redblackgraph/core/redblack.py                  75      6    92%   23, 28, 36, 87, 93, 98
+redblackgraph/simple/__init__.py                10      0   100%
+redblackgraph/simple/avos.py                     9      0   100%
+redblackgraph/simple/calc_relationship.py       10      1    90%   32
+redblackgraph/simple/components.py              22      0   100%
+redblackgraph/simple/generation.py              15      7    53%   21-27
+redblackgraph/simple/mat_avos.py                 4      0   100%
+redblackgraph/simple/rel_composition.py         28      0   100%
+redblackgraph/simple/triangularization.py       50      0   100%
+redblackgraph/simple/util.py                    16      2    88%   24, 26
+redblackgraph/simple/vec_avos.py                 4      0   100%
+redblackgraph/simple/warshall.py                13      0   100%
+redblackgraph/util/__init__.py                   1      0   100%
+redblackgraph/util/relationship_file_io.py     118      7    94%   41, 91, 164-165, 170-171, 174
+--------------------------------------------------------------------------
+TOTAL                                          406     27    93%
 
-[32mRequired test coverage of 80% reached. Total coverage: 91.46%
+[32mRequired test coverage of 80% reached. Total coverage: 93.35%
 [0m
-[32m[1m========================== 23 passed in 0.42 seconds ===========================[0m
+========================== slowest 10 test durations ===========================
+0.04s call     tests/util/test_relationship_file_io.py::test_rel_file
+0.02s call     tests/simple/test_rel_composition.py::test_my_use_case_edge
+0.01s call     tests/simple/test_rel_composition.py::test_my_use_case_vertex
+0.00s call     tests/simple/test_components.py::test_find_components
+0.00s teardown tests/simple/test_components.py::test_find_components
+0.00s teardown tests/simple/test_rel_composition.py::test_my_use_case_edge
+0.00s setup    tests/simple/test_mat_avos.py::test_matrix_avos
+0.00s setup    tests/simple/test_vec_avos.py::test_identity
+0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
+0.00s setup    tests/simple/test_calc_relationship.py::test_deirect_relationships
+[32m[1m========================== 26 passed in 0.52 seconds ===========================[0m

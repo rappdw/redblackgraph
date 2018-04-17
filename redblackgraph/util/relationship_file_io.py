@@ -24,7 +24,7 @@ class PersonIdentifier:
     def __init__(self):
         self.person_dictionary = {'p_id': 0}
         
-    def get_person_id(self, person: Tuple[str, str]) -> Optional[int]:
+    def get_person_id(self, person: Tuple[str, ...]) -> Optional[int]:
         """
         Given a person/bdate tuple, return the person_id (either looking up the person if
         already created an id, or generate a new one).
@@ -78,13 +78,13 @@ class GraphBuilder:
 
 
 class RelationshipFileReader:
-    def __init__(self, input_dir):
-        self.input_dir = input_dir
+    def __init__(self, input_file):
+        self.input_file = input_file
         self.person_identifier = PersonIdentifier()
         self.graph_builder = GraphBuilder()
         
     def __call__(self, *args, **kwargs):
-        with open(self.input_dir, "r") as csvfile:
+        with open(self.input_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0].startswith("#") or row[0] in ["Vertex", "Fn"]:

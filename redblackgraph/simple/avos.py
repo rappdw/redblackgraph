@@ -18,7 +18,7 @@ def avos(x, y):
     # "self relationship". If either the relationship of a to b or b to c is self,
     # then the transitive relationship is the non-self relationship
     if x <= 1 or y <= 1:
-        self_relationship, non_self_relationship = (x, y) if x <= 1 else (y, x)
+        _, non_self_relationship = (x, y) if x <= 1 else (y, x)
         return non_self_relationship
 
     generationNumber = generation(y)

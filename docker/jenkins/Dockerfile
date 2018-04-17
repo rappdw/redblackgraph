@@ -1,4 +1,4 @@
-FROM python:3.6.3
+FROM python:3.6.5
 
 ADD requirements.txt /requirements.txt
 ADD requirements-dev.txt /requirements-dev.txt

@@ -322,6 +322,25 @@ class TestmatrixOperations(object):
         assert A_lambda[8][13] == 5
         assert A_lambda[8][14] == 2
 
+    def test_triangularization(self):
+        R = rb.array([[-1, 0, 0, 2, 0, 3, 0],
+                      [ 0,-1, 0, 0, 0, 0, 0],
+                      [ 2, 0, 1, 0, 0, 0, 0],
+                      [ 0, 0, 0,-1, 0, 0, 0],
+                      [ 0, 2, 0, 0,-1, 0, 3],
+                      [ 0, 0, 0, 0, 0, 1, 0],
+                      [ 0, 0, 0, 0, 0, 0, 1]
+                      ])
+        A_star: rb.array = R.transitive_closure()[0]
+        permutation_matrices = A_star.get_triangularization_permutation_matrices()
+        A_cannonical = A_star.triangularize(permutation_matrices)
+        A_cannonical_2 = A_star.triangularize()
+        assert_equal(A_cannonical, A_cannonical_2)
+        assert permutation_matrices
+        for row in range(len(A_cannonical)):
+            for col in range(row):
+                assert A_cannonical[row, col] == 0
+
 
 
 if __name__ == "__main__":
