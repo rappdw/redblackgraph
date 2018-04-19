@@ -1,25 +1,46 @@
-from redblackgraph.simple import generation
+def avos_sum(x: int, y: int) -> int:
+    '''
+    The avos sum is the non-zero minumum of x and y unless x == -y in which case the result is 0
+    :param x: operand 1
+    :param y: operand 2
+    :return: avos sum
+    '''
+    if x == -y:
+        return 0
+    if x == 0:
+        return y
+    if y == 0:
+        return x
+    if x < y:
+        return x
+    return y
 
+def leftmost_significant_bit_position(x: int) -> int:
+    '''
+    Given an integer, return the bit position of it's leftmost significant bit
+    :param x: operand
+    :return: bit position of leftmost significant bit
+    '''
+    bit_position = 0
+    while (x > 1):
+        x >>= 1
+        bit_position += 1
+    return bit_position
 
-def avos(x, y):
-    '''The avos product is the transitive relationship function.
-    Given that:
-      - vertex a is related to vertex b by x
-      - vertex b is related to vertex c by y
-    return the avos product which is how vertex a is related to vertex c
+def avos_product(x: int, y: int) -> int:
+    '''
+    The avos product replaces the left most significant bit of operand 2 with operand 1
+    :param x: operand 1
+    :param y: operand 2
+    :return: avos product
     '''
 
-    # The zero property of the avos product; the transitive relationship is 0 if
-    # either vertex a to vertex b is zero, or vertex b to vertex c is zero
+    sign = 1 if (x >= 0) == (y >= 0) else -1
+    x, y = abs(x), abs(y)
+
+    # The zero property of the avos product
     if x == 0 or y == 0:
         return 0
 
-    # The identity property of the avos product; the relationship of 1 or -1 is a
-    # "self relationship". If either the relationship of a to b or b to c is self,
-    # then the transitive relationship is the non-self relationship
-    if x <= 1 or y <= 1:
-        _, non_self_relationship = (x, y) if x <= 1 else (y, x)
-        return non_self_relationship
-
-    generationNumber = generation(y)
-    return (y & (2 ** generationNumber - 1)) | (x << generationNumber)
+    bit_position = leftmost_significant_bit_position(y)
+    return sign * ((y & (2 ** bit_position - 1)) | (x << bit_position))

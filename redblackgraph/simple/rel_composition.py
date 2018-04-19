@@ -1,5 +1,4 @@
-from redblackgraph.simple import avos, mat_avos
-from redblackgraph.simple.util import nz_min
+from redblackgraph.simple import avos_sum, avos_product, mat_avos
 import copy
 
 
@@ -23,7 +22,7 @@ def vertex_relational_composition(u, R, v, color):
         R_lambda[i].append(vc_lambda[i][0])
         for j in range(N):
             if uc_lambda[0][j] != 0:
-                R_lambda[i][j] = nz_min(avos(vc_lambda[i][0], uc_lambda[0][j]), R_lambda[i][j])
+                R_lambda[i][j] = avos_sum(avos_product(vc_lambda[i][0], uc_lambda[0][j]), R_lambda[i][j])
     R_lambda[N].append(color)
     return R_lambda
 
@@ -47,5 +46,5 @@ def edge_relational_composition(R, alpha, beta, relationship):
     for i in range(N):
         for j in range(N):
             if R_lambda[alpha][j] != 0:
-                R_lambda[i][j] = nz_min(avos(R_lambda[i][alpha], R_lambda[alpha][j]), R_lambda[i][j])
+                R_lambda[i][j] = avos_sum(avos_product(R_lambda[i][alpha], R_lambda[alpha][j]), R_lambda[i][j])
     return R_lambda

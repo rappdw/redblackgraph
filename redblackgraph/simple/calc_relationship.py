@@ -1,4 +1,4 @@
-from redblackgraph.simple import generation
+from redblackgraph.simple import leftmost_significant_bit_position
 
 
 def lookup_relationship(da, db):
@@ -30,4 +30,4 @@ def calculate_relationship(a, b):
 
     if common_ancestor == -1:
         return "No Relationship", -1
-    return lookup_relationship(generation(x), generation(y)), common_ancestor
+    return lookup_relationship(leftmost_significant_bit_position(x), leftmost_significant_bit_position(y)), common_ancestor

@@ -1,6 +1,5 @@
 import numpy as np
-from redblackgraph.simple import avos, generation
-from .util import nz_min
+from redblackgraph.simple import avos_sum, avos_product, leftmost_significant_bit_position
 
 
 def warshall(M):
@@ -16,6 +15,6 @@ def warshall(M):
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                W[i][j] = nz_min(W[i][j], avos(W[i][k], W[k][j]))
+                W[i][j] = avos_sum(W[i][j], avos_product(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
-    return W, generation(diameter)
+    return W, leftmost_significant_bit_position(diameter)

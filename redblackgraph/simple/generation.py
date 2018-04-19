@@ -1,15 +1,3 @@
-def generation(pedigree_number):
-    '''Given a pedigree_number, representing a relationship from a "root" vertex to an
-    "ancester" vertex, return the number of edges that must be followed in order
-    to "walk" from the "root" to the "ancester".'''
-    x = pedigree_number
-    gen = 0
-    while (x > 1):
-        x >>= 1
-        gen += 1
-    return gen
-
-
 def get_traversal_path(pedigree_number):
     '''Given a pedigree_number, representing a relationship from a "root" vertex to an
     "ancester" vertex, return the traversal path of edges to red or black vertices
