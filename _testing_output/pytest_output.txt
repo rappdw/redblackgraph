@@ -1,318 +1,21 @@
-GIT_HASH: 8314209
+GIT_HASH: cddb01f
 [1m============================= test session starts ==============================[0m
 platform linux -- Python 3.6.5, pytest-3.5.0, py-1.5.3, pluggy-0.6.0
 rootdir: /workdir, inifile:
 plugins: cov-2.5.1
-collected 27 items
+collected 28 items
 
 tests/test_einsum.py .[36m                                                   [  3%][0m
 tests/test_loops.py .[36m                                                    [  7%][0m
-tests/test_redblack.py ...........[36m                                       [ 48%][0m
-tests/simple/test_avos.py ..[36m                                             [ 55%][0m
-tests/simple/test_calc_relationship.py .[36m                                 [ 59%][0m
-tests/simple/test_components.py F[36m                                        [ 62%][0m
-tests/simple/test_mat_avos.py FF[36m                                         [ 70%][0m
-tests/simple/test_rel_composition.py FFFF[36m                                [ 85%][0m
-tests/simple/test_vec_avos.py FF[36m                                         [ 92%][0m
-tests/simple/test_warshall.py F[36m                                          [ 96%][0m
+tests/test_redblack.py ...........[36m                                       [ 46%][0m
+tests/simple/test_avos.py ...[36m                                            [ 57%][0m
+tests/simple/test_calc_relationship.py .[36m                                 [ 60%][0m
+tests/simple/test_components.py .[36m                                        [ 64%][0m
+tests/simple/test_mat_avos.py ..[36m                                         [ 71%][0m
+tests/simple/test_rel_composition.py ....[36m                                [ 85%][0m
+tests/simple/test_vec_avos.py ..[36m                                         [ 92%][0m
+tests/simple/test_warshall.py .[36m                                          [ 96%][0m
 tests/util/test_relationship_file_io.py .[36m                                [100%][0m
-
-=================================== FAILURES ===================================
-[31m[1m_____________________________ test_find_components _____________________________[0m
-
-[1m    def test_find_components():[0m
-[1m        A = [[-1, 0, 0, 2, 0, 3, 0],[0m
-[1m             [ 0,-1, 0, 0, 0, 0, 0],[0m
-[1m             [ 2, 0, 1, 0, 0, 0, 0],[0m
-[1m             [ 0, 0, 0,-1, 0, 0, 0],[0m
-[1m             [ 0, 2, 0, 0,-1, 0, 3],[0m
-[1m             [ 0, 0, 0, 0, 0, 1, 0],[0m
-[1m             [ 0, 0, 0, 0, 0, 0, 1]][0m
-[1m        A_star = warshall(A)[0][0m
-[1m        components = find_components(A_star)[0m
-[1m>       assert components == [1, 2, 1, 1, 2, 1, 2][0m
-[1m[31mE       assert [1, 2, 1, 3, 4, 1, ...] == [1, 2, 1, 1, 2, 1, ...][0m
-[1m[31mE         At index 3 diff: 3 != 1[0m
-[1m[31mE         Use -v to get the full diff[0m
-
-[1m[31mtests/simple/test_components.py[0m:14: AssertionError
-[31m[1m_______________________________ test_matrix_avos _______________________________[0m
-
-[1m    def test_matrix_avos():[0m
-[1m        A = [[-1,  2,  3,  0,  0],[0m
-[1m             [ 0, -1,  0,  2,  0],[0m
-[1m             [ 0,  0,  1,  0,  0],[0m
-[1m             [ 0,  0,  0, -1,  0],[0m
-[1m             [ 2,  0,  0,  0,  1]][0m
-[1m        expected_result =  [[-1,  2,  3,  4,  0],[0m
-[1m                            [ 0, -1,  0,  2,  0],[0m
-[1m                            [ 0,  0,  1,  0,  0],[0m
-[1m                            [ 0,  0,  0, -1,  0],[0m
-[1m                            [ 2,  4,  5,  0,  1]][0m
-[1m>       result = mat_avos(A, A)[0m
-
-[1m[31mtests/simple/test_mat_avos.py[0m:15: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8cc576708>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m______________________________ test_vec_mat_avos _______________________________[0m
-
-[1m    def test_vec_mat_avos():[0m
-[1m        A =  [[-1,  2,  3,  4,  0],[0m
-[1m              [ 0, -1,  0,  2,  0],[0m
-[1m              [ 0,  0,  1,  0,  0],[0m
-[1m              [ 0,  0,  0, -1,  0],[0m
-[1m              [ 2,  4,  5,  0,  1]][0m
-[1m        u = [[2, 0, 0, 0, 0]][0m
-[1m        v = [[0],[0m
-[1m             [3],[0m
-[1m             [0],[0m
-[1m             [0],[0m
-[1m             [0]][0m
-[1m    [0m
-[1m>       result = mat_avos(u, A)[0m
-
-[1m[31mtests/simple/test_mat_avos.py[0m:40: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8c3f77088>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m______________________ test_vertex_relational_composition ______________________[0m
-
-[1m    def test_vertex_relational_composition():[0m
-[1m        # use the A+ from the example in our notebook, add in a sibling to the last vertex in the graph[0m
-[1m        A = [[-1, 2, 3, 4, 0],[0m
-[1m             [0, -1, 0, 2, 0],[0m
-[1m             [0, 0, 1, 0, 0],[0m
-[1m             [0, 0, 0, -1, 0],[0m
-[1m             [2, 4, 5, 8, 1]][0m
-[1m        u = [[2, 0, 0, 0, 0]][0m
-[1m        v = [[0], [0], [0], [0], [0]][0m
-[1m>       A_lambda = vertex_relational_composition(u, A, v, -1)[0m
-
-[1m[31mtests/simple/test_rel_composition.py[0m:13: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/rel_composition.py[0m:17: in vertex_relational_composition
-[1m    uc_lambda = mat_avos(u, R)[0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8c3f7e748>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m___________________________ test_my_use_case_vertex ____________________________[0m
-
-[1m    def test_my_use_case_vertex():[0m
-[1m        #        D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em[0m
-[1m        A1 = [[ -1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D[0m
-[1m              [  0, -1,  0,  0,  0,  2,  3,  0,  0,  0,  0,  0,  0,  0],  # E[0m
-[1m              [  0,  0,  1,  0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0],  # R[0m
-[1m              [  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # M[0m
-[1m              [  0,  2,  0,  3, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # H[0m
-[1m              [  0,  0,  0,  0,  0, -1,  0,  0,  0,  0,  2,  3,  0,  0],  # Mi[0m
-[1m              [  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0],  # A[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0],  # I[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0, -1,  3,  0,  0,  0,  0],  # Do[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0],  # Ev[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,  0],  # G[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0],  # Ma[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0],  # S[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em[0m
-[1m             ][0m
-[1m        #      D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J[0m
-[1m        u = [[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3]][0m
-[1m        v = [[ 0], # D[0m
-[1m             [ 0], # E[0m
-[1m             [ 2], # R[0m
-[1m             [ 0], # M[0m
-[1m             [ 0], # H[0m
-[1m             [ 0], # Mi[0m
-[1m             [ 0], # A[0m
-[1m             [ 0], # I[0m
-[1m             [ 2], # Do[0m
-[1m             [ 0], # Ev[0m
-[1m             [ 0], # G[0m
-[1m             [ 0], # Ma[0m
-[1m             [ 0], # S[0m
-[1m             [ 0], # Em[0m
-[1m             ][0m
-[1m        R = warshall(A1)[0].tolist()[0m
-[1m>       A_lambda = vertex_relational_composition(u, R, v, -1)[0m
-
-[1m[31mtests/simple/test_rel_composition.py[0m:68: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/rel_composition.py[0m:17: in vertex_relational_composition
-[1m    uc_lambda = mat_avos(u, R)[0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8c3f9cb48>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m___________________ test_edge_relational_composition_simple ____________________[0m
-
-[1m    def test_edge_relational_composition_simple():[0m
-[1m        R = [[-1, 0, 3, 0, 0],[0m
-[1m             [ 0,-1, 0, 2, 0],[0m
-[1m             [ 0, 0, 1, 0, 0],[0m
-[1m             [ 0, 0, 0,-1, 0],[0m
-[1m             [ 2, 0, 5, 0, 1]][0m
-[1m>       R_lambda = edge_relational_composition(R, 0, 1, 2)[0m
-
-[1m[31mtests/simple/test_rel_composition.py[0m:87: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/rel_composition.py[0m:43: in edge_relational_composition
-[1m    u_lambda = mat_avos(u_lambda, R)[0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8c3f96508>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m____________________________ test_my_use_case_edge _____________________________[0m
-
-[1m    def test_my_use_case_edge():[0m
-[1m        #        D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J[0m
-[1m        A1 = [[ -1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D[0m
-[1m              [  0, -1,  0,  0,  0,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0],  # E[0m
-[1m              [  0,  0,  1,  0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0,  0],  # R[0m
-[1m              [  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # M[0m
-[1m              [  0,  2,  0,  3, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # H[0m
-[1m              [  0,  0,  0,  0,  0, -1,  0,  0,  0,  0,  2,  3,  0,  0,  0],  # Mi[0m
-[1m              [  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],  # A[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0],  # I[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0, -1,  3,  0,  0,  0,  0,  2],  # Do[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0],  # Ev[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  0],  # G[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0],  # Ma[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0],  # S[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0], # Em[0m
-[1m              [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]  # J[0m
-[1m              ][0m
-[1m        R = warshall(A1)[0][0m
-[1m        # Missing edge is R -> J, 2[0m
-[1m>       A_lambda = edge_relational_composition(R, 2, 14, 2)[0m
-
-[1m[31mtests/simple/test_rel_composition.py[0m:115: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-[1m[31mredblackgraph/simple/rel_composition.py[0m:43: in edge_relational_composition
-[1m    u_lambda = mat_avos(u_lambda, R)[0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in mat_avos
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: in <listcomp>
-[1m    return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-.0 = <zip object at 0x7ff8c3f77a08>
-
-[1m>   return [[avos_sum([avos_product(a, b) for a, b in zip(A_row, B_col)]) for B_col in zip(*B)] for A_row in A][0m
-[1m[31mE   TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/mat_avos.py[0m:6: TypeError
-[31m[1m________________________________ test_identity _________________________________[0m
-
-[1m    def test_identity():[0m
-[1m        # from the sample adjacency matrix in the notebook, test vec_avos(me, father)[0m
-[1m        u = [-1, 2, 3, 0, 0][0m
-[1m        v = [2, -1, 0, 0, 0][0m
-[1m>       assert vec_avos(u, v) == 2[0m
-
-[1m[31mtests/simple/test_vec_avos.py[0m:8: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-u = [-1, 2, 3, 0, 0], v = [2, -1, 0, 0, 0]
-
-[1m    def vec_avos(u, v):[0m
-[1m        '''Given two vectors, compute the avos product.'''[0m
-[1m>       return avos_sum([avos_product(a, b) for a, b in zip(u, v)])[0m
-[1m[31mE       TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/vec_avos.py[0m:5: TypeError
-[31m[1m_______________________________ test_transitive ________________________________[0m
-
-[1m    def test_transitive():[0m
-[1m        # from the sample adjacency matrix in the notebook, test vec_avos(my daughter, my father)[0m
-[1m        u = [2, 0, 0, 0, 1][0m
-[1m        v = [2, -1, 0, 0, 0][0m
-[1m>       assert vec_avos(u, v) == 4[0m
-
-[1m[31mtests/simple/test_vec_avos.py[0m:20: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-u = [2, 0, 0, 0, 1], v = [2, -1, 0, 0, 0]
-
-[1m    def vec_avos(u, v):[0m
-[1m        '''Given two vectors, compute the avos product.'''[0m
-[1m>       return avos_sum([avos_product(a, b) for a, b in zip(u, v)])[0m
-[1m[31mE       TypeError: avos_sum() missing 1 required positional argument: 'y'[0m
-
-[1m[31mredblackgraph/simple/vec_avos.py[0m:5: TypeError
-[31m[1m________________________________ test_warshall _________________________________[0m
-
-[1m    def test_warshall():[0m
-[1m        # test transitive closure on the example matrix from our notebook[0m
-[1m        Arb = [[-1, 2, 3, 0, 0],[0m
-[1m               [ 0,-1, 0, 2, 0],[0m
-[1m               [ 0, 0, 1, 0, 0],[0m
-[1m               [ 0, 0, 0,-1, 0],[0m
-[1m               [ 2, 0, 0, 0, 1]][0m
-[1m        expected_results = ([[-1, 2, 3, 4, 0],[0m
-[1m                             [ 0,-1, 0, 2, 0],[0m
-[1m                             [ 0, 0, 1, 0, 0],[0m
-[1m                             [ 0, 0, 0,-1, 0],[0m
-[1m                             [ 2, 4, 5, 8, 1]], 3)[0m
-[1m        Arb_plus = warshall(Arb)[0m
-[1m>       assert_equal(Arb_plus, expected_results)[0m
-[1m[31mE       AssertionError: [0m
-[1m[31mE       Arrays are not equal[0m
-[1m[31mE       item=0[0m
-[1m[31mE       [0m
-[1m[31mE       (mismatch 24.0%)[0m
-[1m[31mE        x: array([[0, 0, 3, 0, 0],[0m
-[1m[31mE              [0, 0, 0, 0, 0],[0m
-[1m[31mE              [0, 0, 1, 0, 0],...[0m
-[1m[31mE        y: array([[-1,  2,  3,  4,  0],[0m
-[1m[31mE              [ 0, -1,  0,  2,  0],[0m
-[1m[31mE              [ 0,  0,  1,  0,  0],...[0m
-
-[1m[31mtests/simple/test_warshall.py[0m:18: AssertionError
 
 ----------- coverage: platform linux, python 3.6.5-final-0 -----------
 Name                                         Stmts   Miss  Cover   Missing
@@ -323,30 +26,31 @@ redblackgraph/core/avos_einsumfunc.py            7      1    86%   8
 redblackgraph/core/rbm.py                        0      0   100%
 redblackgraph/core/redblack.py                  75      6    92%   23, 28, 36, 87, 93, 98
 redblackgraph/simple/__init__.py                 9      0   100%
-redblackgraph/simple/avos.py                    23      1    96%   15
+redblackgraph/simple/avos.py                    34      1    97%   15
 redblackgraph/simple/calc_relationship.py       10      1    90%   32
 redblackgraph/simple/components.py              22      0   100%
 redblackgraph/simple/generation.py               8      7    12%   9-15
-redblackgraph/simple/mat_avos.py                 3      0   100%
-redblackgraph/simple/rel_composition.py         27     17    37%   18-27, 44-50
+redblackgraph/simple/mat_avos.py                 4      0   100%
+redblackgraph/simple/rel_composition.py         27      0   100%
 redblackgraph/simple/triangularization.py       50      0   100%
-redblackgraph/simple/vec_avos.py                 3      0   100%
+redblackgraph/simple/vec_avos.py                 4      0   100%
 redblackgraph/simple/warshall.py                12      0   100%
 redblackgraph/util/__init__.py                   1      0   100%
 redblackgraph/util/relationship_file_io.py     118      7    94%   41, 91, 164-165, 170-171, 174
 --------------------------------------------------------------------------
-TOTAL                                          392     43    89%
+TOTAL                                          405     26    94%
 
-[32mRequired test coverage of 80% reached. Total coverage: 89.03%
-[0m========================== slowest 10 test durations ===========================
+[32mRequired test coverage of 80% reached. Total coverage: 93.58%
+[0m
+========================== slowest 10 test durations ===========================
 0.04s call     tests/util/test_relationship_file_io.py::test_rel_file
-0.02s call     tests/simple/test_rel_composition.py::test_my_use_case_vertex
 0.02s call     tests/simple/test_rel_composition.py::test_my_use_case_edge
+0.02s call     tests/simple/test_rel_composition.py::test_my_use_case_vertex
 0.00s call     tests/simple/test_components.py::test_find_components
 0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
-0.00s call     tests/simple/test_warshall.py::test_warshall
-0.00s call     tests/test_einsum.py::test_avos
-0.00s call     tests/test_redblack.py::TestmatrixOperations::test_relational_composition
+0.00s setup    tests/simple/test_components.py::test_find_components
 0.00s call     tests/test_redblack.py::TestmatrixOperations::test_vector_matrix_rproduct
-0.00s call     tests/test_redblack.py::TestmatrixOperations::test_vector_matrix_product
-[31m[1m===================== 10 failed, 17 passed in 0.64 seconds =====================[0m
+0.00s call     tests/simple/test_rel_composition.py::test_vertex_relational_composition
+0.00s call     tests/simple/test_warshall.py::test_warshall
+0.00s teardown tests/test_redblack.py::TestmatrixOperations::test_vector_matrix_rproduct
+[32m[1m========================== 28 passed in 0.62 seconds ===========================[0m

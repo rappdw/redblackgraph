@@ -104,7 +104,7 @@ if __name__ == "__main__":
         # test_suite='nose.collector',
         cmdclass={"sdist": sdist_checked},
         configuration=configuration,
-        requires=[
+        install_requires=[
             'XlsxWriter',
             'numpy'
         ],

@@ -29,17 +29,28 @@ def leftmost_significant_bit_position(x: int) -> int:
 
 def compute_sign(x: int, y:int) -> int:
     '''
-    Compute the sign of an avos product.
+    This is a little complicated to explain at this point, so for now, just trust me
     :param x:
     :param y:
     :return:
     '''
-    sign = 1
-    if (x >= 0) != (y >= 0):
-        if x != -1 and y != -1:
-            sign = -1
-    elif x == -1 and y == -1:
+
+    a = x >= 0
+    b = y >=0
+    c = x == -1
+    d = y == -1
+
+    # with the truth states of a, b, c, d, sign will be:
+    #   as of yet undetermined (u) - (!a or !b) and (!c and !d)
+    #   negative (n) - (!a and !b) and !u
+    #   positive (p) = !(n or u)
+    if (not a or not b) and (not c and not d):
+        sign = None
+    elif not a and not b:
         sign = -1
+    else:
+        sign = 1
+
     return sign
 
 def avos_product(x: int, y: int) -> int:
@@ -50,6 +61,7 @@ def avos_product(x: int, y: int) -> int:
     :return: avos product
     '''
 
+    sign = compute_sign(x, y)
     x, y = abs(x), abs(y)
 
     # The zero property of the avos product
@@ -57,4 +69,4 @@ def avos_product(x: int, y: int) -> int:
         return 0
 
     bit_position = leftmost_significant_bit_position(y)
-    return compute_sign(x, y) * ((y & (2 ** bit_position - 1)) | (x << bit_position))
+    return sign * ((y & (2 ** bit_position - 1)) | (x << bit_position))

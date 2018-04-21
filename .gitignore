@@ -12,7 +12,6 @@ redblackgraph/sparsetools/CMakeLists.txt
 _sparsetools.cpython-36m-darwin.so
 redblackgraph/sparsetools/cmake-build-debug/
 _sparsetools.cpython-36m-x86_64-linux-gnu.so
-notebooks/.ipynb_checkpoints/
 redblackgraph/core/src/multiarray/redblack.c
 redblackgraph/core/src/multiarray/rbg_math.c
 redblackgraph/core/src/multiarray/rbg_math.h
@@ -30,3 +29,5 @@ notebooks/*.aux
 notebooks/*.log
 notebooks/*.out
 notebooks/Rapp-FamilyHistory/*.xlsx
+.pytest_cache
+**/.ipynb_checkpoints
