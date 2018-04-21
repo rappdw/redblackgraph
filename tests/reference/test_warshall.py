@@ -9,10 +9,11 @@ def test_warshall():
            [ 0, 0, 1, 0, 0],
            [ 0, 0, 0,-1, 0],
            [ 2, 0, 0, 0, 1]]
-    expected_results = ([[-1, 2, 3, 4, 0],
+    expected_results = [[-1, 2, 3, 4, 0],
                          [ 0,-1, 0, 2, 0],
                          [ 0, 0, 1, 0, 0],
                          [ 0, 0, 0,-1, 0],
-                         [ 2, 4, 5, 8, 1]], 3)
+                         [ 2, 4, 5, 8, 1]]
     Arb_plus = warshall(Arb)
-    assert_equal(Arb_plus, expected_results)
+    assert_equal(Arb_plus.W, expected_results)
+    assert 3 == Arb_plus.diameter

@@ -1,4 +1,4 @@
-GIT_HASH: 13d3111
+GIT_HASH: 38f1882
 [1m============================= test session starts ==============================[0m
 platform linux -- Python 3.6.5, pytest-3.5.0, py-1.5.3, pluggy-0.6.0
 rootdir: /workdir, inifile:
@@ -34,24 +34,24 @@ redblackgraph/reference/mat_avos.py                4      0   100%
 redblackgraph/reference/rel_composition.py        27      0   100%
 redblackgraph/reference/triangularization.py      50      0   100%
 redblackgraph/reference/util.py                   17      0   100%
-redblackgraph/reference/vec_avos.py                4      0   100%
-redblackgraph/reference/warshall.py               12      0   100%
+redblackgraph/reference/vec_avos.py                5      0   100%
+redblackgraph/reference/warshall.py               17      0   100%
 redblackgraph/util/__init__.py                     1      0   100%
 redblackgraph/util/relationship_file_io.py       118      7    94%   41, 91, 164-165, 170-171, 174
 ----------------------------------------------------------------------------
-TOTAL                                            406     26    94%
+TOTAL                                            412     26    94%
 
-[32mRequired test coverage of 80% reached. Total coverage: 93.60%
+[32mRequired test coverage of 80% reached. Total coverage: 93.69%
 [0m
 ========================== slowest 10 test durations ===========================
-0.04s call     tests/util/test_relationship_file_io.py::test_rel_file
-0.02s call     tests/reference/test_rel_composition.py::test_my_use_case_vertex
+0.05s call     tests/util/test_relationship_file_io.py::test_rel_file
 0.02s call     tests/reference/test_rel_composition.py::test_my_use_case_edge
+0.02s call     tests/reference/test_rel_composition.py::test_my_use_case_vertex
+0.00s setup    tests/reference/test_calc_relationship.py::test_deirect_relationships
 0.00s call     tests/reference/test_components.py::test_find_components
-0.00s teardown tests/reference/test_rel_composition.py::test_my_use_case_vertex
-0.00s setup    tests/reference/test_avos.py::test_sign
-0.00s call     tests/reference/test_warshall.py::test_warshall
-0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
-0.00s setup    tests/reference/test_mat_avos.py::test_matrix_avos
+0.00s teardown tests/reference/test_avos.py::test_simple_avos_sum
 0.00s setup    tests/test_einsum.py::test_avos
-[32m[1m========================== 28 passed in 0.65 seconds ===========================[0m
+0.00s teardown tests/test_redblack.py::TestmatrixOperations::test_vector_matrix_rproduct
+0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
+0.00s setup    tests/util/test_relationship_file_io.py::test_rel_file
+[32m[1m========================== 28 passed in 0.73 seconds ===========================[0m

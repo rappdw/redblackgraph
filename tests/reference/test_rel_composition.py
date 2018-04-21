@@ -63,7 +63,7 @@ def test_my_use_case_vertex():
          [ 0], # S
          [ 0], # Em
          ]
-    R = warshall(A1)[0].tolist()
+    R = warshall(A1).W.tolist()
     A_lambda = vertex_relational_composition(u, R, v, -1)
     assert A_lambda[0][12] == 12
     assert A_lambda[0][13] == 13
@@ -109,7 +109,7 @@ def test_my_use_case_edge():
           [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0], # Em
           [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]  # J
           ]
-    R = warshall(A1)[0]
+    R = warshall(A1).W
     # Missing edge is R -> J, 2
     A_lambda = edge_relational_composition(R, 2, 14, 2)
     assert A_lambda[0][12] == 12

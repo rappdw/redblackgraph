@@ -105,8 +105,9 @@ if __name__ == "__main__":
         cmdclass={"sdist": sdist_checked},
         configuration=configuration,
         install_requires=[
+            'dataclasses',
+            'numpy',
             'XlsxWriter',
-            'numpy'
         ],
         extras_require={
             'dev': [

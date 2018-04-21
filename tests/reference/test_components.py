@@ -9,7 +9,7 @@ def test_find_components():
          [ 0, 2, 0, 0,-1, 0, 3],
          [ 0, 0, 0, 0, 0, 1, 0],
          [ 0, 0, 0, 0, 0, 0, 1]]
-    A_star = warshall(A)[0]
+    A_star = warshall(A).W
     components = find_components(A_star)
     assert components == [1, 2, 1, 1, 2, 1, 2]
     extended_components = find_components_extended(A_star)

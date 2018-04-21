@@ -1,8 +1,15 @@
 import numpy as np
+from dataclasses import dataclass
+from typing import Sequence
 from redblackgraph.reference import avos_sum, avos_product, leftmost_significant_bit_position
 
 
-def warshall(M):
+@dataclass
+class WarshallResult:
+    W: np.array
+    diameter: int
+
+def warshall(M: Sequence[Sequence[int]]) -> WarshallResult:
     '''Computes the transitive closure of a Red Black adjacency matrix and as a side-effect,
     the diameter.'''
 
@@ -17,4 +24,4 @@ def warshall(M):
             for j in range(n):
                 W[i][j] = avos_sum(W[i][j], avos_product(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
-    return W, leftmost_significant_bit_position(diameter)
+    return WarshallResult(W, leftmost_significant_bit_position(diameter))
