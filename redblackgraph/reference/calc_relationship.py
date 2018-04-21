@@ -16,7 +16,6 @@ def lookup_relationship(da: int, db: int) -> str:
     :param db: generational distance from v to common ancester
     :return: a string designating relationship
     '''
-    da, db = abs(da), abs(db)
     removal = abs(da - db)
     if da == 0 or db == 0:
         # direct ancestor
