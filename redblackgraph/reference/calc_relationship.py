@@ -1,7 +1,14 @@
+from dataclasses import dataclass
+from typing import Sequence
 from redblackgraph.reference import leftmost_significant_bit_position
 
 
-def lookup_relationship(da, db):
+@dataclass
+class Relationship:
+    common_ancestor: int
+    relationship: str
+
+def lookup_relationship(da: int, db: int) -> str:
     '''
     This is a very rudimentary implementation of a Consanguinity lookup and doesn't handle many
     cases correctly.
@@ -9,12 +16,24 @@ def lookup_relationship(da, db):
     :param db: generational distance from v to common ancester
     :return: a string designating relationship
     '''
+    da, db = abs(da), abs(db)
     removal = abs(da - db)
-    generational = min(da, db)
-    return f"{generational - 1} cousin {removal} removed"
+    if da == 0 or db == 0:
+        # direct ancestor
+        if removal == 1:
+            return "parent"
+        if removal == 2:
+            return "grandparent"
+        if removal == 3:
+            return "great grandparent"
+        return f"{removal - 2} great grandparent"
+    else:
+        # cousin
+        generational = min(da, db)
+        return f"{generational - 1} cousin {removal} removed"
 
 
-def calculate_relationship(a, b):
+def calculate_relationship(a: Sequence[int], b: Sequence[int]) -> Relationship:
     '''
     Determine if a relationship exists between u, v where u, v are row vectors of the transitive
     closure of a Red Black adjacency matrix
@@ -29,5 +48,6 @@ def calculate_relationship(a, b):
                                   default=(-1, (0, 0)))
 
     if common_ancestor == -1:
-        return "No Relationship", -1
-    return lookup_relationship(leftmost_significant_bit_position(x), leftmost_significant_bit_position(y)), common_ancestor
+        return Relationship(-1, "No Relationship")
+    return Relationship(common_ancestor,
+                        lookup_relationship(leftmost_significant_bit_position(x), leftmost_significant_bit_position(y)))
