@@ -1,5 +1,5 @@
 import numpy as np
-from redblackgraph.simple import avos_sum, avos_product, leftmost_significant_bit_position
+from redblackgraph.reference import avos_sum, avos_product, leftmost_significant_bit_position
 
 
 def warshall(M):

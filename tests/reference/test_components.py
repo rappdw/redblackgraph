@@ -1,4 +1,4 @@
-from redblackgraph.simple import find_components, find_components_extended, triangularize, warshall
+from redblackgraph.reference import find_components, find_components_extended, triangularize, warshall
 
 
 def test_find_components():

@@ -23,7 +23,7 @@ A pdf file will be generated into the `build/latex-{datestamped}` directory.
 
 # A Note on Implementations
 
-* `redblackgraph.simple` - a pure python implementation. This simple implementation is intended for illustrative purposes only.
+* `redblackgraph.reference` - a pure python implementation. This simple implementation is intended for illustrative purposes only.
 * `redblackgraph.matrix` and `redblackgrpah.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support avos matrix products. 
 * `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation. 
 

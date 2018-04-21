@@ -1,4 +1,4 @@
-from redblackgraph.simple import leftmost_significant_bit_position
+from redblackgraph.reference import leftmost_significant_bit_position
 
 
 def lookup_relationship(da, db):

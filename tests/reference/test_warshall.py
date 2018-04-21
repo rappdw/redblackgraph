@@ -1,4 +1,4 @@
-from redblackgraph.simple import warshall
+from redblackgraph.reference import warshall
 from numpy.testing import assert_equal
 
 

@@ -1,4 +1,4 @@
-from redblackgraph.simple import vec_avos
+from redblackgraph.reference import vec_avos
 
 
 def test_identity():

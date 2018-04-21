@@ -2,6 +2,8 @@
 W:  7, 0: Wildcard import core (wildcard-import)
 ************* Module redblackgraph.generate_sparsetools
 W: 19, 0: Uses of a deprecated module 'optparse' (deprecated-module)
+************* Module redblackgraph.reference.rel_composition
+W:  6, 0: Anomalous backslash in string: '\l'. String constant might be missing an r prefix. (anomalous-backslash-in-string)
 ************* Module redblackgraph.core.rbm
 W: 76, 0: TODO: (fixme)
 ************* Module redblackgraph.core.redblack
@@ -11,8 +13,6 @@ E:120,15: Argument 'dtype' passed by position and keyword in classmethod call (r
 ************* Module redblackgraph.core
 W: 20, 0: Wildcard import avos_einsumfunc (wildcard-import)
 W: 22, 0: Wildcard import redblack (wildcard-import)
-************* Module redblackgraph.simple.rel_composition
-W:  6, 0: Anomalous backslash in string: '\l'. String constant might be missing an r prefix. (anomalous-backslash-in-string)
 
 -----------------------------------
 Your code has been rated at 9.76/10

@@ -1,4 +1,4 @@
-from redblackgraph.simple import calculate_relationship
+from redblackgraph.reference import calculate_relationship
 
 
 def test_deirect_relationships():

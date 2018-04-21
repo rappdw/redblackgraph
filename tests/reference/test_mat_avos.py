@@ -1,4 +1,4 @@
-from redblackgraph.simple import mat_avos
+from redblackgraph.reference import mat_avos
 
 
 def test_matrix_avos():

@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Tuple
 from numpy import ndarray, asarray
-from . import einsum, warshall, vertex_relational_composition, edge_relational_composition
-from redblackgraph.simple import find_components, triangularize, get_triangularization_permutation_matrices
+from redblackgraph.core import einsum, warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.reference import find_components, triangularize, get_triangularization_permutation_matrices
 
 __all__ = ['array', 'matrix']
 

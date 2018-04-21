@@ -1,5 +1,5 @@
 from functools import reduce
-from redblackgraph.simple import avos_product, avos_sum
+from redblackgraph.reference import avos_product, avos_sum
 
 
 def mat_avos(A, B):

@@ -1,5 +1,4 @@
-from redblackgraph.simple import vertex_relational_composition, edge_relational_composition
-from redblackgraph.simple import warshall
+from redblackgraph.reference import vertex_relational_composition, edge_relational_composition, warshall
 
 def test_vertex_relational_composition():
     # use the A+ from the example in our notebook, add in a sibling to the last vertex in the graph
