@@ -30,3 +30,18 @@ def test_avos():
     assert_equal(einsum('ij,jk', A_star, v.reshape(5, 1), avos=True), v_lambda.reshape(5, 1))
     assert_equal(einsum('i,...ij', u, A_star, avos=True), u_lambda)
     assert_equal(einsum('...i,i', A_star, v, avos=True), v_lambda)
+
+def test_identity():
+    A = np.array([[-1, 2, 3, 0, 0],
+                  [ 0,-1, 0, 2, 0],
+                  [ 0, 0, 1, 0, 0],
+                  [ 0, 0, 0, -1, 0],
+                  [ 2, 0, 0, 0, 1]], dtype=np.int64)
+    I = np.array([[ 1, 0, 0, 0, 0],
+                  [ 0, 1, 0, 0, 0],
+                  [ 0, 0, 1, 0, 0],
+                  [ 0, 0, 0, 1, 0],
+                  [ 0, 0, 0, 0, 1]], dtype=np.int64)
+
+    res = einsum('ij,jk', I, A, avos=True)
+    assert_equal(A, res)

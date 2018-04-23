@@ -11,7 +11,9 @@ def test_sign():
         (-1, 4),
         (4, -2),
         (4, -1),
-        (2, 4)
+        (2, 4),
+        (-1, 1),
+        (1, -1),
     ]
     expected = [
         None,
@@ -22,7 +24,9 @@ def test_sign():
         1,
         None,
         1,
-        1
+        1,
+        -1,
+        -1
     ]
     for expected, pair in zip(expected, pairs):
         assert expected == compute_sign(*pair)

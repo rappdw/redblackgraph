@@ -8,7 +8,7 @@ def test_loop():
                   [ 0,  0,  1,  0,  0],
                   [ 0,  0,  0, -1,  0],
                   [ 2,  0,  0,  0,  1]], dtype=np.int32)
-    A_star = A.transitive_closure()[0]
+    A_star = A.transitive_closure().W
 
     # what happens if we perform a relational_composition that causes a loop
     u = rb.array([0, 0, 0, 0, 3])

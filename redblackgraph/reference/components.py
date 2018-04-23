@@ -1,4 +1,6 @@
-def find_components(A):
+from typing import Sequence
+
+def find_components(A: Sequence[Sequence[int]]) -> Sequence[int]:
     """
     Given an input adjacency matrix compute the connected components
     :param A: input adjacency matrix (transitively closed)

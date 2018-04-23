@@ -168,8 +168,8 @@ class TestmatrixOperations(object):
                              [ 0,  0,  0, -1,  0],
                              [ 2,  4,  5,  8,  1]])
         results = a.transitive_closure()
-        assert_equal(results[0], expected)
-        assert_equal(results[1], 3)
+        assert_equal(results.W, expected)
+        assert_equal(results.diameter, 3)
 
     def test_vector_product(self):
         # test rank-1 mutliplication
@@ -309,7 +309,7 @@ class TestmatrixOperations(object):
                        [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],  # Em
                        [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3,-1]   # J
                        ])
-        R = R1.transitive_closure()[0]
+        R = R1.transitive_closure().W
         # Missing edge is R -> J, 2
         A_lambda = R.edge_relational_composition(2, 14, 2)
         assert A_lambda[0][12] == 12
@@ -331,15 +331,12 @@ class TestmatrixOperations(object):
                       [ 0, 0, 0, 0, 0, 1, 0],
                       [ 0, 0, 0, 0, 0, 0, 1]
                       ])
-        A_star: rb.array = R.transitive_closure()[0]
-        permutation_matrices = A_star.get_triangularization_permutation_matrices()
-        A_cannonical = A_star.triangularize(permutation_matrices)
-        A_cannonical_2 = A_star.triangularize()
-        assert_equal(A_cannonical, A_cannonical_2)
-        assert permutation_matrices
-        for row in range(len(A_cannonical)):
+        A_star: rb.array = R.transitive_closure().W
+        A_cannonical = A_star.triangularize()
+        assert A_cannonical.label_permutation is not None
+        for row in range(len(A_cannonical.A)):
             for col in range(row):
-                assert A_cannonical[row, col] == 0
+                assert A_cannonical.A[row, col] == 0
 
 
 

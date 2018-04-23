@@ -9,7 +9,7 @@ W: 76, 0: TODO: (fixme)
 ************* Module redblackgraph.core.redblack
 W: 51, 0: Anomalous backslash in string: '\l'. String constant might be missing an r prefix. (anomalous-backslash-in-string)
 W: 76, 0: Anomalous backslash in string: '\l'. String constant might be missing an r prefix. (anomalous-backslash-in-string)
-E:120,15: Argument 'dtype' passed by position and keyword in classmethod call (redundant-keyword-arg)
+E:118,15: Argument 'dtype' passed by position and keyword in classmethod call (redundant-keyword-arg)
 ************* Module redblackgraph.core
 W: 20, 0: Wildcard import avos_einsumfunc (wildcard-import)
 W: 22, 0: Wildcard import redblack (wildcard-import)

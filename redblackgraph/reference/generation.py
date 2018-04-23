@@ -1,4 +1,7 @@
-def get_traversal_path(pedigree_number):
+from typing import Sequence
+
+
+def get_traversal_path(pedigree_number: int) -> Sequence[str]:
     '''Given a pedigree_number, representing a relationship from a "root" vertex to an
     "ancester" vertex, return the traversal path of edges to red or black vertices
     to "walk" from the "root" to the "ancesster".

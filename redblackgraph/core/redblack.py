@@ -1,8 +1,7 @@
 import numpy as np
-from typing import Tuple
 from numpy import ndarray, asarray
 from redblackgraph.core import einsum, warshall, vertex_relational_composition, edge_relational_composition
-from redblackgraph.reference import find_components, triangularize, get_triangularization_permutation_matrices
+from redblackgraph.reference import find_components, triangularize, Triangularization, WarshallResult
 
 __all__ = ['array', 'matrix']
 
@@ -44,8 +43,9 @@ class _Avos(ndarray):
             'black': c_black
         }
 
-    def transitive_closure(self) -> Tuple['_Avos', int]:
-        return warshall(self)
+    def transitive_closure(self) -> WarshallResult:
+        res = warshall(self)
+        return WarshallResult(res[0], res[1])
 
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
@@ -97,11 +97,9 @@ class _Avos(ndarray):
     def find_components(self):
         return np.array(find_components(self.tolist()))
 
-    def triangularize(self, P=None):
-        return np.array(triangularize(self.tolist(), P)).view(type(self))
-
-    def get_triangularization_permutation_matrices(self):
-        return get_triangularization_permutation_matrices(self.tolist())
+    def triangularize(self) -> Triangularization:
+        t = triangularize(self)
+        return Triangularization(np.array(t.A).view(type(self)), t.label_permutation)
 
 
 class array(_Avos, ndarray):
