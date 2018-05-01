@@ -1,4 +1,5 @@
 #include <Python.h>
+#include <stdlib.h>
 #include <math.h>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
@@ -13,12 +14,17 @@
  * #temptype = npy_int, npy_long, npy_longlong#
  */
 
-NPY_NO_EXPORT @type@ @name@_nz_min(@type@ a, @type@ b)
+NPY_NO_EXPORT @type@ @name@_avos_sum(@type@ a, @type@ b)
 {
-    return a == 0 ? b : (b == 0 ? a : (a == -b ? 0 : (a < b ? a : b)));
+    if (a == -b) return 0;
+    if (a == 0) return b;
+    if (b == 0) return a;
+    if (a < b) return a;
+    return b;
+
 }
 
-NPY_NO_EXPORT int @name@_generation(@type@ x)
+NPY_NO_EXPORT int @name@_leftmost_significant_bit_position(@type@ x)
 {
     int targetlevel = 0;
     while (x >>= 1) {
@@ -27,18 +33,30 @@ NPY_NO_EXPORT int @name@_generation(@type@ x)
     return targetlevel;
 }
 
-NPY_NO_EXPORT @type@ @name@_avos(@type@ x, @type@ y)
+NPY_NO_EXPORT int @name@_compute_sign(@type@ x, @type@ y)
 {
-    // An interesting case is presented if x or y is 1 or -1. In these cases the avos product
-    // represents the situation where a and b are the same vertex or b and c are the same vertex.
-    // In a sense, this is the avos identity
-    if (x <= 1 || y <= 1)
-    {
-        return (x == 0 || y == 0) ? 0 : (y <= 1 ? x : y);
+    int a = x >= 0;
+    int b = y >= 0;
+    int c = x == -1;
+    int d = y == -1;
+    if ((!a || !b) && (!c && !d)) return 0;
+    if ((!a && !b) || ((!a || !b) && (x == 1 || y ==1))) return -1;
+    return 1;
+}
+
+NPY_NO_EXPORT @type@ @name@_avos_product(@type@ x, @type@ y)
+{
+    int sign = @name@_compute_sign(x, y);
+    x = abs(x);
+    y = abs(y);
+
+    // zero property
+    if (x == 0 || y == 0) {
+        return 0;
     }
 
-    int generationNumber = @name@_generation(y);
-    return (y & (@type@)pow(2, generationNumber) - 1) | (x << generationNumber);
+    int bit_position = @name@_leftmost_significant_bit_position(y);
+    return sign * ((y & (@type@)pow(2, bit_position) - 1) | (x << bit_position));
 }
 
 /**end repeat**/

@@ -61,7 +61,7 @@ static void
         if (np != 0 && i == beta) {
             lhs = np;
         }
-        r = @name@_nz_min(r, @name@_avos(lhs, *(@type@ *)ip1));
+        r = @name@_avos_sum(r, @name@_avos_product(lhs, *(@type@ *)ip1));
         ip0 += is0;
         ip1 += is1;
     }
@@ -113,7 +113,7 @@ static void
         if (m != alpha) {
             for (p = 0; p < dn; p++) {
                 if (*(@type@ *)ipR1 != 0) {
-                    *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR2, @name@_avos(lhs, *(@type@ *)ipR1));
+                    *(@type@ *)op = @name@_avos_sum(*(@type@ *)ipR2, @name@_avos_product(lhs, *(@type@ *)ipR1));
                 }
                 else {
                     *(@type@ *)op = *(@type@ *)ipR2;
@@ -248,7 +248,7 @@ static void
 
     for (m = 0; m < dn; m++) {
         for (p = 0; p < dn; p++) {
-            *(@type@ *)op = @name@_nz_min(*(@type@ *)ipR, @name@_avos(*(@type@ *)ipv, *(@type@ *)ipu));
+            *(@type@ *)op = @name@_avos_sum(*(@type@ *)ipR, @name@_avos_product(*(@type@ *)ipv, *(@type@ *)ipu));
 
             // advance to next column of u, R and output
             ipR += isR_j;
