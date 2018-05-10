@@ -113,7 +113,7 @@ static void
         data1 += stride1;
         data_out += stride_out;
 #elif @nop@ == 3
-        *(@type@ *)data_out = @name@_avos_sum(@name@_avos_product(@name@_avos((*(@type@ *)data0),
+        *(@type@ *)data_out = @name@_avos_sum(@name@_avos_product(@name@_avos_product((*(@type@ *)data0),
                                                                     (*(@type@ *)data1)),
                                                         (*(@type@ *)data2)),
                                             (*(@type@ *)data_out));

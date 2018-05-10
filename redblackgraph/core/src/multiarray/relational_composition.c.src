@@ -228,7 +228,9 @@ static void
             // raise an exception
             char s[100];
             memset(s, 0, 100*sizeof(char));
-            sprintf(s,"Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", n, *(@type@ *)ipu, *(@type@ *)ipv);
+            long u_i = *(@type@ *)ipu;
+            long v_i = *(@type@ *)ipv;
+            sprintf(s,"Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", n, u_i, v_i);
 
             PyErr_SetString(PyExc_ValueError, s);
             return;

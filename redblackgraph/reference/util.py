@@ -19,7 +19,7 @@ def compute_sign(x: int, y:int) -> int:
     '''
 
     a = x >= 0
-    b = y >=0
+    b = y >= 0
     c = x == -1
     d = y == -1
 
