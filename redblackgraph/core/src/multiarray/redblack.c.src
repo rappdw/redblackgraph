@@ -2479,10 +2479,20 @@ finish:
     return ret;
 }
 
+static PyObject *
+c_avos_sum_impl(PyObject *self, PyObject *args) {
+    Py_RETURN_NONE;
+}
+
+static PyObject *
+c_avos_product_impl(PyObject *self, PyObject *args) {
+    Py_RETURN_NONE;
+}
+
 static struct PyMethodDef array_module_methods[] = {
-    {"c_einsum_avos",
-        (PyCFunction)array_einsum2,
-        METH_VARARGS|METH_KEYWORDS, NULL},
+    {"c_einsum_avos",   (PyCFunction)array_einsum2,         METH_VARARGS|METH_KEYWORDS, "einsum avos function"},
+    {"c_avos_sum",      (PyCFunction)c_avos_sum_impl,       METH_VARARGS,               "avos sum"},
+    {"c_avos_product",  (PyCFunction)c_avos_product_impl,   METH_VARARGS,               "avos product"},
     {NULL, NULL, 0, NULL}                /* sentinel */
 };
 

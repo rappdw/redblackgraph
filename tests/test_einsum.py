@@ -1,5 +1,5 @@
 import numpy as np
-from redblackgraph import einsum
+from redblackgraph import einsum, avos_sum, avos_product
 from numpy.testing import (assert_equal)
 
 def test_avos():
@@ -45,3 +45,17 @@ def test_identity():
 
     res = einsum('ij,jk', I, A, avos=True)
     assert_equal(A, res)
+
+def test_avos_sum():
+    sums = []
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            sums.append(avos_sum(i, j))
+    assert sums == [-1, -1, 0, -1, 0, 1, 0, 1, 1]
+
+def test_product():
+    products = []
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            products.append(avos_product(i, j))
+    assert products == [-1, 0, -1, 0, 0, 0, -1, 0, 1]
