@@ -8,7 +8,8 @@ RUN chmod 1777 /tmp \
     && apt-get update && apt-get install --no-install-recommends --allow-unauthenticated -y \
     pandoc \
     && pip install -r /tmp/requirements.txt \
-    && mkdir -p /home/jovyan/.jupyter/custom
+    && mkdir -p /home/jovyan/.jupyter/custom \
+    && fix-permissions /home/jovyan/.jupyter
 
 ADD docker/notebook/custom.css /home/jovyan/.jupyter/custom
 
