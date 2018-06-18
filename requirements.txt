@@ -1,3 +1,3 @@
-dataclasses==0.5
-numpy==1.14.2
-XlsxWriter==1.0.4
+dataclasses
+numpy
+XlsxWriter

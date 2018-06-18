@@ -1,6 +1,5 @@
-FROM rappdw/docker-ds
+FROM rappdw/docker-ds:cpu-only
 
-USER root
 ADD requirements.txt /tmp/requirements.txt
 ADD docker/notebook/gen-latex.* /usr/local/bin/
 
@@ -13,4 +12,3 @@ RUN chmod 1777 /tmp \
 
 ADD docker/notebook/custom.css /home/jovyan/.jupyter/custom
 
-USER $NB_USER

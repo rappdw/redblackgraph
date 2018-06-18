@@ -106,7 +106,7 @@ if __name__ == "__main__":
         configuration=configuration,
         install_requires=[
             'dataclasses',
-            'numpy',
+            'numpy>=0.14.0',
             'XlsxWriter',
         ],
         extras_require={
