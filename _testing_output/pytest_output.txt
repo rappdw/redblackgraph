@@ -1,7 +1,7 @@
-GIT_HASH: 45b8520
+GIT_HASH: 6d4c8db
 [1m============================= test session starts ==============================[0m
-platform darwin -- Python 3.6.5, pytest-3.5.0, py-1.5.3, pluggy-0.6.0
-rootdir: /Users/drapp/sandbox/redblackgraph, inifile:
+platform linux -- Python 3.6.5, pytest-3.6.2, py-1.5.3, pluggy-0.6.0
+rootdir: /workdir, inifile:
 plugins: cov-2.5.1
 collected 33 items
 
@@ -17,7 +17,7 @@ tests/reference/test_vec_avos.py ..[36m                                      [ 
 tests/reference/test_warshall.py .[36m                                       [ 96%][0m
 tests/util/test_relationship_file_io.py .[36m                                [100%][0m
 
----------- coverage: platform darwin, python 3.6.5-final-0 -----------
+----------- coverage: platform linux, python 3.6.5-final-0 -----------
 Name                                           Stmts   Miss  Cover   Missing
 ----------------------------------------------------------------------------
 redblackgraph/__init__.py                          9      0   100%
@@ -44,14 +44,14 @@ TOTAL                                            439     33    92%
 [32mRequired test coverage of 80% reached. Total coverage: 92.48%
 [0m
 ========================== slowest 10 test durations ===========================
-0.31s call     tests/util/test_relationship_file_io.py::test_rel_file
-0.12s call     tests/reference/test_rel_composition.py::test_my_use_case_vertex
-0.11s call     tests/reference/test_rel_composition.py::test_my_use_case_edge
-0.05s call     tests/test_redblack.py::TestmatrixOperations::test_vector_matrix_rproduct
-0.03s setup    tests/test_redblack.py::TestmatrixOperations::test_cardinality
-0.03s call     tests/reference/test_components.py::test_find_components
-0.03s setup    tests/test_redblack.py::TestmatrixOperations::test_avos
-0.02s call     tests/reference/test_vec_avos.py::test_transitive
-0.01s call     tests/reference/test_avos.py::test_product
-0.01s call     tests/test_redblack.py::TestmatrixOperations::test_avos
-[32m[1m========================== 33 passed in 2.36 seconds ===========================[0m
+0.04s call     tests/util/test_relationship_file_io.py::test_rel_file
+0.03s call     tests/reference/test_rel_composition.py::test_my_use_case_edge
+0.02s call     tests/reference/test_rel_composition.py::test_my_use_case_vertex
+0.00s call     tests/reference/test_components.py::test_find_components
+0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
+0.00s call     tests/reference/test_rel_composition.py::test_vertex_relational_composition
+0.00s setup    tests/test_redblack.py::TestmatrixOperations::test_triangularization
+0.00s setup    tests/reference/test_avos.py::test_sign2
+0.00s call     tests/reference/test_warshall.py::test_warshall
+0.00s call     tests/test_redblack.py::TestmatrixOperations::test_relational_composition
+[32m[1m========================== 33 passed in 0.82 seconds ===========================[0m
