@@ -91,25 +91,11 @@ if __name__ == "__main__":
 
     if run_build:
         from numpy.distutils.core import setup
-
-        # # Customize extension building
-        # cmdclass['build_ext'] = get_build_ext_override()
-        #
-        # cwd = os.path.abspath(os.path.dirname(__file__))
-        # if not os.path.exists(os.path.join(cwd, 'PKG-INFO')):
-        #     # Generate Cython sources, unless building from source release
-        #     generate_cython()
-
         metadata['configuration'] = configuration
     else:
         # Don't import numpy here - non-build actions are required to succeed
         # without Numpy for example when pip is used to install Scipy when
         # Numpy is not yet present in the system.
-
-        # Version number is added to metadata inside configuration() if build
-        # is run.
-        #metadata['version'] = get_version_info()[0]
         metadata['name'] = 'redblackgraph'
-        pass
 
     setup(**metadata)
