@@ -1,2 +1,3 @@
+dataclasses
 numpy
 XlsxWriter
