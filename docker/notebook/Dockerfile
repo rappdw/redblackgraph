@@ -1,4 +1,4 @@
-FROM rappdw/docker-ds:cpu-only
+FROM rappdw/docker-ds
 
 ADD docker/notebook/gen-latex.* /usr/local/bin/
 

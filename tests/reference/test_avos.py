@@ -59,3 +59,11 @@ def test_product():
         for j in range(-1, 2):
             products.append(avos_product(i, j))
     assert products == [-1, 0, -1, 0, 0, 0, -1, 0, 1]
+
+def test_signed_product():
+    for i in range(10):
+        for j in range(10):
+            try:
+                assert avos_product(i, j) == -avos_product(-i, -j)
+            except:
+                print(f"error for i: {i}, j: {j}")
