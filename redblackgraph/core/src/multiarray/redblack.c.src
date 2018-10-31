@@ -2481,12 +2481,46 @@ finish:
 
 static PyObject *
 c_avos_sum_impl(PyObject *self, PyObject *args) {
-    Py_RETURN_NONE;
+    // given two arguments of python int (PyLong), use long_avos_sum to provide a result
+    PyLongObject *arg0, *arg1;
+    PyLongObject *rtn;
+
+    if (PyTuple_GET_SIZE(args) != 2) {
+        PyErr_SetString(PyExc_ValueError, "two operands are required");
+        return NULL;
+    }
+
+    arg0 = PyTuple_GET_ITEM(args, 0);
+    arg1 = PyTuple_GET_ITEM(args, 1);
+
+    npy_longlong l0 = PyLong_AsLong(arg0);
+    npy_longlong l1 = PyLong_AsLong(arg1);
+    npy_longlong result = longlong_avos_sum(l0, l1);
+
+    rtn = PyLong_FromLongLong(result);
+    return rtn;
 }
 
 static PyObject *
 c_avos_product_impl(PyObject *self, PyObject *args) {
-    Py_RETURN_NONE;
+    // given two arguments of python int (PyLong), use long_avos_product to provide a result
+    PyLongObject *arg0, *arg1;
+    PyLongObject *rtn;
+
+    if (PyTuple_GET_SIZE(args) != 2) {
+        PyErr_SetString(PyExc_ValueError, "two operands are required");
+        return NULL;
+    }
+
+    arg0 = PyTuple_GET_ITEM(args, 0);
+    arg1 = PyTuple_GET_ITEM(args, 1);
+
+    npy_longlong l0 = PyLong_AsLongLong(arg0);
+    npy_longlong l1 = PyLong_AsLongLong(arg1);
+    npy_longlong result = longlong_avos_product(l0, l1);
+
+    rtn = PyLong_FromLongLong(result);
+    return rtn;
 }
 
 static struct PyMethodDef array_module_methods[] = {

@@ -8,8 +8,8 @@ def einsum(*operands, **kwargs):
         raise ValueError("Avos should be specified in all cases.")
     return c_einsum_avos(*operands, **kwargs)
 
-def avos_sum(*operands):
-    return c_avos_sum(*operands)
+def avos_sum(lhs: int, rhs: int) -> int:
+    return c_avos_sum(lhs, rhs)
 
-def avos_product(*operands):
-    return c_avos_product(*operands)
+def avos_product(lhs: int, rhs: int) -> int:
+    return c_avos_product(lhs, rhs)

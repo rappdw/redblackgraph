@@ -15,9 +15,9 @@ Original error was: %s
 """ % (exc,)
     raise ImportError(msg)
 
-from .avos_einsumfunc import *
+from .avos import *
 from .redblack import *
 
-__all__ += avos_einsumfunc.__all__
+__all__ += avos.__all__
 __all__ += redblack.__all__
 __all__ += ['warshall', 'vertex_relational_composition', 'edge_relational_composition']
