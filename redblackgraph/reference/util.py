@@ -31,7 +31,7 @@ def compute_sign(x: int, y:int) -> int:
         sign = None
     elif (not a and not b) or (
             (not a or not b) and (x == 1 or y == 1)):
-        # identity property first. if one of the operatns are 1 or -1, then the sign is the sign
+        # identity property first. if one of the operands are 1 or -1, then the sign is the sign
         # of the other operand. If the operands are 1 and -1 then the sign is -
         sign = -1
     else:
