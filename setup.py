@@ -1,3 +1,4 @@
+import setuptools # needed for bdist_wheel
 import versioneer
 import os
 from os import path
@@ -105,7 +106,7 @@ if __name__ == "__main__":
         cmdclass={"sdist": sdist_checked},
         configuration=configuration,
         install_requires=[
-            'dataclasses',
+            'dataclasses;python_version<"3.7"',
             'numpy>=0.14.0',
             'XlsxWriter',
         ],
