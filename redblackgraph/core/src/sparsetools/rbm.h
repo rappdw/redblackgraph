@@ -68,12 +68,12 @@ const T generation(T x)
 }
 
 template <class T>
-const T avos(const T& lhs, const T& rhs)
+const T avos_product(const T& lhs, const T& rhs)
 {
     T generationNumber = generation(rhs);
     if (lhs == 0 || lhs == 1) {
         if (generationNumber == 0 && lhs != rhs) {
-            throw std::domain_error("Undefined avos." );
+            throw std::domain_error("Undefined avos_product." );
         }
         return rhs;
     }
@@ -81,8 +81,14 @@ const T avos(const T& lhs, const T& rhs)
 }
 
 template <class T>
-const T& acc(const T& lhs, const T& rhs)
+const T& avos_sum(const T& lhs, const T& rhs)
 {
+    if (lhs == -rhs) return 0;
+    if (lhs == 0) return rhs;
+    if (rhs == 0) return lhs;
+    if (lhs < rhs) return lhs;
+    return rhs;
+
     return lhs == 0 ? rhs : (lhs < rhs ? lhs : rhs);
 }
 
@@ -126,8 +132,8 @@ void rbm_matmat_pass2(const I n_row,
             for(I kk = kk_start; kk < kk_end; kk++){
                 I k = Bj[kk];
 
-                // change 1: redefinition of matrix multiplication, change + to <acc> and * to <avos>
-                sums[k] = acc(sums[k], (avos(v, Bx[kk])));
+                // change 1: redefinition of matrix multiplication, change + to <avos_sum> and * to <avos_product>
+                sums[k] = avos_sum(sums[k], (avos_product(v, Bx[kk])));
 
                 if(next[k] == -1){
                     next[k] = head;
