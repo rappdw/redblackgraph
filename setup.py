@@ -11,7 +11,7 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('redblackgraph',
                            parent_package,
                            top_path)
-    config.add_extension('rb_multiarray',
+    config.add_extension('_multiarray',
                          [
                              'redblackgraph/core/src/multiarray/rbg_math.h.src',
                              'redblackgraph/core/src/multiarray/rbg_math.c.src',
@@ -21,12 +21,12 @@ def configuration(parent_package='', top_path=None):
                          ],
                          include_dirs=['redblackgraph/core/src/multiarray'])
 
-    # config.add_extension('rb_sparsetools',
-    #                      [
-    #                         'redblackgraph/core/src/sparsetools/sparsetools.cxx',
-    #                         'redblackgraph/core/src/sparsetools/rbm.cxx'
-    #                      ],
-    #                      include_dirs=['redblackgraph/core/src/sparsetools'])
+    config.add_extension('_sparsetools',
+                         [
+                            'redblackgraph/core/src/sparsetools/sparsetools.cxx',
+                            'redblackgraph/core/src/sparsetools/rbm.cxx'
+                         ],
+                         include_dirs=['redblackgraph/core/src/sparsetools'])
 
     return config
 
@@ -71,6 +71,7 @@ if __name__ == "__main__":
         install_requires=[
             'dataclasses;python_version<"3.7"',
             'numpy>=0.14.0',
+            'scipy',
             'XlsxWriter',
         ],
         extras_require={

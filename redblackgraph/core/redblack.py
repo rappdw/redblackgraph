@@ -50,7 +50,7 @@ class _Avos(ndarray):
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
-        u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
+        u, v represent a vertex, lambda, not currently represented in self, compose R_{lambda}
         which is the transitive closure for this graph with lambda included
         :param u: simple row vector for new vertex, lambda
         :param v: simple column vector for new vertex, lambda
@@ -75,7 +75,7 @@ class _Avos(ndarray):
     def edge_relational_composition(self, alpha, beta, pedigree_number, compute_closure=False):
         '''
         Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
-        compose R_{\lambda} which is the transitive closure for this graph with the edge added
+        compose R_{lambda} which is the transitive closure for this graph with the edge added
         :param alpha: index in self that is the source of relationship np
         :param beta: index in self that is the targe of relationship np
         :param pedigree_number: the pedigree number of the relationship from alpha to beta

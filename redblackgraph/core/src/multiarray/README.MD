@@ -1,7 +1,6 @@
-RedBlackMultiArray
-------------------
+#RedBlackMultiArray
 
-rb_multiarray is a Numpy Extension Module that makes use
+_multiarray is a Numpy Extension Module that makes use
 of the Numpy C-API to implement C optimized RedBlack linear algebra
 operations on Numpy arrays. 
 
@@ -12,3 +11,8 @@ avos operation.
 
 It implements all linear algebra functionality via a modified
 einstein summation function.
+
+#RedBlackSparseTools
+
+_sparsetools is a Scipy Extension modules that provides a sparse implementation
+of RedBlack linear algebra operations.

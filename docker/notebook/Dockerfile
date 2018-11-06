@@ -6,6 +6,7 @@ RUN chmod 1777 /tmp; \
     apt-get update; \
     apt-get install --no-install-recommends --allow-unauthenticated -y \
         gcc \
+        g++ \
         linux-headers-4.9-amd64 \
         libc6-dev \
         pandoc \

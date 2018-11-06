@@ -64,6 +64,9 @@ def test_signed_product():
     for i in range(10):
         for j in range(10):
             try:
-                assert avos_product(i, j) == -avos_product(-i, -j)
+                product = avos_product(i, j)
+                neg_product = -avos_product(-i, -j)
+                assert product == neg_product
             except:
-                print(f"error for i: {i}, j: {j}")
+                print(f"error for i: {i}, j: {j}, prod: {product}, -prod: {neg_product}")
+    raise ValueError("I believe this test case is failing... investigate")

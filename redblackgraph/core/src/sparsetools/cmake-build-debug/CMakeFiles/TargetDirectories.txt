@@ -1,3 +1,0 @@
-/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/drapp/sandbox/redBlackGraph/redblackgraph/sparsetools/cmake-build-debug/CMakeFiles/sparsetools.dir

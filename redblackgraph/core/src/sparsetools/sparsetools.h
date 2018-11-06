@@ -7,7 +7,6 @@
 #include <stdexcept>
 
 #include "bool_ops.h"
-#include "complex_ops.h"
 
 typedef Py_ssize_t thunk_t(int I_typenum, int T_typenum, void **args);
 

@@ -5,7 +5,7 @@ import copy
 def vertex_relational_composition(u, R, v, color):
     '''
     Given simple row vector u, transitively closed matrix R, and simple column vector v where
-    u and v represent a vertex, lambda, not currently represented in R, compose R_{\lambda}
+    u and v represent a vertex, lambda, not currently represented in R, compose R_{lambda}
     which is the transitive closure for the graph with lambda included
     :param u: simple row vector for new vertex, lambda
     :param R: transitive closure for Red Black graph

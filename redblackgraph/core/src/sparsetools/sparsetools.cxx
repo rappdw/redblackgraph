@@ -51,8 +51,7 @@ static const int supported_T_typenums[] = {NPY_BOOL,
                                            NPY_INT, NPY_UINT,
                                            NPY_LONG, NPY_ULONG,
                                            NPY_LONGLONG, NPY_ULONGLONG,
-                                           NPY_FLOAT, NPY_DOUBLE, NPY_LONGDOUBLE,
-                                           NPY_CFLOAT, NPY_CDOUBLE, NPY_CLONGDOUBLE};
+                                           NPY_FLOAT, NPY_DOUBLE, NPY_LONGDOUBLE};
 static const int n_supported_T_typenums = sizeof(supported_T_typenums) / sizeof(int);
 
 static PyObject *array_from_std_vector_and_free(int typenum, void *p);
@@ -485,9 +484,6 @@ static void *allocate_std_vector_typenum(int typenum)
         PROCESS(NPY_FLOAT, npy_float);
         PROCESS(NPY_DOUBLE, npy_double);
         PROCESS(NPY_LONGDOUBLE, npy_longdouble);
-        PROCESS(NPY_CFLOAT, npy_cfloat_wrapper);
-        PROCESS(NPY_CDOUBLE, npy_cdouble_wrapper);
-        PROCESS(NPY_CLONGDOUBLE, npy_clongdouble_wrapper);
     } catch (std::exception &e) {
         /* failed */
     }
@@ -520,9 +516,6 @@ static void free_std_vector_typenum(int typenum, void *p)
     PROCESS(NPY_FLOAT, npy_float);
     PROCESS(NPY_DOUBLE, npy_double);
     PROCESS(NPY_LONGDOUBLE, npy_longdouble);
-    PROCESS(NPY_CFLOAT, npy_cfloat_wrapper);
-    PROCESS(NPY_CDOUBLE, npy_cdouble_wrapper);
-    PROCESS(NPY_CLONGDOUBLE, npy_clongdouble_wrapper);
 
 #undef PROCESS
 }
@@ -556,9 +549,6 @@ static PyObject *array_from_std_vector_and_free(int typenum, void *p)
     PROCESS(NPY_FLOAT, npy_float);
     PROCESS(NPY_DOUBLE, npy_double);
     PROCESS(NPY_LONGDOUBLE, npy_longdouble);
-    PROCESS(NPY_CFLOAT, npy_cfloat_wrapper);
-    PROCESS(NPY_CDOUBLE, npy_cdouble_wrapper);
-    PROCESS(NPY_CLONGDOUBLE, npy_clongdouble_wrapper);
 
 #undef PROCESS
 
