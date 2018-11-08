@@ -38,9 +38,8 @@ template <class T>
 const T avos_product(const T& lhs, const T& rhs)
 {
     int sign = compute_sign(lhs, rhs);
-    T x, y;
-    x = lhs ? lhs >= 0 : -lhs;
-    y = rhs ? rhs >= 0 : -rhs;
+    T x = lhs >= 0 ? lhs: -lhs;
+    T y = rhs >= 0 ? rhs : -rhs;
 
     // zero property
     if (x == 0 || y == 0) {
@@ -149,7 +148,7 @@ void rbm_matmat_pass2(const I n_row,
                 I k = Bj[kk];
 
                 // change 1: redefinition of matrix multiplication, change + to <avos_sum> and * to <avos_product>
-                sums[k] = avos_sum(sums[k], (avos_product(v, Bx[kk])));
+                sums[k] = avos_sum(sums[k], avos_product(v, Bx[kk]));
 
                 if(next[k] == -1){
                     next[k] = head;
