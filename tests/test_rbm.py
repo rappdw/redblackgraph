@@ -5,21 +5,52 @@ from redblackgraph import rb_matrix, Color
 
 MATRICES = [
     # elementary case
+    # {
+    #     # 0 - me
+    #     # 1 - father
+    #     # 2 - mother
+    #     # 3 - paternal grandfather
+    #     'input': rb_matrix((
+    #         [0, 2, 3, 0, 2, 1, 0],
+    #         [0, 1, 2, 1, 3, 2, 3],
+    #         [0, 3, 5, 6, 7]
+    #     )),
+    #     'expected': rb_matrix((
+    #         [0, 2, 3, 4, 0, 2, 1, 0],
+    #         [0, 1, 2, 3, 1, 3, 2, 3],
+    #         [0, 4, 6, 7, 8]
+    #     )),
+    #     'iterations': 1
+    # },
     {
         # 0 - me
         # 1 - father
         # 2 - mother
         # 3 - paternal grandfather
-        'input': rb_matrix((
-            [0, 2, 3, 0, 2, 1, 0],
-            [0, 1, 2, 1, 3, 2, 3],
-            [0, 3, 5, 6, 7]
-        )),
-        'expected': rb_matrix((
-            [0, 2, 3, 4, 0, 2, 1, 0],
-            [0, 1, 2, 3, 1, 3, 2, 3],
-            [0, 4, 6, 7, 8]
-        )),
+        'input': rb_matrix(
+            coo_matrix(
+                (
+                        [-1, 2, 3, -1, 2, 1, -1],
+                    (
+                        [ 0, 0, 0,  1, 1, 2,  3],
+                        [ 0, 1, 2,  1, 3, 2,  3]
+                    )
+                ),
+                shape=(4, 4)
+            )
+        ),
+        'expected': rb_matrix(
+            coo_matrix(
+                (
+                        [-1, 2, 3, -1, 2, 1, -1, 4],
+                    (
+                        [ 0, 0, 0,  1, 1, 2,  3, 0],
+                        [ 0, 1, 2,  1, 3, 2,  3, 3]
+                    )
+                ),
+                shape=(4,4)
+            )
+        ),
         'iterations': 1
     },
     # simple case
@@ -113,12 +144,13 @@ MATRICES = [
 ]
 
 
-def matrx_equality_test(m1, m2):
-    test_ne = m1 != m2
+def matrx_equality_test(actual, expected):
+    test_ne = actual != expected
     if test_ne.nnz != 0:
-        print_matrix("Falied-m1", m1)
-        print_matrix("Falied-m2", m2)
-        print(test_ne)
+        print()
+        print_matrix("Falied-actual", actual)
+        print_matrix("Falied-expected", expected)
+        print_matrix("Failed-ne", test_ne)
     assert test_ne.nnz == 0
 
 def print_matrix(label, m):
@@ -150,5 +182,3 @@ def test_transitive_closure():
     # TODO: need to implement warshall algorithm as described in the Jupyter notebook and then test
     pass
 
-def test_check_math():
-    raise ValueError("I don't think the math is right in the sparse tools module, verify")

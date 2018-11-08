@@ -22,17 +22,13 @@ def compute_sign(x: int, y:int) -> int:
     b = y >= 0
     c = x == -1
     d = y == -1
-    e = x < 0
-    f = y < 0
-    g = x == 1
-    h = y == 1
 
     # with the truth states of a, b, c, d, sign will be:
-    #   as of yet undetermined (u) - (!a or !b) and (!c and !d)
+    #   as of yet undefined (u) - (!a or !b) and (!c and !d)
     #   negative (n) - (!a and !b) and !u
     #   positive (p) = !(n or u)
     if (not a or not b) and (not c and not d):
-        sign = None
+        raise ValueError(f"Undefined operation avos_sign({x}, {y})")
     elif (not a and not b) or ((not a or not b) and (x == 1 or y == 1)):
         # identity property first. if one of the operands are 1 or -1, then the sign is the sign
         # of the other operand. If the operands are 1 and -1 then the sign is -

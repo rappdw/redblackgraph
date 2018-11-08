@@ -18,8 +18,7 @@ redblackgraph/core/src/multiarray/rbg_math.h
 redblackgraph/core/src/multiarray/relational_composition.c
 redblackgraph/core/src/multiarray/warshall.c
 redblackgraph/__config__.py
-redblackgraph/rb_multiarray.*.so
-redblackgraph/rb_sparsetools.*.so
+redblackgraph/*.so
 redblackgraph/tests/resources/closure.results.csv
 redblackgraph/tests/resources/composition.results.csv
 _version.py.bld

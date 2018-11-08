@@ -10,6 +10,57 @@
 
 using namespace std;
 
+// see: https://github.com/klmr/named-operator
+// for how to define named operator in C++
+template <class T>
+const int leftmost_significant_bit_position(T x)
+{
+    int targetlevel = 0;
+    while (x >>= 1) {
+        targetlevel += 1;
+    }
+    return targetlevel;
+}
+
+template <class T>
+const int compute_sign(const T& x, const T& y)
+{
+    int a = x >= 0;
+    int b = y >= 0;
+    int c = x == -1;
+    int d = y == -1;
+    if ((!a || !b) && (!c && !d)) return 0;
+    if ((!a && !b) || ((!a || !b) && (x == 1 || y ==1))) return -1;
+    return 1;
+}
+
+template <class T>
+const T avos_product(const T& lhs, const T& rhs)
+{
+    int sign = compute_sign(lhs, rhs);
+    T x, y;
+    x = lhs ? lhs >= 0 : -lhs;
+    y = rhs ? rhs >= 0 : -rhs;
+
+    // zero property
+    if (x == 0 || y == 0) {
+        return 0;
+    }
+
+    int bit_position = leftmost_significant_bit_position(y);
+    return sign * ((y & (npy_int)pow(2, bit_position) - 1) | (x << bit_position));
+}
+
+template <class T>
+const T& avos_sum(const T& a, const T& b)
+{
+    if (a == -b) return 0;
+    if (a == 0) return b;
+    if (b == 0) return a;
+    if (a < b) return a;
+    return b;
+}
+
 /*
  * Pass 1 computes RBM row pointer for the matrix product C = A * B
  *
@@ -56,41 +107,6 @@ void rbm_matmat_pass1(const I n_row,
     }
 }
 
-
-// see: https://github.com/klmr/named-operator
-// for how to define named operator in C++
-template <class T>
-const T generation(T x)
-{
-    int targetlevel = 0;
-    while (x >>= 1) ++targetlevel;
-    return targetlevel;
-}
-
-template <class T>
-const T avos_product(const T& lhs, const T& rhs)
-{
-    T generationNumber = generation(rhs);
-    if (lhs == 0 || lhs == 1) {
-        if (generationNumber == 0 && lhs != rhs) {
-            throw std::domain_error("Undefined avos_product." );
-        }
-        return rhs;
-    }
-    return (rhs & (T)(pow(2, generationNumber) - 1)) | (lhs << generationNumber);
-}
-
-template <class T>
-const T& avos_sum(const T& lhs, const T& rhs)
-{
-    if (lhs == -rhs) return 0;
-    if (lhs == 0) return rhs;
-    if (rhs == 0) return lhs;
-    if (lhs < rhs) return lhs;
-    return rhs;
-
-    return lhs == 0 ? rhs : (lhs < rhs ? lhs : rhs);
-}
 
 /*
  * Pass 2 computes RBM entries for matrix C = A*B using the
@@ -145,9 +161,7 @@ void rbm_matmat_pass2(const I n_row,
 
         for(I jj = 0; jj < length; jj++){
 
-            // change 2: preserve the diagonal, even if it's zero
-            // perhaps another argument for 1 == self (see comment in operators.generation2
-            if(sums[head] != 0 || head == i){
+            if(sums[head] != 0){
                 Cj[nnz] = head;
                 Cx[nnz] = sums[head];
                 nnz++;
