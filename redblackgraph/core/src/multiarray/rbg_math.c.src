@@ -46,9 +46,8 @@ NPY_NO_EXPORT int @name@_compute_sign(@type@ x, @type@ y)
 NPY_NO_EXPORT @type@ @name@_avos_product(@type@ lhs, @type@ rhs)
 {
     int sign = @name@_compute_sign(lhs, rhs);
-    @type@ x, y;
-    x = lhs ? lhs >= 0 : -lhs;
-    y = rhs ? rhs >= 0 : -rhs;
+    @type@ x = lhs >= 0 ? lhs : -lhs;
+    @type@ y = rhs >= 0 ? rhs : -rhs;
 
     // zero property
     if (x == 0 || y == 0) {
