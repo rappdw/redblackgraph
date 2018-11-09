@@ -9,7 +9,7 @@ class WarshallResult:
     W: np.array
     diameter: int
 
-def warshall(M: Sequence[Sequence[int]]) -> WarshallResult:
+def warshall(M: Sequence[Sequence[int]], copy:bool=True) -> WarshallResult:
     '''Computes the transitive closure of a Red Black adjacency matrix and as a side-effect,
     the diameter.'''
 
@@ -17,7 +17,7 @@ def warshall(M: Sequence[Sequence[int]]) -> WarshallResult:
     # * Replaces innermost loop's: `W[i][j] = W[i][j] or (W[i][k] and W[k][j])`
     # * Adds diameter calculation
     n = len(M)
-    W = np.array(M, copy=True)
+    W = np.array(M, copy=copy)
     diameter = 0
     for k in range(n):
         for i in range(n):

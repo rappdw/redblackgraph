@@ -17,8 +17,8 @@ See sparsetools.cxx for more details.
 
 """
 import optparse
-import os
 from distutils.dep_util import newer
+from pathlib import Path
 
 #
 # List of all routines and their argument types.
@@ -276,9 +276,7 @@ def main():
             methods.append(method)
 
         # Produce output
-        dst = os.path.join(os.path.dirname(__file__),
-                           'sparsetools',
-                           unit_name + '_impl.h')
+        dst = Path(__file__).parent.parent / 'redblackgraph' / 'core' / 'src' / 'sparsetools' / (unit_name + '_impl.h')
         if newer(__file__, dst) or options.force:
             print("[generate_sparsetools] generating %r" % (dst,))
             with open(dst, 'w') as f:
@@ -305,9 +303,7 @@ def main():
     };"""
 
     # Produce sparsetools_impl.h
-    dst = os.path.join(os.path.dirname(__file__),
-                       'sparsetools',
-                       'sparsetools_impl.h')
+    dst = Path(__file__).parent.parent / 'redblackgraph' / 'core' / 'src' / 'sparsetools' / 'sparsetools_impl.h'
 
     if newer(__file__, dst) or options.force:
         print("[generate_sparsetools] generating %r" % (dst,))
