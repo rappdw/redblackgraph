@@ -22,7 +22,7 @@
  * listed below in the call_spec function.
  */
 
-#define PY_ARRAY_UNIQUE_SYMBOL _scipy_sparse_sparsetools_ARRAY_API
+#define PY_ARRAY_UNIQUE_SYMBOL _rbg_sparse_sparsetools_ARRAY_API
 
 #include <Python.h>
 

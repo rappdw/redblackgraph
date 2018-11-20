@@ -50,15 +50,10 @@ I_TYPES = [
 #
 T_TYPES = [
     ('NPY_BYTE', 'npy_byte'),
-    ('NPY_UBYTE', 'npy_ubyte'),
     ('NPY_SHORT', 'npy_short'),
-    ('NPY_USHORT', 'npy_ushort'),
     ('NPY_INT', 'npy_int'),
-    ('NPY_UINT', 'npy_uint'),
     ('NPY_LONG', 'npy_long'),
-    ('NPY_ULONG', 'npy_ulong'),
     ('NPY_LONGLONG', 'npy_longlong'),
-    ('NPY_ULONGLONG', 'npy_ulonglong'),
 ]
 
 #

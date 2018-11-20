@@ -12,7 +12,7 @@ using namespace std;
 
 // see: https://github.com/klmr/named-operator
 // for how to define named operator in C++
-inline template <class T>
+template <class T>
 const int leftmost_significant_bit_position(T x)
 {
     int targetlevel = 0;
@@ -22,7 +22,7 @@ const int leftmost_significant_bit_position(T x)
     return targetlevel;
 }
 
-inline template <class T>
+template <class T>
 const int compute_sign(const T& x, const T& y)
 {
     int a = x >= 0;
@@ -34,7 +34,7 @@ const int compute_sign(const T& x, const T& y)
     return 1;
 }
 
-inline template <class T>
+template <class T>
 const T avos_product(const T& lhs, const T& rhs)
 {
     int sign = compute_sign(lhs, rhs);
@@ -47,13 +47,14 @@ const T avos_product(const T& lhs, const T& rhs)
     }
 
     int bit_position = leftmost_significant_bit_position(y);
-    return sign * ((y & (npy_int)pow(2, bit_position) - 1) | (x << bit_position));
+    return sign * ((y & ((npy_int)pow(2, bit_position) - 1)) | (x << bit_position));
 }
 
-inline template <class T>
+template <class T>
 const T& avos_sum(const T& a, const T& b)
 {
-    if (a == -b) return 0;
+    static const T ZERO = 0;
+    if (a == -b) return ZERO;
     if (a == 0) return b;
     if (b == 0) return a;
     if (a < b) return a;
@@ -125,26 +126,21 @@ void rbm_matmat_pass2(const I n_row,
       	                    I Cj[],
       	                    T Cx[])
 {
+    // method that uses O(n) temp storage
     std::vector<I> next(n_col,-1);
     std::vector<T> sums(n_col, 0);
-
-    I nnz = 0;
-
     Cp[0] = 0;
 
+    I nnz = 0;
     for(I i = 0; i < n_row; i++){
         I head   = -2;
         I length =  0;
 
-        I jj_start = Ap[i];
-        I jj_end   = Ap[i+1];
-        for(I jj = jj_start; jj < jj_end; jj++){
+        for(I jj = Ap[i]; jj < Ap[i+1]; jj++){
             I j = Aj[jj];
             T v = Ax[jj];
 
-            I kk_start = Bp[j];
-            I kk_end   = Bp[j+1];
-            for(I kk = kk_start; kk < kk_end; kk++){
+            for(I kk = Bp[j]; kk < Bp[j+1]; kk++){
                 I k = Bj[kk];
 
                 // change 1: redefinition of matrix multiplication, change + to <avos_sum> and * to <avos_product>

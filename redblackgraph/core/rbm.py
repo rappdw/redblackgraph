@@ -20,7 +20,7 @@ class rb_matrix(csr_matrix):
         return self.__class__(other)._mul_sparse_matrix(self)
 
     def _mul_sparse_matrix(self, other):
-        # this is lifted from scipy.csr._mul_sparxe_matrix and is identical aside from explicitely
+        # this is lifted from scipy.sparse.compressed._mul_sparse_matrix and is identical aside from explicitely
         # using rbm_matmat_passx as the functions rather than looking them up from functions available
         # in the scipy._sparsetools module
         M, K1 = self.shape
