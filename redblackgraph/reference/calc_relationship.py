@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Sequence
-from redblackgraph.reference import leftmost_significant_bit_position
+from redblackgraph.reference import MSB
 
 
 @dataclass
@@ -49,4 +49,4 @@ def calculate_relationship(a: Sequence[int], b: Sequence[int]) -> Relationship:
     if common_ancestor == -1:
         return Relationship(-1, "No Relationship")
     return Relationship(common_ancestor,
-                        lookup_relationship(leftmost_significant_bit_position(x), leftmost_significant_bit_position(y)))
+                        lookup_relationship(MSB(x), MSB(y)))

@@ -1,5 +1,5 @@
 from .generation import get_traversal_path
-from .avos import avos_sum, avos_product, leftmost_significant_bit_position
+from .avos import avos_sum, avos_product, MSB
 from .components import find_components
 from .triangularization import find_components_extended, triangularize, Components, Triangularization
 from .warshall import warshall, WarshallResult

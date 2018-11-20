@@ -13,7 +13,7 @@ using namespace std;
 // see: https://github.com/klmr/named-operator
 // for how to define named operator in C++
 template <class T>
-const int leftmost_significant_bit_position(T x)
+const int MSB(T x)
 {
     int targetlevel = 0;
     while (x >>= 1) {
@@ -46,7 +46,7 @@ const T avos_product(const T& lhs, const T& rhs)
         return 0;
     }
 
-    int bit_position = leftmost_significant_bit_position(y);
+    int bit_position = MSB(y);
     return sign * ((y & ((npy_int)pow(2, bit_position) - 1)) | (x << bit_position));
 }
 

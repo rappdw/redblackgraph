@@ -1,6 +1,6 @@
-def leftmost_significant_bit_position(x: int) -> int:
+def MSB(x: int) -> int:
     '''
-    Given an integer, return the bit position of it's leftmost significant bit
+    Given an integer, return the bit position of it's most significant bit
     :param x: operand
     :return: bit position of leftmost significant bit
     '''

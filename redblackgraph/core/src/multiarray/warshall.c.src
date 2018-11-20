@@ -95,7 +95,7 @@ static void
         ipR1 = args[1] + (k + 1) * isR_j;
         ipR2 += isR_i;
     }
-    *(npy_intp *)args[2] = @name@_leftmost_significant_bit_position(diameter);
+    *(npy_intp *)args[2] = @name@_MSB(diameter);
 }
 
 static void

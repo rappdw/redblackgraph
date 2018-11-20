@@ -8,3 +8,6 @@ Introduced to Strassen's method of matrix multiplication in [Introduction to Alg
 
 Looking into Strassen's method, it seems that avos multiplicaiton is likely a semi-ring [Strassen algorithm](https://en.wikipedia.org/wiki/Strassen_algorithm)
 
+Removed reference to unsigned types in sparsetools... Rather than do this, 
+red 1 should be defined as binary 11111...1 for word width w and then only operate 
+on unsigned types. This makes the min function a bit odd, but works well.

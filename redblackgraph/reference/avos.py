@@ -1,4 +1,4 @@
-from redblackgraph.reference.util import compute_sign, leftmost_significant_bit_position
+from redblackgraph.reference.util import compute_sign, MSB
 
 def avos_sum(x: int, y: int) -> int:
     '''
@@ -32,5 +32,5 @@ def avos_product(x: int, y: int) -> int:
     if x == 0 or y == 0:
         return 0
 
-    bit_position = leftmost_significant_bit_position(y)
+    bit_position = MSB(y)
     return sign * ((y & (2 ** bit_position - 1)) | (x << bit_position))

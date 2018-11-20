@@ -1,7 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 from typing import Sequence
-from redblackgraph.reference import avos_sum, avos_product, leftmost_significant_bit_position
+from redblackgraph.reference import avos_sum, avos_product, MSB
 
 
 @dataclass
@@ -24,4 +24,4 @@ def warshall(M: Sequence[Sequence[int]], copy:bool=True) -> WarshallResult:
             for j in range(n):
                 W[i][j] = avos_sum(W[i][j], avos_product(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
-    return WarshallResult(W, leftmost_significant_bit_position(diameter))
+    return WarshallResult(W, MSB(diameter))
