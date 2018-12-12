@@ -67,9 +67,9 @@ extern char *edge_relational_composition_signature;
 /**********************************************/
 
 /**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #name     = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
+ * #type     = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
+ * #temptype = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
  */
 
 /**begin repeat1
@@ -641,11 +641,11 @@ _contig_outstride0_unary_specialization_table[NPY_NTYPES] = {
  *         object, string, unicode, void,
  *         datetime, timedelta, half#
  * #use = 0,
- *        0, 0,
- *        0, 0,
- *        1, 0,
- *        1, 0,
- *        1, 0,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
  *        0, 0, 0,
  *        0, 0, 0,
  *        0, 0, 0, 0,
@@ -672,11 +672,11 @@ static sum_of_products_fn _binary_specialization_table[NPY_NTYPES][5] = {
  *         object, string, unicode, void,
  *         datetime, timedelta, half#
  * #use = 0,
- *        0, 0,
- *        0, 0,
- *        1, 0,
- *        1, 0,
- *        1, 0,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
  *        0, 0, 0,
  *        0, 0, 0,
  *        0, 0, 0, 0,
@@ -709,11 +709,11 @@ static sum_of_products_fn _outstride0_specialized_table[NPY_NTYPES][4] = {
  *         object, string, unicode, void,
  *         datetime, timedelta, half#
  * #use = 0,
- *        0, 0,
- *        0, 0,
- *        1, 0,
- *        1, 0,
- *        1, 0,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
  *        0, 0, 0,
  *        0, 0, 0,
  *        0, 0, 0, 0,
@@ -745,11 +745,11 @@ static sum_of_products_fn _allcontig_specialized_table[NPY_NTYPES][4] = {
  *         object, string, unicode, void,
  *         datetime, timedelta, half#
  * #use = 0,
- *        0, 0,
- *        0, 0,
- *        1, 0,
- *        1, 0,
- *        1, 0,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
  *        0, 0, 0,
  *        0, 0, 0,
  *        0, 0, 0, 0,
@@ -781,11 +781,11 @@ static sum_of_products_fn _unspecialized_table[NPY_NTYPES][4] = {
  *         object, string, unicode, void,
  *         datetime, timedelta, half#
  * #use = 0,
- *        0, 0,
- *        0, 0,
- *        1, 0,
- *        1, 0,
- *        1, 0,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
+ *        1, 1,
  *        0, 0, 0,
  *        0, 0, 0,
  *        0, 0, 0, 0,
@@ -2495,10 +2495,10 @@ c_avos_sum_impl(PyObject *self, PyObject *args) {
 
     npy_longlong l0 = PyLong_AsLongLong(arg0);
     npy_longlong l1 = PyLong_AsLongLong(arg1);
-    npy_longlong result = longlong_avos_sum(l0, l1);
+    npy_ulonglong result = ulonglong_avos_sum(l0, l1);
 
-    rtn = PyLong_FromLongLong(result);
-    return rtn;
+    if (result == NPY_MAX_ULONGLONG) return PyLong_FromLong(-1);
+    return PyLong_FromUnsignedLongLong(result);
 }
 
 static PyObject *
@@ -2517,10 +2517,10 @@ c_avos_product_impl(PyObject *self, PyObject *args) {
 
     npy_longlong l0 = PyLong_AsLongLong(arg0);
     npy_longlong l1 = PyLong_AsLongLong(arg1);
-    npy_longlong result = longlong_avos_product(l0, l1);
+    npy_ulonglong result = ulonglong_avos_product(l0, l1);
 
-    rtn = PyLong_FromLongLong(result);
-    return rtn;
+    if (result == NPY_MAX_ULONGLONG) return PyLong_FromLong(-1);
+    return PyLong_FromUnsignedLongLong(result);
 }
 
 static struct PyMethodDef array_module_methods[] = {
@@ -2580,30 +2580,54 @@ PyMODINIT_FUNC init_multiarray(void) {
 
     d = PyModule_GetDict(m);
 
-    f = PyUFunc_FromFuncAndDataAndSignature(warshall_functions,
-                    warshall_data, warshall_signatures,
-                    3, 1, 2, PyUFunc_None, "warshall",
-                    "warshall-floyd avos \n"
-                    "     \"(m,m)->(m,m),()\" \n",
-                    0, warshall_signature);
+    f = PyUFunc_FromFuncAndDataAndSignature(
+            warshall_functions,                         // functions (len n_types)
+            warshall_data,                              // data
+            warshall_signatures,                        // types
+            10,                                         // ntypes
+            1,                                          // nin
+            2,                                          // nout
+            PyUFunc_None,                               // identity
+            "warshall",                                 // name
+            "warshall-floyd avos \n"
+            "     \"(m,m)->(m,m),()\" \n",              // doc
+            0,                                          // unused
+            warshall_signature                          // signature
+        );
     PyDict_SetItemString(d, "warshall", f);
     Py_DECREF(f);
 
-    f = PyUFunc_FromFuncAndDataAndSignature(vertex_relational_composition_functions,
-                    vertex_relational_composition_data, vertex_relational_composition_signatures,
-                    3, 4, 1, PyUFunc_None, "vertex_relational_composition",
-                    "avos vertex_relational_composition \n"
-                    "     \"(n),(n,n),(n),()->(n,n)\" \n",
-                    0, vertex_relational_composition_signature);
+    f = PyUFunc_FromFuncAndDataAndSignature(
+            vertex_relational_composition_functions,
+            vertex_relational_composition_data,
+            vertex_relational_composition_signatures,
+            10,
+            4,
+            1,
+            PyUFunc_None,
+            "vertex_relational_composition",
+            "avos vertex_relational_composition \n"
+            "     \"(n),(n,n),(n),()->(n,n)\" \n",
+            0,
+            vertex_relational_composition_signature
+        );
     PyDict_SetItemString(d, "vertex_relational_composition", f);
     Py_DECREF(f);
 
-    f = PyUFunc_FromFuncAndDataAndSignature(edge_relational_composition_functions,
-                    edge_relational_composition_data, edge_relational_composition_signatures,
-                    3, 4, 1, PyUFunc_None, "edge_relational_composition",
-                    "avos edge_relational_composition \n"
-                    "     \"(n),(),(),()->(n,n)\" \n",
-                    0, edge_relational_composition_signature);
+    f = PyUFunc_FromFuncAndDataAndSignature(
+            edge_relational_composition_functions,
+            edge_relational_composition_data,
+            edge_relational_composition_signatures,
+            10,
+            4,
+            1,
+            PyUFunc_None,
+            "edge_relational_composition",
+            "avos edge_relational_composition \n"
+            "     \"(n),(),(),()->(n,n)\" \n",
+            0,
+            edge_relational_composition_signature
+        );
     PyDict_SetItemString(d, "edge_relational_composition", f);
     Py_DECREF(f);
 

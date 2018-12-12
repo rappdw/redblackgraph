@@ -1,4 +1,6 @@
 activate
+.idea
+.vscode
 .venv
 dist/
 build/

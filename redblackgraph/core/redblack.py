@@ -72,13 +72,13 @@ class _Avos(ndarray):
         out = np.empty(shape=(R_star.shape[0] + 1, R_star.shape[1] + 1), dtype=R_star.dtype).view(type(self))
         return vertex_relational_composition(u, R_star, v, c, out)
 
-    def edge_relational_composition(self, alpha, beta, pedigree_number, compute_closure=False):
+    def edge_relational_composition(self, alpha, beta, relationship, compute_closure=False):
         '''
         Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
         compose R_{lambda} which is the transitive closure for this graph with the edge added
         :param alpha: index in self that is the source of relationship np
         :param beta: index in self that is the targe of relationship np
-        :param pedigree_number: the pedigree number of the relationship from alpha to beta
+        :param relationship: r(alpha, beta)
         :param compute_closure: if True, compute the closure of R prior to performing the relational composition
         :return: transitive closure for Red BLack graph with lambda, new_diameter
         '''
@@ -92,7 +92,7 @@ class _Avos(ndarray):
         if R_star[beta][alpha] != 0:
             raise ValueError("Relational composition would result in a cycle.")
 
-        return edge_relational_composition(R_star, alpha, beta, pedigree_number)
+        return edge_relational_composition(R_star, alpha, beta, relationship)
 
     def find_components(self):
         return np.array(find_components(self.tolist()))

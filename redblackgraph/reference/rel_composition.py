@@ -34,7 +34,7 @@ def edge_relational_composition(R, alpha, beta, relationship):
     :param R:
     :param alpha: a vertex in the graph (row index)
     :param beta: a vertex in the grpah (column index)
-    :param relationship: the relationship (beta's pedigree number in alpha's pedigree)
+    :param relationship: r(alpha, beta)
     :return: transitive closure of the grpah, R, with new edge
     '''
     N = len(R)

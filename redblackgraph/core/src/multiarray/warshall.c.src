@@ -42,9 +42,9 @@
 char *warshall_signature = "(m,m)->(m,m),()";
 
 /**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #name     = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
+ * #type     = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
+ * #maxval   = NPY_MAX_UBYTE, NPY_MAX_UBYTE, NPY_MAX_USHORT, NPY_MAX_USHORT, NPY_MAX_UINT, NPY_MAX_UINT, NPY_MAX_ULONG, NPY_MAX_ULONG, NPY_MAX_ULONGLONG, NPY_MAX_ULONGLONG#
  */
 
 static void
@@ -78,7 +78,7 @@ static void
         for (i = 0; i < dn; i++) {
             for (j = 0; j < dn; j++) {
                 *(@type@ *)op = @name@_avos_sum(*(@type@ *)op, @name@_avos_product((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
-                if (*(@type@ *)op > diameter) diameter = *(@type@ *)op;
+                if (*(@type@ *)op != @maxval@ && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
                 // advance column of output, advance column of R2
                 ipR2 += isR_j;
@@ -127,18 +127,14 @@ static void
 
 PyUFuncGenericFunction warshall_functions[] = {
 /**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #name   = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
  */
     &@name@_gufunc_warshall,
 /**end repeat**/
 };
 void *warshall_data[] = {
 /**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #name   = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
  */
     (void *)NULL,
 /**end repeat**/
@@ -146,11 +142,9 @@ void *warshall_data[] = {
 
 char warshall_signatures[] = {
 /**begin repeat
- * #name = int, long, longlong#
- * #type = NPY_INT, NPY_LONG, NPY_LONGLONG#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #type_num = NPY_BYTE,      NPY_UBYTE,     NPY_SHORT,      NPY_USHORT,     NPY_INT,      NPY_UINT,     NPY_LONG,      NPY_ULONG,     NPY_LONGLONG,      NPY_ULONGLONG#
  */
-    @type@, @type@, NPY_INT,
+    @type_num@, @type_num@, NPY_INT,
 /**end repeat**/
 };
 

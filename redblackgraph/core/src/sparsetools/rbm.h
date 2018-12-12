@@ -53,8 +53,6 @@ const T avos_product(const T& lhs, const T& rhs)
 template <class T>
 const T& avos_sum(const T& a, const T& b)
 {
-    static const T ZERO = 0;
-    if (a == -b) return ZERO;
     if (a == 0) return b;
     if (b == 0) return a;
     if (a < b) return a;

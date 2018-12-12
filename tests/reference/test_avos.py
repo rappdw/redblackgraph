@@ -51,7 +51,7 @@ def test_avos_sum():
     for i in range(-1, 2):
         for j in range(-1, 2):
             sums.append(avos_sum(i, j))
-    assert sums == [-1, -1, 0, -1, 0, 1, 0, 1, 1]
+    assert sums == [-1, -1, -1, -1, 0, 1, -1, 1, 1]
 
 def test_sign2():
     signs = []

@@ -2,13 +2,11 @@ from redblackgraph.reference.util import compute_sign, MSB
 
 def avos_sum(x: int, y: int) -> int:
     '''
-    The avos sum is the non-zero minumum of x and y unless x == -y in which case the result is 0
+    The avos sum is the non-zero minumum of x and y
     :param x: operand 1
     :param y: operand 2
     :return: avos sum
     '''
-    if x == -y:
-        return 0
     if x == 0:
         return y
     if y == 0:
