@@ -10,31 +10,3 @@ def MSB(x: int) -> int:
         bit_position += 1
     return bit_position
 
-def compute_sign(x: int, y:int) -> int:
-    '''
-    This is a little complicated to explain at this point, so for now, just trust me
-    :param x:
-    :param y:
-    :return:
-    '''
-
-    a = x >= 0
-    b = y >= 0
-    c = x == -1
-    d = y == -1
-
-    # with the truth states of a, b, c, d, sign will be:
-    #   as of yet undefined (u) - (!a or !b) and (!c and !d)
-    #   negative (n) - (!a and !b) and !u
-    #   positive (p) = !(n or u)
-    if (not a or not b) and (not c and not d):
-        raise ValueError(f"Undefined operation avos_sign({x}, {y})")
-    elif (not a and not b) or ((not a or not b) and (x == 1 or y == 1)):
-        # identity property first. if one of the operands are 1 or -1, then the sign is the sign
-        # of the other operand. If the operands are 1 and -1 then the sign is -
-        sign = -1
-    else:
-        sign = 1
-
-    return sign
-

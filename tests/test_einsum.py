@@ -68,15 +68,27 @@ def test_identity(dtype):
     assert_equal(A, res)
 
 def test_avos_sum():
+    operands = []
     sums = []
     for i in range(-1, 2):
         for j in range(-1, 2):
             sums.append(avos_sum(i, j))
-    assert sums == [-1, -1, -1, -1, 0, 1, -1, 1, 1]
+    errors = ""
+    expected = [-1, -1, -1, -1, 0, 1, -1, 1, 1]
+    for i in range(len(sums)):
+        if sums[i] != expected[i]:
+            errors += f"{operands[i][0]} + {operands[i][1]} = {sums[i]}. Expected: {expected[i]}\n"
+    assert not errors
 
 def test_product():
+    operands = []
     products = []
     for i in range(-1, 2):
         for j in range(-1, 2):
             products.append(avos_product(i, j))
-    assert products == [-1, 0, -1, 0, 0, 0, -1, 0, 1]
+    errors = ""
+    expected = [-1, 0, -1, 0, 0, 0, -1, 0, 1]
+    for i in range(len(products)):
+        if products[i] != expected[i]:
+            errors += f"{operands[i][0]} * {operands[i][1]} = {products[i]}. Expected: {expected[i]}\n"
+    assert not errors

@@ -42,9 +42,9 @@
 char *warshall_signature = "(m,m)->(m,m),()";
 
 /**begin repeat
- * #name     = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
- * #type     = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
- * #maxval   = NPY_MAX_UBYTE, NPY_MAX_UBYTE, NPY_MAX_USHORT, NPY_MAX_USHORT, NPY_MAX_UINT, NPY_MAX_UINT, NPY_MAX_ULONG, NPY_MAX_ULONG, NPY_MAX_ULONGLONG, NPY_MAX_ULONGLONG#
+ * #name      = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
+ * #type      = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
+ * #utype     = npy_ubyte,     npy_ubyte,     npy_ushort,     npy_ushort,     npy_uint,     npy_uint,     npy_ulong,     npy_ulong,     npy_ulonglong,     npy_ulonglong#
  */
 
 static void
@@ -78,7 +78,7 @@ static void
         for (i = 0; i < dn; i++) {
             for (j = 0; j < dn; j++) {
                 *(@type@ *)op = @name@_avos_sum(*(@type@ *)op, @name@_avos_product((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
-                if (*(@type@ *)op != @maxval@ && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
+                if ((@utype@)~*(@type@ *)op != 0 && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
                 // advance column of output, advance column of R2
                 ipR2 += isR_j;

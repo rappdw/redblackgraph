@@ -16,6 +16,9 @@ template <class T>
 const int MSB(T x)
 {
     int targetlevel = 0;
+    if ((@utype@)~x == 0) {
+        return targetlevel;
+    }
     while (x >>= 1) {
         targetlevel += 1;
     }
@@ -23,38 +26,46 @@ const int MSB(T x)
 }
 
 template <class T>
-const int compute_sign(const T& x, const T& y)
-{
-    int a = x >= 0;
-    int b = y >= 0;
-    int c = x == -1;
-    int d = y == -1;
-    if ((!a || !b) && (!c && !d)) return 0;
-    if ((!a && !b) || ((!a || !b) && (x == 1 || y ==1))) return -1;
-    return 1;
-}
-
-template <class T>
 const T avos_product(const T& lhs, const T& rhs)
 {
-    int sign = compute_sign(lhs, rhs);
-    T x = lhs >= 0 ? lhs: -lhs;
-    T y = rhs >= 0 ? rhs : -rhs;
+    T x = lhs;
+    T y = rhs;
 
     // zero property
     if (x == 0 || y == 0) {
         return 0;
     }
+    // Special case -1 * 1 or -1 * -1
+    // TODO: there is a problem with unsigned char and unsigned short (~<unsigned char> is <int>)
+    if (~x == 0) {
+        if (y == 1) {
+            return x;
+        }
+        x = 1;
+    }
+    if (~y == 0) {
+        if (x == 1) {
+            return y;
+        }
+        y = 1;
+    }
 
     int bit_position = MSB(y);
-    return sign * ((y & ((npy_int)pow(2, bit_position) - 1)) | (x << bit_position));
+//    if (bit_position == (sizeof(x) * 8) - 1) {
+//        // Overflow Error
+//        PyErr_Format(PyExc_OverflowError,
+//                         "Avos product of %d and %d, results in an overflow", \
+//                         lhs, rhs
+//                         );
+//    }
+    return (y & ((npy_int)pow(2, bit_position) - 1)) | (x << bit_position);
 }
 
 template <class T>
 const T& avos_sum(const T& a, const T& b)
 {
-    if (a == 0) return b;
-    if (b == 0) return a;
+    if (a == 0 || ~b == 0) return b;
+    if (b == 0 || ~a == 0) return a;
     if (a < b) return a;
     return b;
 }
