@@ -16,7 +16,7 @@ template <class T>
 const int MSB(T x)
 {
     int targetlevel = 0;
-    if ((@utype@)~x == 0) {
+    if ((T)~x == 0) {
         return targetlevel;
     }
     while (x >>= 1) {
@@ -37,13 +37,13 @@ const T avos_product(const T& lhs, const T& rhs)
     }
     // Special case -1 * 1 or -1 * -1
     // TODO: there is a problem with unsigned char and unsigned short (~<unsigned char> is <int>)
-    if (~x == 0) {
+    if ((T)~x == 0) {
         if (y == 1) {
             return x;
         }
         x = 1;
     }
-    if (~y == 0) {
+    if ((T)~y == 0) {
         if (x == 1) {
             return y;
         }

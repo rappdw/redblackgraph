@@ -54,8 +54,8 @@ def test_avos(dtype):
     # using rank 1 arrays can cause problems.
     # See: https://www.coursera.org/learn/neural-networks-deep-learning/lecture/87MUx/a-note-on-python-numpy-vectors
     # Safer to always use either a row vector or column vector
-    u = rb.array([2, 0, 0, 0, 0], dtype=np.uint8).reshape((1, 5))
-    v = rb.array([0, 3, 0, 0, 0], dtype=np.uint8).reshape((5, 1))
+    u = rb.array([2, 0, 0, 0, 0], dtype=dtype).reshape((1, 5))
+    v = rb.array([0, 3, 0, 0, 0], dtype=dtype).reshape((5, 1))
     u_lambda = np.array([2, 4, 5, 8, 0]).reshape((1, 5))
     v_lambda = np.array([5, 3, 0, 0, 9]).reshape((5, 1))
     assert_equal(u @ A_star, u_lambda)
@@ -120,7 +120,17 @@ def test_relational_composition(dtype):
                          [ 0,  0,  0,  0,  0,  0,  1]], dtype=dtype)
     assert_equal(A_lambda_2, expected)
 
-def test_my_use_case_vertex():
+@pytest.mark.parametrize("dtype", [
+    np.int8,
+    np.uint8,
+    np.int16,
+    np.uint16,
+    np.int32,
+    np.uint32,
+    np.int64,
+    np.uint64
+])
+def test_my_use_case_vertex(dtype):
     #                D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
     A1 = rb.array([[-1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D
                    [ 0, -1,  0,  0,  0,  2,  3,  0,  0,  0,  0,  0,  0,  0],  # E
@@ -136,9 +146,9 @@ def test_my_use_case_vertex():
                    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0],  # Ma
                    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  0],  # S
                    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
-                  ], dtype=np.uint8)
+                  ], dtype=dtype)
     #               D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
-    u = rb.array([[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3]], dtype=np.uint8)
+    u = rb.array([[ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3]], dtype=dtype)
     v = rb.array([[0],  # D
                   [0],  # E
                   [2],  # R
@@ -154,7 +164,7 @@ def test_my_use_case_vertex():
                   [0],  # S
                   [0]   # Em
                   ],
-                 dtype=np.uint8)
+                 dtype=dtype)
     A_lambda = A1.vertex_relational_composition(u, v, -1, compute_closure=True)
     assert A_lambda[0][12] == 12
     assert A_lambda[0][13] == 13
