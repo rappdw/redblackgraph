@@ -6,7 +6,7 @@ del get_versions
 from .core import *
 from .sparse import *
 from .util import RelationshipFileReader, RedBlackGraphWriter
-from .color import Color
+from redblackgraph.types.color import Color
 
 __all__ = ['__version__']
 __all__.extend(core.__all__)
