@@ -1,5 +1,5 @@
 from numpy.testing import assert_equal
-from redblackgraph.reference import find_components, find_components_extended, canonical_sort, triangularize, topological_sort, warshall
+from redblackgraph.reference import canonical_sort, triangularize, transitive_closure
 
 def test_triangularize_via_topological_sort():
     A = [[-1, 0, 0, 2, 0, 3, 0],
@@ -30,7 +30,7 @@ def test_triangularization():
          [ 0, 2, 0, 0,-1, 0, 3],
          [ 0, 0, 0, 0, 0, 1, 0],
          [ 0, 0, 0, 0, 0, 0, 1]]
-    A_star = warshall(A).W
+    A_star = transitive_closure(A).W
     A_star_canonical = canonical_sort(A_star)
     expected_canonical = [[ 1, 2, 5, 4, 0, 0, 0],
                           [ 0,-1, 3, 2, 0, 0, 0],

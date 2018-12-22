@@ -1,4 +1,4 @@
-from redblackgraph.reference import find_components, find_components_extended, topological_sort, warshall
+from redblackgraph.reference import find_components, find_components_extended, topological_sort, transitive_closure
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -11,7 +11,7 @@ def test_find_components():
          [ 0, 2, 0, 0,-1, 0, 3],
          [ 0, 0, 0, 0, 0, 1, 0],
          [ 0, 0, 0, 0, 0, 0, 1]]
-    A_star = warshall(A).W
+    A_star = transitive_closure(A).W
     components = find_components(A_star)
     assert components == [1, 2, 1, 1, 2, 1, 2]
     extended_components = find_components_extended(A_star)

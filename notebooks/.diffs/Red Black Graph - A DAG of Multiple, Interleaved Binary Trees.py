@@ -248,7 +248,7 @@ def avos_product(x: int, y: int) -> int:
 # In[4]:
 
 
-# %load ../redblackgraph/reference/warshall.py
+# %load ../redblackgraph/reference/transitive_closure.py
 import numpy as np
 from dataclasses import dataclass
 from typing import Sequence
@@ -264,7 +264,7 @@ def warshall(M: Sequence[Sequence[int]]) :
     '''Computes the transitive closure of a Red Black adjacency matrix and as a side-effect,
     the diameter.'''
 
-    # Modification of stardard warshall algorithm:
+    # Modification of stardard transitive_closure algorithm:
     # * Replaces innermost loop's: `W[i][j] = W[i][j] or (W[i][k] and W[k][j])`
     # * Adds diameter calculation
     n = len(M)
@@ -849,7 +849,7 @@ A = [[-1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], # D
      [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
     ]
 B = copy.deepcopy(A)
-res = smp.warshall(B)
+res = smp.transitive_closure(B)
 print(f"A_star:\n{res.W} \ndiameter: {res.diameter}")
 
 
@@ -876,7 +876,7 @@ A1 = [[-1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], # D
       [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1]  # Em
      ]
 B1 = copy.deepcopy(A1)
-res = smp.warshall(B1)
+res = smp.transitive_closure(B1)
 print(f"A1_star:\n{res.W} \ndiameter: {res.diameter}")
 
 
@@ -931,7 +931,7 @@ R1 = [[ -1,  2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],  # D
       [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0], # Em
       [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  3, -1]  # J
       ]
-R = smp.warshall(R1).W
+R = smp.transitive_closure(R1).W
 # Missing edge is R -> J, 2
 A_lambda = smp.edge_relational_composition(R, 2, 14, 2)
 A_lambda
@@ -942,7 +942,7 @@ A_lambda
 # In[18]:
 
 
-get_ipython().run_cell_magic('timeit', '', 'B1 = copy.deepcopy(A1)\nres = smp.warshall(B1)')
+get_ipython().run_cell_magic('timeit', '', 'B1 = copy.deepcopy(A1)\nres = smp.transitive_closure(B1)')
 
 
 # In[19]:

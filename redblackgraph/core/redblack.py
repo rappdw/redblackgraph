@@ -1,7 +1,8 @@
 import numpy as np
 from numpy import ndarray, asarray
-from redblackgraph.core import einsum, warshall, vertex_relational_composition, edge_relational_composition
-from redblackgraph.reference import find_components, canonical_sort, Triangularization, WarshallResult
+from .avos import einsum
+from ._multiarray import warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.types.transitive_closure import TransitiveClosure
 
 __all__ = ['array', 'matrix']
 
@@ -43,9 +44,9 @@ class _Avos(ndarray):
             'black': c_black
         }
 
-    def transitive_closure(self) -> WarshallResult:
+    def transitive_closure(self) -> TransitiveClosure:
         res = warshall(self)
-        return WarshallResult(res[0], res[1])
+        return TransitiveClosure(res[0], res[1])
 
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
@@ -93,13 +94,6 @@ class _Avos(ndarray):
             raise ValueError("Relational composition would result in a cycle.")
 
         return edge_relational_composition(R_star, alpha, beta, relationship)
-
-    def find_components(self):
-        return np.array(find_components(self.tolist()))
-
-    def triangularize(self) -> Triangularization:
-        t = canonical_sort(self)
-        return Triangularization(np.array(t.A).view(type(self)), t.label_permutation)
 
 
 class array(_Avos, ndarray):

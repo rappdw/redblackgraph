@@ -20,4 +20,3 @@ from .redblack import *
 
 __all__ += avos.__all__
 __all__ += redblack.__all__
-__all__ += ['warshall', 'vertex_relational_composition', 'edge_relational_composition']

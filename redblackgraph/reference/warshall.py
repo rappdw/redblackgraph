@@ -1,15 +1,10 @@
 import numpy as np
-from dataclasses import dataclass
 from typing import Sequence
-from redblackgraph.reference import avos_sum, avos_product, MSB
+from .avos import avos_sum, avos_product, MSB
+from redblackgraph.types.transitive_closure import TransitiveClosure
 
 
-@dataclass
-class WarshallResult:
-    W: np.array
-    diameter: int
-
-def warshall(M: Sequence[Sequence[int]], copy:bool=True) -> WarshallResult:
+def transitive_closure(M: Sequence[Sequence[int]], copy:bool=True) -> TransitiveClosure:
     '''Computes the transitive closure of a Red Black adjacency matrix and as a side-effect,
     the diameter.'''
 
@@ -24,4 +19,4 @@ def warshall(M: Sequence[Sequence[int]], copy:bool=True) -> WarshallResult:
             for j in range(n):
                 W[i][j] = avos_sum(W[i][j], avos_product(W[i][k], W[k][j]))
                 diameter = max(diameter, W[i][j])
-    return WarshallResult(W, MSB(diameter))
+    return TransitiveClosure(W, MSB(diameter))

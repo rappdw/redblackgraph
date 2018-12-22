@@ -139,7 +139,9 @@ def triangularize(A: Sequence[Sequence[int]]) -> Triangularization:
     # step 1: determine topological ordering of nodes in the graph
     n = len(A)
     ordering = topological_sort(A)
+    # step 2: setup the permutation matrix
     P = np.zeros(shape=(n, n), dtype=np.int32)
     for idx, i in enumerate(ordering):
         P[idx][i] = 1
+    # step 3: permute the matrix and return triangularization
     return Triangularization(P @ A @ P.T, ordering)

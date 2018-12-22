@@ -35,7 +35,7 @@ redblackgraph/reference/rel_composition.py        27      0   100%
 redblackgraph/reference/triangularization.py      58      0   100%
 redblackgraph/reference/util.py                   17      0   100%
 redblackgraph/reference/vec_avos.py                5      0   100%
-redblackgraph/reference/warshall.py               17      0   100%
+redblackgraph/reference/transitive_closure.py               17      0   100%
 redblackgraph/util/__init__.py                     1      0   100%
 redblackgraph/util/relationship_file_io.py       118      7    94%   41, 91, 164-165, 170-171, 174
 ----------------------------------------------------------------------------

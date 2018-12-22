@@ -203,7 +203,7 @@ def test_relational_composition():
     # TODO: add assertions to validate the result
 
 def test_transitive_closure():
-    # TODO: need to implement warshall algorithm as described in the Jupyter notebook and then test
+    # TODO: need to implement transitive_closure algorithm as described in the Jupyter notebook and then test
     pass
 
 @pytest.mark.parametrize("dtype", [
