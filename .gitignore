@@ -33,3 +33,5 @@ notebooks/Rapp-FamilyHistory/*.xlsx
 .pytest_cache
 **/.ipynb_checkpoints
 .Trash-*
+_multiarray.*.so
+_sparsetools.*.so

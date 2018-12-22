@@ -1,6 +1,8 @@
 import setuptools # needed for bdist_wheel
-import versioneer
+import os
+import subprocess
 import sys
+import versioneer
 
 from os import path
 
@@ -8,28 +10,24 @@ from os import path
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
 
-    config = Configuration('redblackgraph',
-                           parent_package,
-                           top_path)
-    config.add_extension('_multiarray',
-                         [
-                             'redblackgraph/core/src/multiarray/rbg_math.h.src',
-                             'redblackgraph/core/src/multiarray/rbg_math.c.src',
-                             'redblackgraph/core/src/multiarray/redblack.c.src',
-                             'redblackgraph/core/src/multiarray/relational_composition.c.src',
-                             'redblackgraph/core/src/multiarray/warshall.c.src'
-                         ],
-                         include_dirs=['redblackgraph/core/src/multiarray'])
-
-    config.add_extension('_sparsetools',
-                         [
-                            'redblackgraph/core/src/sparsetools/sparsetools.cxx',
-                            'redblackgraph/core/src/sparsetools/rbm.cxx'
-                         ],
-                         include_dirs=['redblackgraph/core/src/sparsetools'])
-
+    config = Configuration(None, parent_package, top_path)
+    config.set_options(ignore_setup_xxx_py=True,
+                       assume_default_configuration=True,
+                       delegate_options_to_subpackages=True,
+                       quiet=True)
+    config.add_subpackage('redblackgraph')
     return config
 
+# def generate_cython():
+#     cwd = os.path.abspath(os.path.dirname(__file__))
+#     print("Cythonizing sources")
+#     p = subprocess.call([sys.executable,
+#                          os.path.join(cwd, 'tools', 'cythonize.py'),
+#                          'redblackgraph'],
+#                         cwd=cwd)
+#     if p != 0:
+#         raise RuntimeError("Running cythonize failed!")
+#
 
 if __name__ == "__main__":
 
@@ -83,6 +81,7 @@ if __name__ == "__main__":
         },
         setup_requires=[
             'numpy>=0.14.0',
+            'cython'
         ]
     )
 

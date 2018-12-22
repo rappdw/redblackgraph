@@ -684,7 +684,7 @@ class Triangularization:
 
 def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
     """
-    Given an input adjacency matrix (assumed to be transitively closed), triangularize the
+    Given an input adjacency matrix (assumed to be transitively closed), canonical_sort the
     matrix (simply a relabeling of the graph)
     :param A: input adjacency matrix
     :return: a tuple of:
@@ -734,7 +734,7 @@ def _get_triangularization_permutation_matrices(A: Sequence[Sequence[int]]):
     u, v, and q are computed via find_components_extended, and then used to compute a
     permutation matrix, P, and P_transpose
     :param A:
-    :return: the permutation matrices that will triangularize A
+    :return: the permutation matrices that will canonical_sort A
     """
     permutation_basis = find_components_extended(A).get_permutation_basis()
 
@@ -753,7 +753,7 @@ def _get_triangularization_permutation_matrices(A: Sequence[Sequence[int]]):
 
 def triangularize(A: Sequence[Sequence[int]]) -> Triangularization:
     """
-    triangularize the matrix. Uses P and P_transpose if provided, otherwise computes
+    canonical_sort the matrix. Uses P and P_transpose if provided, otherwise computes
     the permutation matrices
     :param A:
     :param P: the transposition matrices (P and P_transpose)

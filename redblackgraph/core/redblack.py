@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray, asarray
 from redblackgraph.core import einsum, warshall, vertex_relational_composition, edge_relational_composition
-from redblackgraph.reference import find_components, triangularize, Triangularization, WarshallResult
+from redblackgraph.reference import find_components, canonical_sort, Triangularization, WarshallResult
 
 __all__ = ['array', 'matrix']
 
@@ -98,7 +98,7 @@ class _Avos(ndarray):
         return np.array(find_components(self.tolist()))
 
     def triangularize(self) -> Triangularization:
-        t = triangularize(self)
+        t = canonical_sort(self)
         return Triangularization(np.array(t.A).view(type(self)), t.label_permutation)
 
 

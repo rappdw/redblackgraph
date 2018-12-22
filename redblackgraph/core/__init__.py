@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function
 __all__ = []
 
 try:
-    from redblackgraph._multiarray import warshall, vertex_relational_composition, edge_relational_composition
+    from ._multiarray import warshall, vertex_relational_composition, edge_relational_composition
 except ImportError as exc:
     msg = """
 Importing the multiarray redblackgraph extension module failed.  Most
@@ -17,9 +17,7 @@ Original error was: %s
 
 from .avos import *
 from .redblack import *
-from .rbm import rb_matrix
 
 __all__ += avos.__all__
 __all__ += redblack.__all__
 __all__ += ['warshall', 'vertex_relational_composition', 'edge_relational_composition']
-__all__ += ['rb_matrix']

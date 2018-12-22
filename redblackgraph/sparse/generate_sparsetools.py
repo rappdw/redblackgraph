@@ -17,8 +17,8 @@ See sparsetools.cxx for more details.
 
 """
 import optparse
+import os
 from distutils.dep_util import newer
-from pathlib import Path
 
 #
 # List of all routines and their argument types.
@@ -99,7 +99,7 @@ def get_thunk_type_set():
 
     Returns
     -------
-    i_types : list [(j, I_typenum, None, I_type, None), ...] 
+    i_types : list [(j, I_typenum, None, I_type, None), ...]
          Pairing of index type numbers and the corresponding C++ types,
          and an unique index `j`. This is for routines that are parameterized
          only by I but not by T.
@@ -188,6 +188,8 @@ def parse_routine(name, args, types):
                 if const:
                     raise ValueError("'W' argument must be an output arg")
                 args.append("(std::vector<%s>*)a[%d]" % (T_type, j,))
+            elif t == 'l':
+                args.append("*(%snpy_int64*)a[%d]" % (const, j))
             else:
                 raise ValueError("Invalid spec character %r" % (t,))
             j += 1
@@ -237,7 +239,7 @@ def parse_routine(name, args, types):
 
 
 def main():
-    p = optparse.OptionParser(usage=__doc__.strip())
+    p = optparse.OptionParser(usage=(__doc__ or '').strip())
     p.add_option("--no-force", action="store_false",
                  dest="force", default=True)
     options, args = p.parse_args()
@@ -276,7 +278,9 @@ def main():
             methods.append(method)
 
         # Produce output
-        dst = Path(__file__).parent.parent / 'redblackgraph' / 'core' / 'src' / 'sparsetools' / (unit_name + '_impl.h')
+        dst = os.path.join(os.path.dirname(__file__),
+                           'sparsetools',
+                           unit_name + '_impl.h')
         if newer(__file__, dst) or options.force:
             print("[generate_sparsetools] generating %r" % (dst,))
             with open(dst, 'w') as f:
@@ -303,7 +307,9 @@ def main():
     };"""
 
     # Produce sparsetools_impl.h
-    dst = Path(__file__).parent.parent / 'redblackgraph' / 'core' / 'src' / 'sparsetools' / 'sparsetools_impl.h'
+    dst = os.path.join(os.path.dirname(__file__),
+                       'sparsetools',
+                       'sparsetools_impl.h')
 
     if newer(__file__, dst) or options.force:
         print("[generate_sparsetools] generating %r" % (dst,))

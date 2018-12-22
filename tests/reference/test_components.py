@@ -1,5 +1,6 @@
-from numpy.testing import assert_equal
-from redblackgraph.reference import find_components, find_components_extended, triangularize, warshall
+from redblackgraph.reference import find_components, find_components_extended, topological_sort, warshall
+from scipy.sparse import coo_matrix
+from scipy.sparse.csgraph import connected_components
 
 
 def test_find_components():
@@ -19,15 +20,21 @@ def test_find_components():
     assert extended_components.size_map[1] == 4
     assert extended_components.size_map[2] == 3
 
-    A_star_canonical = triangularize(A_star)
-    expected_canonical = [[ 1, 2, 5, 4, 0, 0, 0],
-                          [ 0,-1, 3, 2, 0, 0, 0],
-                          [ 0, 0, 1, 0, 0, 0, 0],
-                          [ 0, 0, 0,-1, 0, 0, 0],
-                          [ 0, 0, 0, 0,-1, 3, 2],
-                          [ 0, 0, 0, 0, 0, 1, 0],
-                          [ 0, 0, 0, 0, 0, 0,-1]]
 
-    assert_equal(A_star_canonical.A, expected_canonical)
-
-    #TODO: add test case to ensure we've fixed the "row merges two components" use case
+def test_find_components_dfs():
+    A = [[-1, 0, 0, 2, 0, 3, 0],
+         [ 0,-1, 0, 0, 0, 0, 0],
+         [ 2, 0, 1, 0, 0, 0, 0],
+         [ 0, 0, 0,-1, 0, 0, 0],
+         [ 0, 2, 0, 0,-1, 0, 3],
+         [ 0, 0, 0, 0, 0, 1, 0],
+         [ 0, 0, 0, 0, 0, 0, 1]]
+    A = coo_matrix((
+        [-1, 2, 3, -1, 2, 1, -1, 2, -1, 3, 1, 1],
+        (
+            [0, 0, 0, 1, 2, 2, 3, 4, 4, 4, 5, 6],
+            [0, 3, 5, 1, 0, 2, 3, 1, 4, 6, 5, 6]
+        )
+    ))
+    components = connected_components(A)
+    print(components)

@@ -1,11 +1,10 @@
 """RedBlack matrix"""
 
 import numpy as np
-from redblackgraph._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
+from ._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
 from redblackgraph.reference import Triangularization
 from scipy.sparse.csr import csr_matrix
 from scipy.sparse.sputils import (get_index_dtype, upcast)
-from scipy.sparse import hstack, vstack
 
 class rb_matrix(csr_matrix):
 
@@ -84,9 +83,6 @@ class rb_matrix(csr_matrix):
         '''
         pass
 
-    def find_components(self):
-        pass
-
     def triangularize(self) -> Triangularization:
         pass
 
@@ -100,15 +96,4 @@ class rb_matrix(csr_matrix):
         v -- *simple* column vector
         color -- the coloring of the new node
         '''
-        u_complete = u * self
-        v_complete = self * v
-
-        v_new = hstack([u_complete, color])
-        with_col = hstack([self, v_complete])
-        result = vstack([with_col, v_new])
-
-        # TODO:
-        # for v_j in v_completed where v_j != 0:
-        #   for u_i in u_complete:
-        #       result[i, j] = u_i avos v_j
-        return result
+        pass

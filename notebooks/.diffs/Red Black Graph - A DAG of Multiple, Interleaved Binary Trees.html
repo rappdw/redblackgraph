@@ -12681,7 +12681,7 @@ $$R^+ \lor \vec{v_{s}} = \vec{v_{c}}$$</p>
 
 <span class="k">def</span> <span class="nf">find_components_extended</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Components</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given an input adjacency matrix (assumed to be transitively closed), triangularize the</span>
+<span class="sd">    Given an input adjacency matrix (assumed to be transitively closed), canonical_sort the</span>
 <span class="sd">    matrix (simply a relabeling of the graph)</span>
 <span class="sd">    :param A: input adjacency matrix</span>
 <span class="sd">    :return: a tuple of:</span>
@@ -12731,7 +12731,7 @@ $$R^+ \lor \vec{v_{s}} = \vec{v_{c}}$$</p>
 <span class="sd">    u, v, and q are computed via find_components_extended, and then used to compute a</span>
 <span class="sd">    permutation matrix, P, and P_transpose</span>
 <span class="sd">    :param A:</span>
-<span class="sd">    :return: the permutation matrices that will triangularize A</span>
+<span class="sd">    :return: the permutation matrices that will canonical_sort A</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">permutation_basis</span> <span class="o">=</span> <span class="n">find_components_extended</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">get_permutation_basis</span><span class="p">()</span>
 
@@ -12748,9 +12748,9 @@ $$R^+ \lor \vec{v_{s}} = \vec{v_{c}}$$</p>
     <span class="k">return</span> <span class="n">P</span><span class="p">,</span> <span class="n">P_transpose</span><span class="p">,</span> <span class="n">label_permutation</span>
 
 
-<span class="k">def</span> <span class="nf">triangularize</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Triangularization</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">canonical_sort</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Triangularization</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    triangularize the matrix. Uses P and P_transpose if provided, otherwise computes</span>
+<span class="sd">    canonical_sort the matrix. Uses P and P_transpose if provided, otherwise computes</span>
 <span class="sd">    the permutation matrices</span>
 <span class="sd">    :param A:</span>
 <span class="sd">    :param P: the transposition matrices (P and P_transpose)</span>
@@ -12772,7 +12772,7 @@ $$R^+ \lor \vec{v_{s}} = \vec{v_{c}}$$</p>
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">triangularize</span><span class="p">(</span><span class="n">warshall</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">W</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">canonical_sort</span><span class="p">(</span><span class="n">warshall</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">W</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
 </pre></div>
 
 </div>

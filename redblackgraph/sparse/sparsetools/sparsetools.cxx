@@ -470,7 +470,6 @@ static void *allocate_std_vector_typenum(int typenum)
     }
 
     try {
-        PROCESS(NPY_BOOL, npy_bool_wrapper);
         PROCESS(NPY_BYTE, npy_byte);
         PROCESS(NPY_UBYTE, npy_ubyte);
         PROCESS(NPY_SHORT, npy_short);
@@ -481,9 +480,6 @@ static void *allocate_std_vector_typenum(int typenum)
         PROCESS(NPY_ULONG, npy_ulong);
         PROCESS(NPY_LONGLONG, npy_longlong);
         PROCESS(NPY_ULONGLONG, npy_ulonglong);
-        PROCESS(NPY_FLOAT, npy_float);
-        PROCESS(NPY_DOUBLE, npy_double);
-        PROCESS(NPY_LONGDOUBLE, npy_longdouble);
     } catch (std::exception &e) {
         /* failed */
     }
@@ -502,7 +498,6 @@ static void free_std_vector_typenum(int typenum, void *p)
         delete ((std::vector<ctype>*)p);                        \
     }
 
-    PROCESS(NPY_BOOL, npy_bool_wrapper);
     PROCESS(NPY_BYTE, npy_byte);
     PROCESS(NPY_UBYTE, npy_ubyte);
     PROCESS(NPY_SHORT, npy_short);
@@ -513,9 +508,6 @@ static void free_std_vector_typenum(int typenum, void *p)
     PROCESS(NPY_ULONG, npy_ulong);
     PROCESS(NPY_LONGLONG, npy_longlong);
     PROCESS(NPY_ULONGLONG, npy_ulonglong);
-    PROCESS(NPY_FLOAT, npy_float);
-    PROCESS(NPY_DOUBLE, npy_double);
-    PROCESS(NPY_LONGDOUBLE, npy_longdouble);
 
 #undef PROCESS
 }
@@ -535,7 +527,6 @@ static PyObject *array_from_std_vector_and_free(int typenum, void *p)
         return obj;                                             \
     }
 
-    PROCESS(NPY_BOOL, npy_bool_wrapper);
     PROCESS(NPY_BYTE, npy_byte);
     PROCESS(NPY_UBYTE, npy_ubyte);
     PROCESS(NPY_SHORT, npy_short);
@@ -546,9 +537,6 @@ static PyObject *array_from_std_vector_and_free(int typenum, void *p)
     PROCESS(NPY_ULONG, npy_ulong);
     PROCESS(NPY_LONGLONG, npy_longlong);
     PROCESS(NPY_ULONGLONG, npy_ulonglong);
-    PROCESS(NPY_FLOAT, npy_float);
-    PROCESS(NPY_DOUBLE, npy_double);
-    PROCESS(NPY_LONGDOUBLE, npy_longdouble);
 
 #undef PROCESS
 
