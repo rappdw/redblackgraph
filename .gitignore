@@ -31,6 +31,7 @@ notebooks/*.aux
 notebooks/*.log
 notebooks/*.out
 notebooks/Rapp-FamilyHistory/*.xlsx
+notebooks/.diff
 .pytest_cache
 **/.ipynb_checkpoints
 .Trash-*
