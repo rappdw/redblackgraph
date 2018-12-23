@@ -1,5 +1,5 @@
 #include <Python.h>
-#include <math.h>
+#include <stdlib.h>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/npy_3kcompat.h>
@@ -8,18 +8,25 @@
 #include "rbg_math.h"
 
 /**begin repeat
- * #name = int, long, longlong#
- * #type = npy_int, npy_long, npy_longlong#
- * #temptype = npy_int, npy_long, npy_longlong#
+ * #name      = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
+ * #type      = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
+ * #utype     = npy_ubyte,     npy_ubyte,     npy_ushort,     npy_ushort,     npy_uint,     npy_uint,     npy_ulong,     npy_ulong,     npy_ulonglong,     npy_ulonglong#
+ * #type_num  = NPY_BYTE,      NPY_UBYTE,     NPY_SHORT,      NPY_USHORT,     NPY_INT,      NPY_UINT,     NPY_LONG,      NPY_ULONG,     NPY_LONGLONG,      NPY_ULONGLONG#
+ * #stype_num = NPY_BYTE,      NPY_BYTE,      NPY_SHORT,      NPY_SHORT,      NPY_INT,      NPY_INT,      NPY_LONG,      NPY_LONG,      NPY_LONGLONG,      NPY_LONGLONG#
+ * #temptype  = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
  */
 
-NPY_NO_EXPORT @type@ @name@_nz_min(@type@ a, @type@ b)
+NPY_NO_EXPORT @type@ @name@_avos_sum(@type@ a, @type@ b)
 {
-    return a == 0 ? b : (b == 0 ? a : (a == -b ? 0 : (a < b ? a : b)));
+    if (a == 0 || (@utype@)~b == 0) return b;
+    if (b == 0 || (@utype@)~a == 0) return a;
+    if (((@utype@)a) < ((@utype@)b)) return a;
+    return b;
 }
 
-NPY_NO_EXPORT int @name@_generation(@type@ x)
+NPY_NO_EXPORT int @name@_MSB(@type@ x)
 {
+    if ((@utype@)~x == 0) return 0;
     int targetlevel = 0;
     while (x >>= 1) {
         targetlevel += 1;
@@ -27,18 +34,40 @@ NPY_NO_EXPORT int @name@_generation(@type@ x)
     return targetlevel;
 }
 
-NPY_NO_EXPORT @type@ @name@_avos(@type@ x, @type@ y)
+NPY_NO_EXPORT @utype@ @name@_avos_product(@type@ lhs, @type@ rhs)
 {
-    // An interesting case is presented if x or y is 1 or -1. In these cases the avos product
-    // represents the situation where a and b are the same vertex or b and c are the same vertex.
-    // In a sense, this is the avos identity
-    if (x <= 1 || y <= 1)
-    {
-        return (x == 0 || y == 0) ? 0 : (y <= 1 ? x : y);
+    @utype@ x = (@utype@)lhs;
+    @utype@ y = (@utype@)rhs;
+
+    // The zero property of the avos product
+    if (x == 0 || y == 0) {
+        return 0;
+    }
+    // Special case -1 * 1 or -1 * -1
+    // There is an oddity in bitwise NOT of an unsigned char, ~<unsigned char> temporary is an <int> rather
+    // than an <unsigned char>. Because of this, cast ~x and ~y to the appropriate type
+    if ((@utype@)~x == 0) {
+        if (y == 1) {
+            return x;
+        }
+        x = 1;
+    }
+    if ((@utype@)~y == 0) {
+        if (x == 1) {
+            return y;
+        }
+        y = 1;
     }
 
-    int generationNumber = @name@_generation(y);
-    return (y & (@type@)pow(2, generationNumber) - 1) | (x << generationNumber);
+    int bit_position = @name@_MSB(y);
+//    if (bit_position == (sizeof(x) * 8) - 1) {
+//        // Overflow Error
+//        PyErr_Format(PyExc_OverflowError,
+//                         "Avos product of %d and %d, results in an overflow", \
+//                         lhs, rhs
+//                         );
+//    }
+    return ((y & ((@type@)pow(2, bit_position) - 1)) | (x << bit_position));
 }
 
 /**end repeat**/

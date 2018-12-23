@@ -1,2 +1,4 @@
-numpy==1.14.2
-XlsxWriter==1.0.2
+dataclasses; python_version < '3.7'
+numpy
+XlsxWriter
+scipy

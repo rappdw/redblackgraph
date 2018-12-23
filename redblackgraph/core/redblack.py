@@ -1,8 +1,8 @@
 import numpy as np
-from typing import Tuple
 from numpy import ndarray, asarray
-from . import einsum, warshall, vertex_relational_composition, edge_relational_composition
-from redblackgraph.simple import find_components, triangularize, get_triangularization_permutation_matrices
+from .avos import einsum
+from ._multiarray import warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.types.transitive_closure import TransitiveClosure
 
 __all__ = ['array', 'matrix']
 
@@ -44,13 +44,14 @@ class _Avos(ndarray):
             'black': c_black
         }
 
-    def transitive_closure(self) -> Tuple['_Avos', int]:
-        return warshall(self)
+    def transitive_closure(self) -> TransitiveClosure:
+        res = warshall(self)
+        return TransitiveClosure(res[0], res[1])
 
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
         Given simple row vector u, and simple column vector v where
-        u, v represent a vertex, lambda, not currently represented in self, compose R_{\lambda}
+        u, v represent a vertex, lambda, not currently represented in self, compose R_{lambda}
         which is the transitive closure for this graph with lambda included
         :param u: simple row vector for new vertex, lambda
         :param v: simple column vector for new vertex, lambda
@@ -72,13 +73,13 @@ class _Avos(ndarray):
         out = np.empty(shape=(R_star.shape[0] + 1, R_star.shape[1] + 1), dtype=R_star.dtype).view(type(self))
         return vertex_relational_composition(u, R_star, v, c, out)
 
-    def edge_relational_composition(self, alpha, beta, pedigree_number, compute_closure=False):
+    def edge_relational_composition(self, alpha, beta, relationship, compute_closure=False):
         '''
         Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
-        compose R_{\lambda} which is the transitive closure for this graph with the edge added
+        compose R_{lambda} which is the transitive closure for this graph with the edge added
         :param alpha: index in self that is the source of relationship np
         :param beta: index in self that is the targe of relationship np
-        :param pedigree_number: the pedigree number of the relationship from alpha to beta
+        :param relationship: r(alpha, beta)
         :param compute_closure: if True, compute the closure of R prior to performing the relational composition
         :return: transitive closure for Red BLack graph with lambda, new_diameter
         '''
@@ -92,16 +93,7 @@ class _Avos(ndarray):
         if R_star[beta][alpha] != 0:
             raise ValueError("Relational composition would result in a cycle.")
 
-        return edge_relational_composition(R_star, alpha, beta, pedigree_number)
-
-    def find_components(self):
-        return np.array(find_components(self.tolist()))
-
-    def triangularize(self, P=None):
-        return np.array(triangularize(self.tolist(), P)).view(type(self))
-
-    def get_triangularization_permutation_matrices(self):
-        return get_triangularization_permutation_matrices(self.tolist())
+        return edge_relational_composition(R_star, alpha, beta, relationship)
 
 
 class array(_Avos, ndarray):

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ "$#" -eq 0 ]; then
+    echo "You must specify a notebook from which to generate pdf"
+    exit -1
+fi
+
 build-image notebook
 run-image -c "gen-latex.sh '$1'" notebook
 

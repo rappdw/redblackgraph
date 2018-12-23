@@ -1,4 +1,6 @@
 activate
+.idea
+.vscode
 .venv
 dist/
 build/
@@ -12,15 +14,14 @@ redblackgraph/sparsetools/CMakeLists.txt
 _sparsetools.cpython-36m-darwin.so
 redblackgraph/sparsetools/cmake-build-debug/
 _sparsetools.cpython-36m-x86_64-linux-gnu.so
-notebooks/.ipynb_checkpoints/
 redblackgraph/core/src/multiarray/redblack.c
 redblackgraph/core/src/multiarray/rbg_math.c
 redblackgraph/core/src/multiarray/rbg_math.h
 redblackgraph/core/src/multiarray/relational_composition.c
+redblackgraph/core/src/multiarray/transitive_closure.c
 redblackgraph/core/src/multiarray/warshall.c
 redblackgraph/__config__.py
-redblackgraph/rb_multiarray.*.so
-redblackgraph/rb_sparsetools.*.so
+redblackgraph/*.so
 redblackgraph/tests/resources/closure.results.csv
 redblackgraph/tests/resources/composition.results.csv
 _version.py.bld
@@ -30,3 +31,8 @@ notebooks/*.aux
 notebooks/*.log
 notebooks/*.out
 notebooks/Rapp-FamilyHistory/*.xlsx
+.pytest_cache
+**/.ipynb_checkpoints
+.Trash-*
+_multiarray.*.so
+_sparsetools.*.so
