@@ -1,12 +1,7 @@
-from dataclasses import dataclass
 from typing import Sequence
-from redblackgraph.reference import MSB
+from redblackgraph.types.relationship import Relationship
+from redblackgraph.reference.util import MSB
 
-
-@dataclass
-class Relationship:
-    common_ancestor: int
-    relationship: str
 
 def lookup_relationship(da: int, db: int) -> str:
     '''

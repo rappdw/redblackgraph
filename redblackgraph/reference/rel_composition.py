@@ -1,4 +1,5 @@
-from redblackgraph.reference import avos_sum, avos_product, mat_avos
+from redblackgraph.reference.avos import avos_sum, avos_product
+from redblackgraph.reference.mat_avos import mat_avos
 import copy
 
 
