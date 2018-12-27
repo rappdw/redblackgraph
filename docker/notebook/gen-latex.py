@@ -2,6 +2,7 @@
 import argparse
 import os
 import subprocess
+import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -56,6 +57,10 @@ if __name__ == '__main__':
                         line = line.replace('{tmp.', '{')
                         out_file.write(line)
                         line = "    \\author{Daniel W Rapp}\n"
+                    elif "\\usepackage{amsmath}" in line:
+                        out_file.write("    \\usepackage{amsmath}\n")
+                        out_file.write("    \\usepackage{amsfonts}\n")
+                        line = "    \\usepackage[mathscr]{euscript}\n"
                     elif "    % Colors for the hyperref package" in line:
                         out_file.write("    \\usepackage{float}\n")
                     elif "\\includegraphics" in line:
@@ -87,3 +92,4 @@ if __name__ == '__main__':
             os.remove(tex_input)
     if not args.preserve:
         os.remove(out_file_name)
+    sys.exit(rc)
