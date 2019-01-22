@@ -8,7 +8,7 @@ This data structure resulted from exporation into efficient representations for 
 This package presents and implements the underlying math as well as discusses some interesting applications.
 
 This python module extends both scipy and numpy and also conforms to [dockerutils](https://github.com/rappdw/docker-utils)
-conventions for buildingc and running docker images used in module development. There is a script in the repo bin 
+conventions for building and running docker images used in module development. There is a script in the repo bin 
 directory that can be used to setup the project for development or to prep for reading the notebook. 
 (`bin/setup-project.sh`). You will likely want to create an activate a virtual environment prior to running the script.
 
