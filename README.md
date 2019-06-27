@@ -1,20 +1,20 @@
-Red Black Graph - A DAG of Multiple, Interleaved Binary Trees
+Red-Black Graph - A DAG of Multiple, Interleaved Binary Trees
 ----------------------------------
 
 # Introduction
 
-Red Black Graphs are a specific type of graph, a directed acyclic graph of interleaved binary trees.
-This data structure resulted from exporation into efficient representations for family history.
-This package presents and implements the underlying math as well as discusses some interesting applications.
+Red-Black Graphs are a specific type of graph, a directed acyclic graph of interleaved binary trees.
+This data structure resulted from exploration of efficient representations for family history.
+This package presents and implements the underlying linear algebra as well as discusses some interesting applications.
 
 This python module extends both scipy and numpy and also conforms to [dockerutils](https://github.com/rappdw/docker-utils)
-conventions for building and running docker images used in module development. There is a script in the repo bin 
+conventions for building and running docker images used in module development. There is a script in the bin 
 directory that can be used to setup the project for development or to prep for reading the notebook. 
-(`bin/setup-project.sh`). You will likely want to create an activate a virtual environment prior to running the script.
+(`bin/setup-project.sh`). You will want to create an activate a virtual environment prior to running the script.
 
 # Reading the Notebook
 
-Extensive documentation and examples can be found in the Jupyter notebook, 
+A research paper describing the linear algebra underlying Red-Black graphs as well as examples of application can be found in the Jupyter notebook, 
 "Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb". To access the notebook 
 after you've setup the project for development, simply: 
 * `run-image notebook`
