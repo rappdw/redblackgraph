@@ -76,7 +76,8 @@ if __name__ == "__main__":
             'dev': [
                 'pytest',
                 'pytest-cov',
-                'pylint'
+                'pylint',
+                'dockerutils>=2.0.1'
             ]
         },
         setup_requires=[

@@ -4,3 +4,4 @@ wheel
 pytest
 pytest-cov
 pylint
+dockerutils>=2.0.1
