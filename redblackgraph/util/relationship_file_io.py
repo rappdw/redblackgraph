@@ -2,53 +2,70 @@
 Relationship File IO is a collection of utilities to parse an input csv file
 into a RB Graph.
 
-The input file format consists of multiple rows of thw following format:
-#First Name,Surname,Birthyear,Gender,Father FN,Father Sn,Father By,Mother FN,Mother Sn,Mother By
-
-While it's possible for a given column (aside from gender) to be missing, it is required that
-each individual in the input file can be uniquely identified by the tuple (FN,Sn,By)
+It takes 2 input files. One that defines the vertices with 3 columns: external_id, gender, name.
+One that defines the edges with 2 columns: source_external_id, destination_external_id
 """
+from abc import ABC, abstractmethod
 import csv
+import logging
 from collections import defaultdict
-from typing import Tuple, Optional
+from typing import Optional, Dict, Tuple
 
 import numpy as np
 import redblackgraph as rb
 import xlsxwriter
 
 ROTATE_90 = 'rotate-90'
-COLUMNS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+MAX_COLUMNS_EXCEL = 16384
 
 
 class PersonIdentifier:
     def __init__(self):
-        self.person_dictionary = {'p_id': 0}
-        
-    def get_person_id(self, person: Tuple[str, ...]) -> Optional[int]:
+        self.person_dictionary = {'p_id': (0,)}
+
+    def add_person(self, external_id: str, name: str) -> Optional[int]:
         """
-        Given a person/bdate tuple, return the person_id (either looking up the person if
-        already created an id, or generate a new one).
+        Given an external id and name, add the person into the dictionary if it's not already into the dictionary
 
         If the person tuple is empty, returns None
         :param person: tuple[ given name, surname ]
-        :return: person_id or None if tuple is empty
         """
-        if person[0] or person[1]:
-            if not person in self.person_dictionary:
-                self.person_dictionary[person] = self.person_dictionary['p_id']
-                self.person_dictionary['p_id'] += 1
-            return self.person_dictionary[person]
+        if external_id:
+            if not external_id in self.person_dictionary:
+                internal_id = self.person_dictionary['p_id'][0]
+                self.person_dictionary[external_id] = (internal_id, name)
+                next_id = internal_id + 1
+                self.person_dictionary['p_id'] = (next_id,)
+                return internal_id
+        return None
+
+    def get_person_id(self, id: str) -> Optional[int]:
+        """
+        Given an external id, get the rbg id
+        :return: person_id or None if person hasn't been added
+        """
+        if id and id in self.person_dictionary:
+            return self.person_dictionary[id][0]
+        return None
+
+    def get_person_name(self, id: str) -> Optional[str]:
+        """
+        Given an external id, get the name used when added
+        :return: person name or None if person hasn't been added
+        """
+        if id and id in self.person_dictionary:
+            return self.person_dictionary[id][1]
         return None
     
     def get_vertex_key(self):
-        return {v: k for k, v in self.person_dictionary.items() if k != 'p_id'}
+        return {person_tuple[0]: (external_id, person_tuple[1]) for external_id, person_tuple in self.person_dictionary.items() if external_id != 'p_id'}
 
 
 class GraphBuilder:
     def __init__(self):
         self.rbg_dictionary = defaultdict(lambda: {})
-        
-    def add_vertex(self, vertex_id, color, red_vertex_id: None, black_vertex_id: None):
+
+    def add_vertex(self, vertex_id, color, red_vertex_id:int=None, black_vertex_id:int=None):
         """
         Add a vertex to the graph (optionally include immediate ancestry vertices
         :param vertex_id: id of the vertex to add 
@@ -65,7 +82,11 @@ class GraphBuilder:
             if not black_vertex_id is None:
                 self.rbg_dictionary[vertex_id][black_vertex_id] = 3
                 self.rbg_dictionary[black_vertex_id][black_vertex_id] = 1
-    
+
+    def add_edge(self, source_vertex: int, destination_vertex: int):
+        self.rbg_dictionary[source_vertex][destination_vertex] = 2 \
+            if self.rbg_dictionary[destination_vertex][destination_vertex] == -1 else 3
+
     def generate_graph(self):
         # create an numpy array with the correct shape and load it with the tuples
         m = len(self.rbg_dictionary)
@@ -77,25 +98,43 @@ class GraphBuilder:
         return R
 
 
-class RelationshipFileReader:
-    def __init__(self, input_file):
-        self.input_file = input_file
+class VertexInfo(ABC):
+    @abstractmethod
+    def get_vertex_key(self) -> Dict[int,Tuple[str,str]]:
+        """
+        Get the "vertex key", a dictionary keyed by the vertex id (int) with values
+        that are tuples of (external id, string designation)
+        """
+        pass
+
+
+class RelationshipFileReader(VertexInfo):
+    def __init__(self, persons_file, relationships_file):
+        self.persons_file = persons_file
+        self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
         self.graph_builder = GraphBuilder()
-        
+
     def __call__(self, *args, **kwargs):
-        with open(self.input_file, "r") as csvfile:
+        with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                if row[0].startswith("#") or row[0] in ["Vertex", "Fn"]:
+                if row[0].startswith("#"):
                     continue
-                vertex = tuple(row[0:3])
-                red_vertex = tuple(row[4:7])
-                black_vertex = tuple(row[7:])
-                vertex_id = self.person_identifier.get_person_id(vertex)
-                red_verex_id = self.person_identifier.get_person_id(red_vertex)
-                black_vertex_id = self.person_identifier.get_person_id(black_vertex)
-                self.graph_builder.add_vertex(vertex_id, int(row[3]), red_verex_id, black_vertex_id)
+                external_id = row[0]
+                gender = row[1]
+                name = row[2]
+                vertex_id = self.person_identifier.add_person(external_id, name)
+                self.graph_builder.add_vertex(vertex_id, -1 if gender in ['M', 'm'] else 1)
+        with open(self.relationships_file, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0].startswith("#"):
+                    continue
+                source_vertex = self.person_identifier.get_person_id(row[0])
+                destination_vertex = self.person_identifier.get_person_id(row[1])
+                if not source_vertex is None and not destination_vertex is None:
+                    self.graph_builder.add_edge(source_vertex, destination_vertex)
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
@@ -103,10 +142,12 @@ class RelationshipFileReader:
 
     def get_person_id(self, person):
         return self.person_identifier.get_person_id(person)
-    
+
+
 class RedBlackGraphWriter:
-    def __init__(self, vertex_key=None):
-        self.vertex_key = vertex_key
+    def __init__(self, vertex_info:VertexInfo=None):
+        ''':parameter vertex_info - class providing information on the vertices'''
+        self.vertex_key = vertex_info.get_vertex_key() if vertex_info else None
 
     @staticmethod
     def _open_workbook(output_file):
@@ -121,11 +162,15 @@ class RedBlackGraphWriter:
         return max(len_of_max_string + 0.83, 2.67)
     
     def __call__(self, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+
         workbook, formats = self._open_workbook(kwargs.get('output_file', '/tmp/rbg.csv'))
         worksheet = workbook.add_worksheet()
         worksheet.set_default_row(hide_unused_rows=True)
         R = args[0].tolist()
         n = len(R)
+        if n > MAX_COLUMNS_EXCEL:
+            logging.error("Graph exceeds max size allowable by Excel")
         key_permutation = kwargs.get('key_permutation', np.arange(n))
         row = 0
 
@@ -138,37 +183,31 @@ class RedBlackGraphWriter:
             column += 1
             for column_idx in range(n):
                 vertex_key = self.vertex_key[key_permutation[column_idx]]
-                cell_data = f"{vertex_key[0]}{vertex_key[1]} - {vertex_key[2]}"
+                cell_data = f"{vertex_key[0]} - {vertex_key[1]}"
                 max_key = max(max_key, len(cell_data))
                 worksheet.write(row, column_idx + column, cell_data, formats[ROTATE_90])
             row += 1
 
+        logger.debug(f"Graph size: {n}")
         for row_idx in range(n):
+            if (row_idx + 1) % 500 == 0:
+                logger.debug(f"completed row {row_idx + 1} of {n}")
             column = 0
             if self.vertex_key:
                 vertex_key = self.vertex_key[key_permutation[row_idx]]
-                cell_data = f"{vertex_key[0]}{vertex_key[1]} - {vertex_key[2]}"
+                cell_data = f"{vertex_key[0]} - {vertex_key[1]}"
                 worksheet.write(row + row_idx, 0, cell_data)
                 column += 1
             for column_idx in range(n):
                 cell_data = R[row_idx][column_idx]
                 max_np = max(max_np, cell_data)
                 worksheet.write(row + row_idx, column + column_idx, cell_data)
-        a = n // 26
-        b = n % 26
         column_width = self._calc_width(len(f"{max_np}"))
-        if self.vertex_key:
-            worksheet.freeze_panes(1, 1)
-            worksheet.set_column('A:A', self._calc_width(max_key))
-            if a > 0:
-                worksheet.set_column(f'B:{COLUMNS[a-1]}{COLUMNS[b]}', column_width)
-                worksheet.set_column(f'{COLUMNS[a-1]}{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
-            else:
-                worksheet.set_column(f'B:{COLUMNS[b]}', column_width)
-                worksheet.set_column(f'{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
-        else:
-            worksheet.set_column(f'A:{COLUMNS[b]}', column_width)
-            worksheet.set_column(f'{COLUMNS[b+1]}:XFD', None, None, {'hidden': True})
+        worksheet.freeze_panes(1, 1)
+        worksheet.set_column(0, 0, self._calc_width(max_key))
+        worksheet.set_column(1, n, column_width)
+        worksheet.set_column(n + 1, MAX_COLUMNS_EXCEL - 1, None, None, {'hidden': True})
+        workbook.close()
 
     def append_vertex_key(self, key):
         self.vertex_key[len(self.vertex_key)] = key

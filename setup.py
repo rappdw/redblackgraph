@@ -83,6 +83,9 @@ if __name__ == "__main__":
         setup_requires=[
             'numpy>=0.14.0',
             'cython'
+        ],
+        scripts=[
+            'scripts/rgbcf',
         ]
     )
 

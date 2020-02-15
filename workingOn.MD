@@ -21,3 +21,6 @@ being handled properly in the calling code.
 
 ## Reimplement canonical_sort
 Do this by combining topological_sort with csgraph.find_components
+
+## Work in Ahnentafel
+The basic numbering scheme is the same as the Ahnen number (see: [Wikipedia Reference](https://en.wikipedia.org/wiki/Ahnentafel))
