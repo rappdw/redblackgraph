@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import csv
 import logging
 from collections import defaultdict
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, List
 
 import numpy as np
 import redblackgraph as rb
@@ -109,11 +109,13 @@ class VertexInfo(ABC):
 
 
 class RelationshipFileReader(VertexInfo):
-    def __init__(self, persons_file, relationships_file):
+    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str]):
         self.persons_file = persons_file
         self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
         self.graph_builder = GraphBuilder()
+        self.hop = hop
+        self.filter = filter
 
     def __call__(self, *args, **kwargs):
         with open(self.persons_file, "r") as csvfile:
@@ -122,19 +124,23 @@ class RelationshipFileReader(VertexInfo):
                 if row[0].startswith("#"):
                     continue
                 external_id = row[0]
-                gender = row[1]
+                color = row[1]
                 name = row[2]
-                vertex_id = self.person_identifier.add_person(external_id, name)
-                self.graph_builder.add_vertex(vertex_id, -1 if gender in ['M', 'm'] else 1)
+                hop = row[3]
+                if int(hop) <= self.hop:
+                    if not color == '':
+                        vertex_id = self.person_identifier.add_person(external_id, name)
+                        self.graph_builder.add_vertex(vertex_id, color)
         with open(self.relationships_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0].startswith("#"):
                     continue
-                source_vertex = self.person_identifier.get_person_id(row[0])
-                destination_vertex = self.person_identifier.get_person_id(row[1])
-                if not source_vertex is None and not destination_vertex is None:
-                    self.graph_builder.add_edge(source_vertex, destination_vertex)
+                if row[2] in self.filter:
+                    source_vertex = self.person_identifier.get_person_id(row[0])
+                    destination_vertex = self.person_identifier.get_person_id(row[1])
+                    if not source_vertex is None and not destination_vertex is None:
+                        self.graph_builder.add_edge(source_vertex, destination_vertex)
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):

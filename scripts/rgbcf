@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 import redblackgraph as rb
-from redblackgraph.util.relationship_file_io import RelationshipFileReader, RedBlackGraphWriter
+from redblackgraph.util.relationship_file_io import RelationshipFileReader
 from redblackgraph.reference.triangularization import canonical_sort
 
 if __name__ == '__main__':
@@ -15,8 +15,11 @@ if __name__ == '__main__':
         usage="rgbcf -f <base-file> -o <out-directory> (<base-file>.vertices.csv and <base-file>.edges.csv must exist)",
     )
     parser.add_argument("-f", "--basefile", metavar="<STR>", type=str, help="base file name", required=True)
-    parser.add_argument("-o", "--outdir", metavar="<STR>", type=str, help="output directory (default is same directory as basefile")
+    parser.add_argument("-o", "--outdir", metavar="<STR>", type=str,
+                        help="output directory (default is same directory as basefile")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Increase output verbosity [False]")
+    parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
+    parser.add_argument("-l", "--filter", action="append", default=["BiologicalParent", "UntypedParent"], type=str, nargs="+", help="Number of hops to include in graph")
 
     # extract arguments from the command line
     try:
@@ -56,7 +59,7 @@ if __name__ == '__main__':
 
     logger.info("Reading graph input files")
 
-    reader = RelationshipFileReader(vertices_file, edges_file)
+    reader = RelationshipFileReader(vertices_file, edges_file, args.hops, args.filter)
     graph: rb.array = reader()
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")
