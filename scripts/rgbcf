@@ -20,6 +20,7 @@ if __name__ == '__main__':
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Increase output verbosity [False]")
     parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
     parser.add_argument("-l", "--filter", action="append", default=["BiologicalParent", "UntypedParent"], type=str, nargs="+", help="Number of hops to include in graph")
+    parser.add_argument("-r", "--replace", action="store_true", default=False, help="Replace existing output files")
 
     # extract arguments from the command line
     try:
@@ -36,6 +37,7 @@ if __name__ == '__main__':
     vertices_file = Path(basefile + ".vertices.csv")
     edges_file = Path(basefile + ".edges.csv")
     basename = str(Path(basefile).parts[-1])
+    hops = args.hops
 
     if not vertices_file.exists():
         sys.stderr.write(f"{vertices_file} not found")
@@ -48,18 +50,19 @@ if __name__ == '__main__':
     if not outdir:
         outdir = Path(basefile).parent
 
-    outputfile = outdir / (basename + ".simple.xlsx")
-    cannonicalfile = outdir / (basename + ".cannonical.xlsx")
-    if outputfile.exists():
-        sys.stderr.write(f"{outputfile} already exists")
-        sys.exit(2)
-    if cannonicalfile.exists():
-        sys.stderr.write(f"{cannonicalfile} already exists")
-        sys.exit(2)
+    outputfile = outdir / f"{basename}.{hops}.simple.xlsx"
+    cannonicalfile = outdir / f"{basename}.{hops}.cannonical.xlsx"
+    if not args.replace:
+        if outputfile.exists():
+            sys.stderr.write(f"{outputfile} already exists")
+            sys.exit(2)
+        if cannonicalfile.exists():
+            sys.stderr.write(f"{cannonicalfile} already exists")
+            sys.exit(2)
 
     logger.info("Reading graph input files")
 
-    reader = RelationshipFileReader(vertices_file, edges_file, args.hops, args.filter)
+    reader = RelationshipFileReader(vertices_file, edges_file, hops, args.filter)
     graph: rb.array = reader()
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")

@@ -15,6 +15,8 @@ import numpy as np
 import redblackgraph as rb
 import xlsxwriter
 
+logger = logging.getLogger(__name__)
+
 ROTATE_90 = 'rotate-90'
 MAX_COLUMNS_EXCEL = 16384
 
@@ -65,7 +67,7 @@ class GraphBuilder:
     def __init__(self):
         self.rbg_dictionary = defaultdict(lambda: {})
 
-    def add_vertex(self, vertex_id, color, red_vertex_id:int=None, black_vertex_id:int=None):
+    def add_vertex(self, vertex_id:int, color:int, red_vertex_id:int=None, black_vertex_id:int=None):
         """
         Add a vertex to the graph (optionally include immediate ancestry vertices
         :param vertex_id: id of the vertex to add 
@@ -118,19 +120,35 @@ class RelationshipFileReader(VertexInfo):
         self.filter = filter
 
     def __call__(self, *args, **kwargs):
+        linked = set()
+        skipped_count = 0
+        vertex_count = 0
+        with open(self.relationships_file, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0].startswith("#"):
+                    continue
+                if row[2] in self.filter:
+                    linked.add(row[0])
+                    linked.add(row[1])
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0].startswith("#"):
                     continue
                 external_id = row[0]
+                hop = int(row[3])
                 color = row[1]
-                name = row[2]
-                hop = row[3]
-                if int(hop) <= self.hop:
-                    if not color == '':
+                if external_id in linked:
+                    name = row[2]
+                    if hop <= self.hop and color != '':
+                        color = int(color)
                         vertex_id = self.person_identifier.add_person(external_id, name)
                         self.graph_builder.add_vertex(vertex_id, color)
+                        vertex_count += 1
+                else:
+                    if hop <= self.hop and color != '':
+                        skipped_count += 1
         with open(self.relationships_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -141,6 +159,7 @@ class RelationshipFileReader(VertexInfo):
                     destination_vertex = self.person_identifier.get_person_id(row[1])
                     if not source_vertex is None and not destination_vertex is None:
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
+        logger.info(f"{vertex_count} vertices in graph. {skipped_count} vetices were removed from the graph as they had no edges.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
@@ -168,8 +187,6 @@ class RedBlackGraphWriter:
         return max(len_of_max_string + 0.83, 2.67)
     
     def __call__(self, *args, **kwargs):
-        logger = logging.getLogger(__name__)
-
         workbook, formats = self._open_workbook(kwargs.get('output_file', '/tmp/rbg.csv'))
         worksheet = workbook.add_worksheet()
         worksheet.set_default_row(hide_unused_rows=True)
