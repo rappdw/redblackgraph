@@ -5,8 +5,10 @@ import sys
 from pathlib import Path
 
 import redblackgraph as rb
-from redblackgraph.util.relationship_file_io import RelationshipFileReader
+from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
 from redblackgraph.reference.triangularization import canonical_sort
+
+MAX_PRACTICAL_SIZE = 1500
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -64,6 +66,11 @@ if __name__ == '__main__':
 
     reader = RelationshipFileReader(vertices_file, edges_file, hops, args.filter)
     graph: rb.array = reader()
+
+    if len(graph) >= MAX_COLUMNS_EXCEL:
+        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({len(graph)} vertices)")
+    if len(graph) >= MAX_PRACTICAL_SIZE:
+        logger.warning(f"This graph is on the large size ({len(graph)}). Processing times for graphs in excess of {MAX_PRACTICAL_SIZE} nodes are noticably slower.")
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")
 

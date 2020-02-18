@@ -1,7 +1,7 @@
 import numpy as np
 
 from dataclasses import dataclass
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Tuple, List
 from collections import defaultdict
 
 from redblackgraph.reference.topological_sort import topological_sort
@@ -9,18 +9,20 @@ from redblackgraph.reference.topological_sort import topological_sort
 @dataclass
 class Components:
     ids: Sequence[int]
-    max_relationship: Sequence[int]
+    rel_count: Sequence[int]
     size_map: Dict[int, int] # keyed by component id, valued by size of component
 
-    def get_permutation_basis(self):
-        # this yeilds a list of tuples where each tuple is the size of the component, the component id of the vertex,
-        # the max rel(u,v) for the vertex and the id of the vertex. We want the nodes
-        # ordered by components size, component id, max rel(u,v), finally by vertex id
-        return sorted(
-            [(self.size_map[element[1][0]],) + element[1] + (element[0],)
-             for element in enumerate(zip(self.ids, self.max_relationship))],
-            reverse=True
-        )
+    def get_permutation_basis(self) -> List[Tuple[int, int, int, int]]:
+        # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
+        #   - the size of the component
+        #   - the component id of the vertex
+        #   - count(rel(u,v)) for the vertex
+        #   - max(rel(u,v)) for the vertex
+        #   - the vertex id
+        # This is the default sort ordering used by Traingularization
+        basis = [(self.size_map[element[1][0]],) + element[1] + (element[0],) for element in
+                         enumerate(zip(self.ids, self.rel_count))]
+        return sorted(basis, reverse=True)
 
 @dataclass
 class Triangularization:
@@ -34,45 +36,48 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
     :param A: input adjacency matrix
     :return: a tuple of:
       [0] - a vector matching length of A with the elements holding the connected component id of
-      the identified connected components - labeled u
+      the identified connected components
       [1] - a vector matching length of A with the elements holding the max n_p for the corresponding
-      row - labeled v
-      [2] - a dictionary keyed by component id and valued by size of component
+      row
+      [2] - a vector matching length of A with a count of the relationships for the corresponding row
+      [3] - a dictionary keyed by component id and valued by size of component
     """
     n = len(A)
-    u = [0] * n
-    v = [0] * n
+    component_for_vertex = [0] * n
+    # max_rel_for_vertex = [0] * n
+    rel_count_for_vertex = [0] * n
     q = defaultdict(lambda: 0)
     component_number = 1
-    u[0] = component_number
+    component_for_vertex[0] = component_number
     q[component_number] += 1
     for i in range(n):
         row_max = -2
-        if u[i] == 0:
+        if component_for_vertex[i] == 0:
             component_number += 1
-            u[i] = component_number
+            component_for_vertex[i] = component_number
             q[component_number] += 1
-        row_component_number = u[i]
+        row_component_number = component_for_vertex[i]
         for j in range(n):
             if A[i][j] != 0:
+                rel_count_for_vertex[j] += 1
                 row_max = max(A[i][j], row_max)
-                if u[j] == 0:
-                    u[j] = row_component_number
+                if component_for_vertex[j] == 0:
+                    component_for_vertex[j] = row_component_number
                     q[row_component_number] += 1
-                elif u[j] != row_component_number:
-                    # There are a couple cases here. We implicitely assume a new row
+                elif component_for_vertex[j] != row_component_number:
+                    # There are a couple cases here. We implicitly assume a new row
                     # is a new component, so we need to back that out (iterate from 0
                     # to j), but we could also encounter a row that "merges" two
                     # components (need to sweep the entire u vector)
                     for k in range(n):
-                        if u[k] == row_component_number:
-                            u[k] = u[j]
+                        if component_for_vertex[k] == row_component_number:
+                            component_for_vertex[k] = component_for_vertex[j]
                             q[row_component_number] -= 1
-                            q[u[j]] += 1
+                            q[component_for_vertex[j]] += 1
                     component_number -= 1
-                    row_component_number = u[j]
-        v[i] = row_max
-    return Components(u, v, {k:v for k,v in q.items() if v != 0})
+                    row_component_number = component_for_vertex[j]
+        # max_rel_for_vertex[i] = row_max
+    return Components(component_for_vertex, rel_count_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_permutation_matrices(A):
     """
@@ -81,7 +86,8 @@ def _get_triangularization_permutation_matrices(A):
     :param A:
     :return: the permutation matrices that will canonical_sort A
     """
-    permutation_basis = find_components_extended(A).get_permutation_basis()
+    components = find_components_extended(A)
+    permutation_basis = components.get_permutation_basis()
 
     # from the permutation basis, create the permutation matrix
     n = len(permutation_basis)
