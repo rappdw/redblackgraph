@@ -3,6 +3,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Dict, Sequence, Tuple, List
 from collections import defaultdict
+from .util import MSB
 
 from redblackgraph.reference.topological_sort import topological_sort
 
@@ -10,9 +11,10 @@ from redblackgraph.reference.topological_sort import topological_sort
 class Components:
     ids: Sequence[int]
     rel_count: Sequence[int]
+    max_rel: Sequence[int]
     size_map: Dict[int, int] # keyed by component id, valued by size of component
 
-    def get_permutation_basis(self) -> List[Tuple[int, int, int, int]]:
+    def get_permutation_basis(self) -> List[Tuple[int, int, int, int, int]]:
         # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
         #   - the size of the component
         #   - the component id of the vertex
@@ -21,8 +23,9 @@ class Components:
         #   - the vertex id
         # This is the default sort ordering used by Traingularization
         basis = [(self.size_map[element[1][0]],) + element[1] + (element[0],) for element in
-                         enumerate(zip(self.ids, self.rel_count))]
-        return sorted(basis, reverse=True)
+                         enumerate(zip(self.ids, self.rel_count, self.max_rel))]
+        # sort descending on size of component and "ancestor count", asecending on all other elements
+        return sorted(basis, key=lambda element: (-element[0], element[1], -element[2], element[3], element[4]))
 
 @dataclass
 class Triangularization:
@@ -37,15 +40,15 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
     :return: a tuple of:
       [0] - a vector matching length of A with the elements holding the connected component id of
       the identified connected components
-      [1] - a vector matching length of A with the elements holding the max n_p for the corresponding
-      row
-      [2] - a vector matching length of A with a count of the relationships for the corresponding row
+      [1] - a vector matching length of A with the elements holding the ancestor position for the corresponding
+      column
+      [2] - a vector matching length of A with a count of ancestors for the corresponding row
       [3] - a dictionary keyed by component id and valued by size of component
     """
     n = len(A)
     component_for_vertex = [0] * n
-    # max_rel_for_vertex = [0] * n
-    rel_count_for_vertex = [0] * n
+    max_rel_for_vertex = [0] * n
+    ancester_count_for_vertex = [0] * n
     q = defaultdict(lambda: 0)
     component_number = 1
     component_for_vertex[0] = component_number
@@ -59,8 +62,9 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
         row_component_number = component_for_vertex[i]
         for j in range(n):
             if A[i][j] != 0:
-                rel_count_for_vertex[j] += 1
-                row_max = max(A[i][j], row_max)
+                if i != j:
+                    ancester_count_for_vertex[i] += MSB(A[i][j])
+                max_rel_for_vertex[j] = max(A[i][j], max_rel_for_vertex[j])
                 if component_for_vertex[j] == 0:
                     component_for_vertex[j] = row_component_number
                     q[row_component_number] += 1
@@ -76,8 +80,7 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
                             q[component_for_vertex[j]] += 1
                     component_number -= 1
                     row_component_number = component_for_vertex[j]
-        # max_rel_for_vertex[i] = row_max
-    return Components(component_for_vertex, rel_count_for_vertex, {k:v for k,v in q.items() if v != 0})
+    return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_permutation_matrices(A):
     """
@@ -96,9 +99,9 @@ def _get_triangularization_permutation_matrices(A):
     # label_permutation can be calculated as P @ np.arrange(n), but since we are running the index do it here
     label_permutation = np.arange(n)
     for idx, element in enumerate(permutation_basis):
-        label_permutation[idx] = element[3]
-        P[idx][element[3]] = 1
-        P_transpose[element[3]][idx] = 1
+        label_permutation[idx] = element[-1]
+        P[idx][element[-1]] = 1
+        P_transpose[element[-1]][idx] = 1
     return P, P_transpose, label_permutation
 
 
