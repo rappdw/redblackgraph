@@ -223,8 +223,9 @@ class RedBlackGraphWriter:
                 column += 1
             for column_idx in range(n):
                 cell_data = R[row_idx][column_idx]
-                max_np = max(max_np, cell_data)
-                worksheet.write(row + row_idx, column + column_idx, cell_data)
+                if cell_data != 0:
+                    max_np = max(max_np, cell_data)
+                    worksheet.write(row + row_idx, column + column_idx, cell_data)
         column_width = self._calc_width(len(f"{max_np}"))
         worksheet.freeze_panes(1, 1)
         worksheet.set_column(0, 0, self._calc_width(max_key))
