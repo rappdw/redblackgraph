@@ -34,6 +34,24 @@ If you'd prefer to read hard copy, simply run:
 
 A pdf file will be generated into the `build/latex-{datestamped}` directory.
 
+# To Try Things Out...
+
+Run the following:
+
+```shell script
+# use crawl-fs to extract a sample data set from FamilySearch
+pip install fs-crawler
+crawl-fs -i <FamilySearch Ids to seed crawl> -o <output-directory> -b <name portion of output file>
+
+# this will generate a <name>.vertices.csv and <name>.edges.csv file which can be ingested into a RedBlackGraph
+pip install RedBlackGraph
+# use rgbcf to generate both a simple form and cannonical form of a Red Black Graph (xlsx files)
+rgbcf -f <directory and base name of vertices and edges file> -o <output-directory>
+
+# Use excel to view output
+ 
+```
+
 # A Note on Implementations
 
 * `redblackgraph.reference` - a pure python implementation. This simple implementation is intended primarily for illustrative purposes.
