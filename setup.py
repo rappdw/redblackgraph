@@ -44,15 +44,17 @@ if __name__ == "__main__":
         long_description = f.read()
 
     metadata = dict(
+        name="RedBlackGraph",
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         maintainer = "Daniel Rapp",
         maintainer_email = "rappdw@gmail.com",
-        description = 'Red Black Graphs',
+        description = 'Red Black Graph',
         long_description = long_description,
+        long_description_content_type="text/markdown",
         author = "Daniel Rapp",
         download_url = "https://github.com/rappdw/redblackgraph",
-        license = 'MIT',
+        license = 'AFFERO GPL',
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Intended Audience :: Developers',
@@ -64,7 +66,7 @@ if __name__ == "__main__":
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
         ],
-        platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
+        platforms = ["Windows", "Linux", "Mac OS-X"],
         configuration=configuration,
         install_requires=[
             'dataclasses;python_version<"3.7"',
