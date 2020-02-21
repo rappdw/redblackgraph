@@ -74,11 +74,13 @@ if __name__ == "__main__":
         ],
         extras_require={
             'dev': [
-                'pytest',
-                'pytest-cov',
-                'pylint',
-                'dockerutils>=2.0.1'
-            ]
+                'wheel>=0.29'
+            ],
+            'test': [
+                'pytest>=3.0',
+                'pytest-cov>=2.4',
+                'pylint>=1.8.1'
+            ],
         },
         setup_requires=[
             'numpy>=0.14.0',
