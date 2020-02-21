@@ -6,7 +6,7 @@ from redblackgraph.reference.triangularization import canonical_sort
 def test_rel_file():
     test_persons_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.vertices.csv")
     test_relationships_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.edges.csv")
-    reader = rb.RelationshipFileReader(test_persons_file, test_relationships_file)
+    reader = rb.RelationshipFileReader(test_persons_file, test_relationships_file, 4, ["Bio"])
     graph: rb.array = reader()
     assert len(graph) == len(graph[0])
     assert len(graph) == 15

@@ -14,11 +14,11 @@ OUTPUT_DIR=${OUTPUT_DIR:-_testing_output}
 MODULE_NAME=redblackgraph
 
 function unit_test {
-    pytest --color=yes --cov-config coverage.cfg --cov=$MODULE_NAME --cov-fail-under=80 --cov-report term-missing --durations=10 tests | tee -a _testing_output/pytest_output.txt
+    pytest --color=yes --cov-config coverage.cfg --cov=$MODULE_NAME --cov-fail-under=65 --cov-report term-missing --durations=10 tests | tee -a _testing_output/pytest_output.txt
     exit ${PIPESTATUS[0]}
 }
 function integration_test {
-    pytest --color=yes --cov-config coverage.cfg --cov=$MODULE_NAME --cov-fail-under=80 --cov-report term-missing --durations=10 --slow tests | tee -a _testing_output/pytest_integration_output.txt
+    pytest --color=yes --cov-config coverage.cfg --cov=$MODULE_NAME --cov-fail-under=65 --cov-report term-missing --durations=10 --slow tests | tee -a _testing_output/pytest_integration_output.txt
     exit ${PIPESTATUS[0]}
 }
 
