@@ -11,6 +11,6 @@ install:
   - pip install codecov
   - pip install -e ".[test]"
 script:
-  - bin/test.sh -u
+  - bin/test -u
 after_success:
   - codecov
