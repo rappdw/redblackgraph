@@ -54,6 +54,7 @@ static void
     char *ipR1 = args[1]; // first pointer to R
     char *ipR2 = args[1]; // second pointer to R
     char *op = args[1];
+    @type@ product;
 
     /* lengths of core dimensions */
     npy_intp dn = dimensions[0];
@@ -77,7 +78,15 @@ static void
     for (k = 0; k < dn; k++) {
         for (i = 0; i < dn; i++) {
             for (j = 0; j < dn; j++) {
-                *(@type@ *)op = @name@_avos_sum(*(@type@ *)op, @name@_avos_product((*(@type@ *)ipR1), (*(@type@ *)ipR2)));
+                product = @name@_avos_product((*(@type@ *)ipR1), (*(@type@ *)ipR2));
+                if (i == j && !(product == (@type@)-1 || product == 0 || product == 1)) {
+                    char s[100];
+                    memset(s, 0, 100*sizeof(char));
+                    sprintf(s,"Error: cycle detected! Vertex %li has a path to itself. A(%li,%li)=%li, A(%li,%li)=%li", i, i, k, (*(@type@ *)ipR1), k, j, (*(@type@ *)ipR2));
+
+                    PyErr_SetString(PyExc_ValueError, s);
+                }
+                *(@type@ *)op = @name@_avos_sum(*(@type@ *)op, product);
                 if ((@utype@)~*(@type@ *)op != 0 && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
                 // advance column of output, advance column of R2
