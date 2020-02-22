@@ -51,6 +51,8 @@ if __name__ == '__main__':
     outdir = args.outdir
     if not outdir:
         outdir = Path(basefile).parent
+    else:
+        outdir = Path(outdir)
 
     outputfile = outdir / f"{basename}.{hops}.simple.xlsx"
     cannonicalfile = outdir / f"{basename}.{hops}.cannonical.xlsx"
