@@ -21,7 +21,9 @@ if __name__ == '__main__':
                         help="output directory (default is same directory as basefile")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Increase output verbosity [False]")
     parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
-    parser.add_argument("-l", "--filter", action="append", default=["BiologicalParent", "UntypedParent"], type=str, nargs="+", help="Number of hops to include in graph")
+    parser.add_argument("-l", "--filter", action="append",
+                        default=["BiologicalParent", "UntypedParent", "UnspecifiedParentType"], type=str,
+                        nargs="+", help="Number of hops to include in graph")
     parser.add_argument("-r", "--replace", action="store_true", default=False, help="Replace existing output files")
 
     # extract arguments from the command line
