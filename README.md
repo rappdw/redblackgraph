@@ -1,3 +1,11 @@
+[![TravisCI](https://api.travis-ci.org/rappdw/redblackgraph.svg?branch=master)](https://travis-ci.org/rappdw/redblackgraph) 
+[![Coverage](https://codecov.io/gh/rappdw/redblackgraph/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/redblackgraph)
+[![PyPi](https://img.shields.io/pypi/v/redblackgraph.svg)](https://pypi.org/project/redblackgraph/) 
+[![PyPi](https://img.shields.io/pypi/wheel/redblackgraph.svg)](https://pypi.org/project/redblackgraph/) 
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/) 
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/) 
+
 Red-Black Graph - A DAG of Multiple, Interleaved Binary Trees
 ----------------------------------
 
@@ -25,6 +33,24 @@ If you'd prefer to read hard copy, simply run:
     `bin/generate-pdf.sh notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb` 
 
 A pdf file will be generated into the `build/latex-{datestamped}` directory.
+
+# To Try Things Out...
+
+Run the following:
+
+```shell script
+# use crawl-fs to extract a sample data set from FamilySearch
+pip install fs-crawler
+crawl-fs -i <FamilySearch Ids to seed crawl> -o <output-directory> -b <name portion of output file>
+
+# this will generate a <name>.vertices.csv and <name>.edges.csv file which can be ingested into a RedBlackGraph
+pip install RedBlackGraph
+# use rgbcf to generate both a simple form and cannonical form of a Red Black Graph (xlsx files)
+rgbcf -f <directory and base name of vertices and edges file> -o <output-directory>
+
+# Use excel to view output
+ 
+```
 
 # A Note on Implementations
 

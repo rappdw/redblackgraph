@@ -121,7 +121,6 @@ class RelationshipFileReader(VertexInfo):
 
     def __call__(self, *args, **kwargs):
         linked = set()
-        skipped_count = 0
         vertex_count = 0
         with open(self.relationships_file, "r") as csvfile:
             reader = csv.reader(csvfile)
@@ -132,6 +131,7 @@ class RelationshipFileReader(VertexInfo):
                     linked.add(row[0])
                     linked.add(row[1])
         with open(self.persons_file, "r") as csvfile:
+            skipped_count = 0
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0].startswith("#"):
@@ -141,13 +141,16 @@ class RelationshipFileReader(VertexInfo):
                 color = row[1]
                 if external_id in linked:
                     name = row[2]
-                    if hop <= self.hop and color != '':
-                        color = int(color)
-                        vertex_id = self.person_identifier.add_person(external_id, name)
-                        self.graph_builder.add_vertex(vertex_id, color)
-                        vertex_count += 1
+                    if hop <= self.hop:
+                        if color != '':
+                            color = int(color)
+                            vertex_id = self.person_identifier.add_person(external_id, name)
+                            self.graph_builder.add_vertex(vertex_id, color)
+                            vertex_count += 1
+                        else:
+                            skipped_count += 1
                 else:
-                    if hop <= self.hop and color != '':
+                    if hop <= self.hop:
                         skipped_count += 1
         with open(self.relationships_file, "r") as csvfile:
             reader = csv.reader(csvfile)
@@ -159,7 +162,8 @@ class RelationshipFileReader(VertexInfo):
                     destination_vertex = self.person_identifier.get_person_id(row[1])
                     if not source_vertex is None and not destination_vertex is None:
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
-        logger.info(f"{vertex_count} vertices in graph. {skipped_count} vetices were removed from the graph as they had no edges.")
+        logger.info(f"{vertex_count} vertices in graph. {skipped_count} vetices were"
+                    f" removed from the graph as they either had no edges or no color.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
@@ -223,8 +227,9 @@ class RedBlackGraphWriter:
                 column += 1
             for column_idx in range(n):
                 cell_data = R[row_idx][column_idx]
-                max_np = max(max_np, cell_data)
-                worksheet.write(row + row_idx, column + column_idx, cell_data)
+                if cell_data != 0:
+                    max_np = max(max_np, cell_data)
+                    worksheet.write(row + row_idx, column + column_idx, cell_data)
         column_width = self._calc_width(len(f"{max_np}"))
         worksheet.freeze_panes(1, 1)
         worksheet.set_column(0, 0, self._calc_width(max_key))

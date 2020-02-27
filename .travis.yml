@@ -1,0 +1,14 @@
+language: python
+sudo: true
+dist: xenial
+python:
+  - "3.8"
+  - "3.7"
+  - "3.6"
+install:
+  - pip install codecov
+  - pip install -e ".[test]"
+script:
+  - bin/test -u
+after_success:
+  - codecov

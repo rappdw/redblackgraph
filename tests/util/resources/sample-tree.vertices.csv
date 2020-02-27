@@ -1,16 +1,16 @@
-#id,gender,name
-ABCD-1AB,M,"R, H"
-ABCD-2AB,M,"R, D"
-ABCD-3AB,F,"S, R"
-ABCD-4AB,M,"S, D"
-ABCD-5AB,M,"R, E"
-ABCD-6AB,F,"T, M"
-ABCD-7AB,F,"W, A"
-ABCD-8AB,M,"R, M"
-ABCD-9AB,F,"W, I"
-ABCD-AAB,M,"S, J"
-ABCD-BAB,F,"K, E"
-ABCD-CAB,F,"K, M"
-ABCD-DAB,M,"R, G"
-ABCD-EAB,M,"S, S"
-ABCD-FAB,F,"C, E"
+#id,gender,name,hop
+ABCD-1AB,-1,"R, H",0
+ABCD-2AB,-1,"R, D",0
+ABCD-3AB,1,"S, R",1
+ABCD-4AB,-1,"S, D",2
+ABCD-5AB,-1,"R, E",1
+ABCD-6AB,1,"T, M",1
+ABCD-7AB,1,"W, A",2
+ABCD-8AB,-1,"R, M",2
+ABCD-9AB,1,"W, I",3
+ABCD-AAB,-1,"S, J",3
+ABCD-BAB,1,"K, E",3
+ABCD-CAB,1,"K, M",3
+ABCD-DAB,-1,"R, G",4
+ABCD-EAB,-1,"S, S",4
+ABCD-FAB,1,"C, E",4

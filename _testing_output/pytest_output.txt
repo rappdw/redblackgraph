@@ -1,57 +1,93 @@
-GIT_HASH: 6d4c8db
+GIT_HASH: 5e06e90
 [1m============================= test session starts ==============================[0m
-platform linux -- Python 3.6.5, pytest-3.6.2, py-1.5.3, pluggy-0.6.0
-rootdir: /workdir, inifile:
-plugins: cov-2.5.1
-collected 33 items
+platform darwin -- Python 3.8.1, pytest-5.3.5, py-1.8.1, pluggy-0.13.1
+rootdir: /Users/drapp/dev/redblackgraph
+plugins: cov-2.8.1
+collected 101 items
 
-tests/test_einsum.py ..[36m                                                  [  6%][0m
-tests/test_loops.py .[36m                                                    [  9%][0m
-tests/test_redblack.py ...........[36m                                       [ 42%][0m
-tests/reference/test_avos.py ......[36m                                      [ 60%][0m
-tests/reference/test_calc_relationship.py .[36m                              [ 63%][0m
-tests/reference/test_components.py .[36m                                     [ 66%][0m
-tests/reference/test_mat_avos.py ...[36m                                     [ 75%][0m
-tests/reference/test_rel_composition.py ....[36m                             [ 87%][0m
-tests/reference/test_vec_avos.py ..[36m                                      [ 93%][0m
-tests/reference/test_warshall.py .[36m                                       [ 96%][0m
-tests/util/test_relationship_file_io.py .[36m                                [100%][0m
+tests/test_cycle_detection.py [32m.[0m[32m.[0m[32m.[0m[32m                                        [  2%][0m
+tests/test_einsum.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m                                  [ 20%][0m
+tests/test_rbm.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m                                        [ 35%][0m
+tests/test_redblack.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m           [ 74%][0m
+tests/core/test_avos.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                            [ 79%][0m
+tests/reference/test_avos.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                        [ 83%][0m
+tests/reference/test_calc_relationship.py [32m.[0m[33m                              [ 84%][0m
+tests/reference/test_components.py [32m.[0m[32m.[0m[33m                                    [ 86%][0m
+tests/reference/test_mat_avos.py [32m.[0m[32m.[0m[32m.[0m[33m                                     [ 89%][0m
+tests/reference/test_rel_composition.py [32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                             [ 93%][0m
+tests/reference/test_topological_sort.py [32m.[0m[33m                               [ 94%][0m
+tests/reference/test_triangularization.py [32m.[0m[32m.[0m[33m                             [ 96%][0m
+tests/reference/test_vec_avos.py [32m.[0m[32m.[0m[33m                                      [ 98%][0m
+tests/reference/test_warshall.py [32m.[0m[33m                                       [ 99%][0m
+tests/util/test_relationship_file_io.py [32m.[0m[33m                                [100%][0m
 
------------ coverage: platform linux, python 3.6.5-final-0 -----------
-Name                                           Stmts   Miss  Cover   Missing
-----------------------------------------------------------------------------
-redblackgraph/__init__.py                          9      0   100%
-redblackgraph/core/__init__.py                    15      3    80%   8-17
-redblackgraph/core/avos_einsumfunc.py             11      3    73%   8, 12, 15
-redblackgraph/core/rbm.py                          0      0   100%
-redblackgraph/core/redblack.py                    74      6    92%   22, 27, 35, 87, 93, 98
-redblackgraph/reference/__init__.py                9      0   100%
-redblackgraph/reference/avos.py                   18      1    94%   17
-redblackgraph/reference/calc_relationship.py      23      6    74%   26-32, 50
-redblackgraph/reference/components.py             23      0   100%
-redblackgraph/reference/generation.py              9      7    22%   12-18
-redblackgraph/reference/mat_avos.py                5      0   100%
-redblackgraph/reference/rel_composition.py        27      0   100%
-redblackgraph/reference/triangularization.py      58      0   100%
-redblackgraph/reference/util.py                   17      0   100%
-redblackgraph/reference/vec_avos.py                5      0   100%
-redblackgraph/reference/transitive_closure.py               17      0   100%
-redblackgraph/util/__init__.py                     1      0   100%
-redblackgraph/util/relationship_file_io.py       118      7    94%   41, 91, 164-165, 170-171, 174
-----------------------------------------------------------------------------
-TOTAL                                            439     33    92%
+[33m=============================== warnings summary ===============================[0m
+tests/test_redblack.py::test_avos[int8]
+tests/test_redblack.py::test_avos[int8]
+tests/test_redblack.py::test_avos[uint8]
+tests/test_redblack.py::test_avos[uint8]
+tests/test_redblack.py::test_avos[int16]
+tests/test_redblack.py::test_avos[int16]
+tests/test_redblack.py::test_avos[uint16]
+tests/test_redblack.py::test_avos[uint16]
+tests/test_redblack.py::test_avos[int32]
+tests/test_redblack.py::test_avos[int32]
+tests/test_redblack.py::test_avos[uint32]
+tests/test_redblack.py::test_avos[uint32]
+tests/test_redblack.py::test_avos[int64]
+tests/test_redblack.py::test_avos[int64]
+tests/test_redblack.py::test_avos[uint64]
+tests/test_redblack.py::test_avos[uint64]
+tests/test_redblack.py::test_vector_product
+tests/test_redblack.py::test_vector_product
+tests/test_redblack.py::test_vector_matrix_product
+tests/test_redblack.py::test_vector_matrix_rproduct
+  /Users/drapp/dev/redblackgraph/redblackgraph/core/redblack.py:112: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    return super(matrix, cls).__new__(cls, data, dtype=dtype, copy=copy)
 
-[32mRequired test coverage of 80% reached. Total coverage: 92.48%
-[0m
-========================== slowest 10 test durations ===========================
-0.04s call     tests/util/test_relationship_file_io.py::test_rel_file
+-- Docs: https://docs.pytest.org/en/latest/warnings.html
+
+---------- coverage: platform darwin, python 3.8.1-final-0 -----------
+Name                                            Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------
+redblackgraph/__config__.py                        23     23     0%   3-33
+redblackgraph/__init__.py                          11      0   100%
+redblackgraph/core/avos.py                         11      1    91%   8
+redblackgraph/core/redblack.py                     70      5    93%   23, 28, 36, 88, 94
+redblackgraph/reference/__init__.py                11      0   100%
+redblackgraph/reference/avos.py                    24      1    96%   28
+redblackgraph/reference/calc_relationship.py       20      6    70%   21-27, 45
+redblackgraph/reference/components.py              23      0   100%
+redblackgraph/reference/generation.py               9      7    22%   12-18
+redblackgraph/reference/mat_avos.py                 5      0   100%
+redblackgraph/reference/rel_composition.py         28      0   100%
+redblackgraph/reference/topological_sort.py        26      2    92%   31-37
+redblackgraph/reference/transitive_closure.py      18      0   100%
+redblackgraph/reference/triangularization.py       74      0   100%
+redblackgraph/reference/util.py                     6      0   100%
+redblackgraph/reference/vec_avos.py                 5      0   100%
+redblackgraph/sparse/__init__.py                    4      0   100%
+redblackgraph/sparse/csgraph/__init__.py            0      0   100%
+redblackgraph/sparse/rbm.py                        33      4    88%   19, 72, 84, 87
+redblackgraph/types/__init__.py                     0      0   100%
+redblackgraph/types/color.py                        3      0   100%
+redblackgraph/types/relationship.py                 5      0   100%
+redblackgraph/types/transitive_closure.py           6      0   100%
+redblackgraph/util/__init__.py                      1      0   100%
+redblackgraph/util/relationship_file_io.py        168     15    91%   42, 51, 58-60, 82-83, 85-86, 110, 150-151, 196, 217, 237
+-----------------------------------------------------------------------------
+TOTAL                                             584     64    89%
+
+[32mRequired test coverage of 65% reached. Total coverage: 89.04%
+[0m========================== slowest 10 test durations ===========================
+0.11s call     tests/util/test_relationship_file_io.py::test_rel_file
 0.03s call     tests/reference/test_rel_composition.py::test_my_use_case_edge
 0.02s call     tests/reference/test_rel_composition.py::test_my_use_case_vertex
-0.00s call     tests/reference/test_components.py::test_find_components
-0.00s call     tests/test_redblack.py::TestmatrixOperations::test_avos
-0.00s call     tests/reference/test_rel_composition.py::test_vertex_relational_composition
-0.00s setup    tests/test_redblack.py::TestmatrixOperations::test_triangularization
-0.00s setup    tests/reference/test_avos.py::test_sign2
-0.00s call     tests/reference/test_warshall.py::test_warshall
-0.00s call     tests/test_redblack.py::TestmatrixOperations::test_relational_composition
-[32m[1m========================== 33 passed in 0.82 seconds ===========================[0m
+0.01s call     tests/test_rbm.py::test_avos[int8]
+0.01s call     tests/test_rbm.py::test_avos[int16]
+0.01s call     tests/test_rbm.py::test_avos[uint16]
+0.01s call     tests/test_rbm.py::test_avos[int32]
+0.01s call     tests/test_rbm.py::test_avos[uint64]
+0.01s call     tests/test_rbm.py::test_avos[uint8]
+0.01s call     tests/test_rbm.py::test_avos[uint32]
+[33m======================= [32m101 passed[0m, [33m[1m20 warnings[0m[33m in 0.99s[0m[33m =======================[0m

@@ -44,27 +44,29 @@ if __name__ == "__main__":
         long_description = f.read()
 
     metadata = dict(
+        name="RedBlackGraph",
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         maintainer = "Daniel Rapp",
         maintainer_email = "rappdw@gmail.com",
-        description = 'Red Black Graphs',
+        description = 'Red Black Graph',
         long_description = long_description,
+        long_description_content_type="text/markdown",
         author = "Daniel Rapp",
         download_url = "https://github.com/rappdw/redblackgraph",
-        license = 'MIT',
+        license = 'AGPLv3+',
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Intended Audience :: Developers',
             'Topic :: Scientific/Engineering :: Visualization',
             'Topic :: Software Development :: Version Control :: Git',
             'Topic :: Software Development :: Libraries :: Python Modules',
-            'License :: OSI Approved :: MIT License',
+            'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
         ],
-        platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
+        platforms = ["Windows", "Linux", "Mac OS-X"],
         configuration=configuration,
         install_requires=[
             'dataclasses;python_version<"3.7"',
@@ -74,11 +76,13 @@ if __name__ == "__main__":
         ],
         extras_require={
             'dev': [
-                'pytest',
-                'pytest-cov',
-                'pylint',
-                'dockerutils>=2.0.1'
-            ]
+                'wheel>=0.29'
+            ],
+            'test': [
+                'pytest>=3.0',
+                'pytest-cov>=2.4',
+                'pylint>=1.8.1'
+            ],
         },
         setup_requires=[
             'numpy>=0.14.0',

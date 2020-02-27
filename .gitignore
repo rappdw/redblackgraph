@@ -7,6 +7,10 @@ build/
 .cache/
 .eggs/
 *.pyc
+wheel
+*.egg-info
+*.edges.csv
+*.vertices.csv
 **/__pycache__
 redblackgraph/about.py
 redblackgraph.egg-info/
