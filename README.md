@@ -45,8 +45,8 @@ crawl-fs -i <FamilySearch Ids to seed crawl> -o <output-directory> -b <name port
 
 # this will generate a <name>.vertices.csv and <name>.edges.csv file which can be ingested into a RedBlackGraph
 pip install RedBlackGraph
-# use rgbcf to generate both a simple form and cannonical form of a Red Black Graph (xlsx files)
-rgbcf -f <directory and base name of vertices and edges file> -o <output-directory>
+# use rbgcf to generate both a simple form and cannonical form of a Red Black Graph (xlsx files)
+rbgcf -f <directory and base name of vertices and edges file> -o <output-directory>
 
 # Use excel to view output
  
