@@ -21,7 +21,9 @@ if __name__ == '__main__':
                         help="output directory (default is same directory as basefile")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Increase output verbosity [False]")
     parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
-    parser.add_argument("-l", "--filter", action="append", default=["BiologicalParent", "UntypedParent"], type=str, nargs="+", help="Number of hops to include in graph")
+    parser.add_argument("-l", "--filter", action="append",
+                        default=["BiologicalParent", "UntypedParent", "UnspecifiedParentType"], type=str,
+                        nargs="+", help="Number of hops to include in graph")
     parser.add_argument("-r", "--replace", action="store_true", default=False, help="Replace existing output files")
 
     # extract arguments from the command line
@@ -51,6 +53,8 @@ if __name__ == '__main__':
     outdir = args.outdir
     if not outdir:
         outdir = Path(basefile).parent
+    else:
+        outdir = Path(outdir)
 
     outputfile = outdir / f"{basename}.{hops}.simple.xlsx"
     cannonicalfile = outdir / f"{basename}.{hops}.cannonical.xlsx"
