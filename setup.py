@@ -89,7 +89,7 @@ if __name__ == "__main__":
             'cython'
         ],
         scripts=[
-            'scripts/rgbcf',
+            'scripts/rbgcf',
         ]
     )
 

@@ -12,9 +12,9 @@ MAX_PRACTICAL_SIZE = 1500
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="rgbcf - get cannonical form: parses rbg ingest files and generates the cannonical form",
+        description="rbgcf - get cannonical form: parses rbg ingest files and generates the cannonical form",
         add_help=False,
-        usage="rgbcf -f <base-file> -o <out-directory> (<base-file>.vertices.csv and <base-file>.edges.csv must exist)",
+        usage="rbgcf -f <base-file> -o <out-directory> (<base-file>.vertices.csv and <base-file>.edges.csv must exist)",
     )
     parser.add_argument("-f", "--basefile", metavar="<STR>", type=str, help="base file name", required=True)
     parser.add_argument("-o", "--outdir", metavar="<STR>", type=str,

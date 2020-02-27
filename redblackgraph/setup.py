@@ -6,6 +6,9 @@ def configuration(parent_package='',top_path=None):
     config = Configuration('redblackgraph',parent_package,top_path)
     config.add_subpackage('core')
     config.add_subpackage('sparse')
+    config.add_subpackage('reference')
+    config.add_subpackage('types')
+    config.add_subpackage('util')
     config.make_config_py()
     return config
 
