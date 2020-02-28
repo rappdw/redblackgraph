@@ -45,41 +45,43 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
       [2] - a vector matching length of A with a count of ancestors for the corresponding row
       [3] - a dictionary keyed by component id and valued by size of component
     """
+
+    # see algorithm description in .components find_components
+
     n = len(A)
     component_for_vertex = [0] * n
     max_rel_for_vertex = [0] * n
     ancester_count_for_vertex = [0] * n
-    q = defaultdict(lambda: 0)
-    component_number = 1
-    component_for_vertex[0] = component_number
-    q[component_number] += 1
+    component_number = 0
     for i in range(n):
-        row_max = -2
+        assumed_new_component = False
         if component_for_vertex[i] == 0:
             component_number += 1
             component_for_vertex[i] = component_number
-            q[component_number] += 1
-        row_component_number = component_for_vertex[i]
+            assumed_new_component = True
+        assumed_component_number = component_for_vertex[i]
+        actual_new_component = True
+        spanned_components = set()
+        spanned_components.add(assumed_component_number)
         for j in range(n):
-            if A[i][j] != 0:
-                if i != j:
-                    ancester_count_for_vertex[i] += MSB(A[i][j])
+            if i != j and A[i][j] != 0:
+                ancester_count_for_vertex[i] += MSB(A[i][j])
                 max_rel_for_vertex[j] = max(A[i][j], max_rel_for_vertex[j])
-                if component_for_vertex[j] == 0:
-                    component_for_vertex[j] = row_component_number
-                    q[row_component_number] += 1
-                elif component_for_vertex[j] != row_component_number:
-                    # There are a couple cases here. We implicitly assume a new row
-                    # is a new component, so we need to back that out (iterate from 0
-                    # to j), but we could also encounter a row that "merges" two
-                    # components (need to sweep the entire u vector)
-                    for k in range(n):
-                        if component_for_vertex[k] == row_component_number:
-                            component_for_vertex[k] = component_for_vertex[j]
-                            q[row_component_number] -= 1
-                            q[component_for_vertex[j]] += 1
-                    component_number -= 1
-                    row_component_number = component_for_vertex[j]
+                if component_for_vertex[j] != 0:
+                    spanned_components.add(component_for_vertex[j])
+                    actual_new_component = False
+                component_for_vertex[j] = assumed_component_number
+        if not actual_new_component:
+            root_component = min(spanned_components)
+            spanned_components.remove(root_component)
+            for j in range(n):
+                if component_for_vertex[j] in spanned_components:
+                    component_for_vertex[j] = root_component
+            if assumed_new_component:
+                component_number -= 1
+    q = defaultdict(lambda: 0)
+    for i in range(n):
+        q[component_for_vertex[i]] += 1
     return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_permutation_matrices(A):
