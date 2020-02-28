@@ -120,6 +120,16 @@ class RelationshipFileReader(VertexInfo):
         self.filter = filter
 
     def __call__(self, *args, **kwargs):
+        hop_frontier = set()
+        with open(self.persons_file, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0].startswith("#"):
+                    continue
+                external_id = row[0]
+                hop = int(row[3])
+                if hop > self.hop:
+                    hop_frontier.add(external_id)
         linked = set()
         vertex_count = 0
         with open(self.relationships_file, "r") as csvfile:
@@ -128,8 +138,9 @@ class RelationshipFileReader(VertexInfo):
                 if row[0].startswith("#"):
                     continue
                 if row[2] in self.filter:
-                    linked.add(row[0])
-                    linked.add(row[1])
+                    if row[0] not in hop_frontier and row[1] not in hop_frontier:
+                        linked.add(row[0])
+                        linked.add(row[1])
         with open(self.persons_file, "r") as csvfile:
             skipped_count = 0
             reader = csv.reader(csvfile)
