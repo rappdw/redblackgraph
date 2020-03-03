@@ -41,5 +41,8 @@ def find_components(A: Sequence[Sequence[int]]) -> Sequence[int]:
                 vertices_added_to_component.add(j)
                 for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][j] == 0 or x == j, vertices):
                     vertices_added_to_component.add(k)
+            # now we need to iterate the vertex's column
+            for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][vertex] == 0 or x == vertex, vertices):
+                vertices_added_to_component.add(k)
         component_id += 1
     return component_for_vertex

@@ -42,6 +42,28 @@ def test_find_components():
     assert extended_components.size_map[0] == 7
     assert extended_components.size_map[1] == 3
 
+def test_find_components_use_case_2():
+    A = [[-1, 0, 0, 2, 0, 3, 0],
+         [ 0,-1, 0, 0, 0, 0, 0],
+         [ 2, 0, 1, 0, 0, 0, 0],
+         [ 0, 0, 0,-1, 0, 0, 0],
+         [ 0, 2, 0, 0,-1, 0, 3],
+         [ 0, 0, 0, 0, 0, 1, 0],
+         [  0, 0, 0, 0, 0, 0, 1]]
+    A_star = transitive_closure(A).W
+    expected_transitive_closure = [
+        [-1, 0, 0, 2, 0, 3, 0],
+        [ 0,-1, 0, 0, 0, 0, 0],
+        [ 2, 0, 1, 4, 0, 5, 0],
+        [ 0, 0, 0,-1, 0, 0, 0],
+        [ 0, 2, 0, 0,-1, 0, 3],
+        [ 0, 0, 0, 0, 0, 1, 0],
+        [ 0, 0, 0, 0, 0, 0, 1]
+    ]
+    assert A_star.tolist() == expected_transitive_closure
+
+    components = find_components(A_star)
+    assert components == [0, 1, 0, 0, 1, 0, 1]
 
 def test_find_components_dfs():
     A = [[-1, 0, 0, 2, 0, 3, 0],
