@@ -67,17 +67,17 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
             component_for_vertex[vertex] = component_id
             for j in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[vertex][x] == 0 or x == vertex, vertices):
                 vertices_added_to_component.add(j)
-                max_rel_for_vertex[vertex] = max(max_rel_for_vertex[vertex], A[vertex][j])
+                max_rel_for_vertex[j] = max(max_rel_for_vertex[j], A[vertex][j])
                 ancester_count_for_vertex[vertex] += MSB(A[vertex][j])
                 for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][j] == 0 or x == j, vertices):
                     vertices_added_to_component.add(k)
-                    max_rel_for_vertex[k] = max(max_rel_for_vertex[k], A[k][j])
+                    max_rel_for_vertex[j] = max(max_rel_for_vertex[j], A[k][j])
                     ancester_count_for_vertex[k] += MSB(A[k][j])
             # now we need to iterate the vertex's column
             for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][vertex] == 0 or x == vertex, vertices):
                 vertices_added_to_component.add(k)
-                max_rel_for_vertex[k] = max(max_rel_for_vertex[k], A[k][vertex])
-                ancester_count_for_vertex[k] += MSB(A[k][vertex])
+                max_rel_for_vertex[k] = max(max_rel_for_vertex[k], A[vertex][k])
+                ancester_count_for_vertex[k] += MSB(A[vertex][k])
         q[component_id] = vertex_count
         component_id += 1
     return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
