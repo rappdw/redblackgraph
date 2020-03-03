@@ -1,4 +1,4 @@
-from redblackgraph.reference import find_components, find_components_extended, topological_sort, transitive_closure
+from redblackgraph.reference import find_components, find_components_extended, transitive_closure
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -34,13 +34,13 @@ def test_find_components():
     assert A_star.tolist() == expected_transitive_closure
 
     components = find_components(A_star)
-    assert components == [1, 1, 1, 3, 1, 1, 1, 3, 3, 1]
+    assert components == [0, 0, 0, 1, 0, 0, 0, 1, 1, 0]
 
     extended_components = find_components_extended(A_star)
     assert extended_components.ids == components
     assert len(extended_components.size_map) == 2
-    assert extended_components.size_map[1] == 7
-    assert extended_components.size_map[3] == 3
+    assert extended_components.size_map[0] == 7
+    assert extended_components.size_map[1] == 3
 
 
 def test_find_components_dfs():

@@ -42,5 +42,3 @@ def test_triangularization():
 
     assert_equal(A_star_canonical.A, expected_canonical)
     assert_equal(A_star_canonical.label_permutation, [2, 0, 3, 5, 4, 1, 6])
-
-    #TODO: add test case to ensure we've fixed the "row merges two components" use case

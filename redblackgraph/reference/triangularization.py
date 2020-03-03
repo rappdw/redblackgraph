@@ -1,3 +1,4 @@
+import itertools as it
 import numpy as np
 
 from dataclasses import dataclass
@@ -47,41 +48,33 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
     """
 
     # see algorithm description in .components find_components
-
     n = len(A)
     component_for_vertex = [0] * n
     max_rel_for_vertex = [0] * n
     ancester_count_for_vertex = [0] * n
-    component_number = 0
-    for i in range(n):
-        assumed_new_component = False
-        if component_for_vertex[i] == 0:
-            component_number += 1
-            component_for_vertex[i] = component_number
-            assumed_new_component = True
-        assumed_component_number = component_for_vertex[i]
-        actual_new_component = True
-        spanned_components = set()
-        spanned_components.add(assumed_component_number)
-        for j in range(n):
-            if i != j and A[i][j] != 0:
-                ancester_count_for_vertex[i] += MSB(A[i][j])
-                max_rel_for_vertex[j] = max(A[i][j], max_rel_for_vertex[j])
-                if component_for_vertex[j] != 0:
-                    spanned_components.add(component_for_vertex[j])
-                    actual_new_component = False
-                component_for_vertex[j] = assumed_component_number
-        if not actual_new_component:
-            root_component = min(spanned_components)
-            spanned_components.remove(root_component)
-            for j in range(n):
-                if component_for_vertex[j] in spanned_components:
-                    component_for_vertex[j] = root_component
-            if assumed_new_component:
-                component_number -= 1
     q = defaultdict(lambda: 0)
-    for i in range(n):
-        q[component_for_vertex[i]] += 1
+    vertices = range(n)
+    visited_vertices = set()
+    component_id = 0
+    for i in it.filterfalse(lambda x: x in visited_vertices, vertices):
+        vertices_added_to_component = set()
+        vertex_count = 0
+        vertices_added_to_component.add(i)
+        while vertices_added_to_component:
+            vertex = vertices_added_to_component.pop()
+            vertex_count += 1
+            visited_vertices.add(vertex)
+            component_for_vertex[vertex] = component_id
+            for j in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[vertex][x] == 0 or x == vertex, vertices):
+                vertices_added_to_component.add(j)
+                max_rel_for_vertex[vertex] = max(max_rel_for_vertex[vertex], A[vertex][j])
+                ancester_count_for_vertex[vertex] += MSB(A[vertex][j])
+                for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][j] == 0 or x == j, vertices):
+                    vertices_added_to_component.add(k)
+                    max_rel_for_vertex[k] = max(max_rel_for_vertex[k], A[k][j])
+                    ancester_count_for_vertex[k] += MSB(A[k][j])
+        q[component_id] = vertex_count
+        component_id += 1
     return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_permutation_matrices(A):
