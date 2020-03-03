@@ -20,8 +20,8 @@ class Components:
         # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
         #   - the size of the component
         #   - the component id of the vertex
-        #   - count(rel(u,v)) for the vertex
-        #   - max(rel(u,v)) for the vertex
+        #   - count(rel(u,v)) for the vertex (row operation)
+        #   - max(rel(u,v)) for the vertex (column operation)
         #   - the vertex id
         # This is the default sort ordering used by Traingularization
         basis = [(self.size_map[element[1][0]],) + element[1] + (element[0],) for element in
