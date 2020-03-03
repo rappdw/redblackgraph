@@ -3,6 +3,7 @@ import itertools as it
 from dataclasses import dataclass
 from typing import Dict, Sequence, Tuple, List
 from collections import defaultdict
+from .components import find_components
 from .util import MSB
 from .permutation import permute
 
@@ -46,40 +47,29 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
       [2] - a vector matching length of A with a count of ancestors for the corresponding row
       [3] - a dictionary keyed by component id and valued by size of component
     """
+    # 60 seconds execution time (3633 vertices)
+    # q = defaultdict(lambda: 0)
+    # component_for_vertex = find_components(A, q)
+    #
+    # vertices = range(len(A))
+    # max_rel_for_vertex = [reduce(max, [A[j][i] for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices)]) for i in vertices]
+    #
+    # return Components(component_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
-    # see algorithm description in .components find_components
+    q = defaultdict(lambda: 0)
+    component_for_vertex = find_components(A, q)
+
+    # 70 seconds exeuction time (3633 vertices)
     n = len(A)
-    component_for_vertex = [0] * n
     max_rel_for_vertex = [0] * n
     ancester_count_for_vertex = [0] * n
-    q = defaultdict(lambda: 0)
     vertices = range(n)
-    visited_vertices = set()
-    component_id = 0
-    for i in it.filterfalse(lambda x: x in visited_vertices, vertices):
-        vertices_added_to_component = set()
-        vertex_count = 0
-        vertices_added_to_component.add(i)
-        while vertices_added_to_component:
-            vertex = vertices_added_to_component.pop()
-            vertex_count += 1
-            visited_vertices.add(vertex)
-            component_for_vertex[vertex] = component_id
-            for j in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[vertex][x] == 0 or x == vertex, vertices):
-                vertices_added_to_component.add(j)
-                max_rel_for_vertex[j] = max(max_rel_for_vertex[j], A[vertex][j])
-                ancester_count_for_vertex[vertex] += MSB(A[vertex][j])
-                for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][j] == 0 or x == j, vertices):
-                    vertices_added_to_component.add(k)
-                    max_rel_for_vertex[j] = max(max_rel_for_vertex[j], A[k][j])
-                    ancester_count_for_vertex[k] += MSB(A[k][j])
-            # now we need to iterate the vertex's column
-            for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][vertex] == 0 or x == vertex, vertices):
-                vertices_added_to_component.add(k)
-                max_rel_for_vertex[k] = max(max_rel_for_vertex[k], A[vertex][k])
-                ancester_count_for_vertex[k] += MSB(A[vertex][k])
-        q[component_id] = vertex_count
-        component_id += 1
+    # if this loop is removed, execution time is: 17 seconds (3633 vertices)
+    for i in vertices:
+        for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices):
+            max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
+            ancester_count_for_vertex[i] += MSB(A[i][j])
+
     return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_ordering(A: Sequence[Sequence[int]]) -> Sequence[int]:
@@ -103,14 +93,8 @@ def canonical_sort(A: Sequence[Sequence[int]]) -> Triangularization:
     order one above the other. Within a component, row ordering is determined first by
     maximum relationship value in a row and finally by original vertex id.
 
-    This is an expensive operation. First it assumes that A is transitively closed (O(n^3)).
-    It then computes the components of the graph (O(n^3)). It then sorts the resultant
-    component information (O(n logn)). Based on this it computes permutation matrices (O(n))
-    and finally uses the permutation matrices to reorder the graph (O(n^2))
-
     :param A: input matrix (assumed to be transitively closed)
-    :param P: the transposition matrices (P and P_transpose)
-    :return: an upper triangular matrix that is symmetrical to A (a relabeling of the graph vertices)
+    :return: an upper triangular matrix that is isomorphic to A
     """
 
     ordering = _get_triangularization_ordering(A)
@@ -121,9 +105,7 @@ def triangularize(A: Sequence[Sequence[int]]) -> Triangularization:
     Relabel the graph so that the resultant Red Black adjacency matrix is upper triangular
 
     This form of triangularization is not canonical, it is only guaranteed to produce an upper
-    triangular representation. It does so by topologically sorting the graph (O(V+E)). Then
-    producing permutation matrices (O(n)). Finally using the permutation matrices to reorder the
-    graph (O(n^2)).
+    triangular representation. It does so by topologically sorting the graph (O(V+E)).
 
     Whereas canonical_sort assumes that the input matrix is transitively closed,
     this version does not.
