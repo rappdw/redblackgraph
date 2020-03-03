@@ -379,5 +379,5 @@ def test_triangularization():
     assert A_cannonical.label_permutation is not None
     for row in range(len(A_cannonical.A)):
         for col in range(row):
-            assert A_cannonical.A[row, col] == 0
+            assert A_cannonical.A[row][col] == 0
 

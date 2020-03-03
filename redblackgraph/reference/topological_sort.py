@@ -26,12 +26,14 @@ def topological_sort(g):
             topological_visit(g, v, color, order)
     return order[::-1]
 
-
 if __name__ == '__main__':
+    from .permutation import permute
     A = [[-1, 2, 3, 0, 0],
          [ 0,-1, 0, 2, 0],
          [ 0, 0, 1, 0, 0],
          [ 0, 0, 0,-1, 0],
          [ 2, 0, 0, 0, 1]]
 
-    print(topological_sort(A))
+    ordering = topological_sort(A)
+    print(ordering)
+    print(permute(A, ordering))

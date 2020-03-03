@@ -1,10 +1,10 @@
 import itertools as it
-import numpy as np
 
 from dataclasses import dataclass
 from typing import Dict, Sequence, Tuple, List
 from collections import defaultdict
 from .util import MSB
+from .permutation import permute
 
 from redblackgraph.reference.topological_sort import topological_sort
 
@@ -15,7 +15,7 @@ class Components:
     max_rel: Sequence[int]
     size_map: Dict[int, int] # keyed by component id, valued by size of component
 
-    def get_permutation_basis(self) -> List[Tuple[int, int, int, int, int]]:
+    def get_ordering(self) -> List[Tuple[int, int, int, int, int]]:
         # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
         #   - the size of the component
         #   - the component id of the vertex
@@ -82,28 +82,16 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
         component_id += 1
     return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
-def _get_triangularization_permutation_matrices(A):
+def _get_triangularization_ordering(A: Sequence[Sequence[int]]) -> Sequence[int]:
     """
-    u, v, and q are computed via find_components_extended, and then used to compute a
-    permutation matrix, P, and P_transpose
-    :param A:
-    :return: the permutation matrices that will canonical_sort A
+    Assumes that A is transitively closed. Finds the components and returns the vertex ordering
+    based on the extended component information
+    :param A: transitively closed RB Graph
+    :return: ordering
     """
     components = find_components_extended(A)
-    permutation_basis = components.get_permutation_basis()
-
-    # from the permutation basis, create the permutation matrix
-    n = len(permutation_basis)
-    P = np.zeros(shape=(n, n), dtype=np.int32)
-    P_transpose = np.zeros(shape=(n, n), dtype=np.int32)
-    # label_permutation can be calculated as P @ np.arrange(n), but since we are running the index do it here
-    label_permutation = np.arange(n)
-    for idx, element in enumerate(permutation_basis):
-        label_permutation[idx] = element[-1]
-        P[idx][element[-1]] = 1
-        P_transpose[element[-1]][idx] = 1
-    return P, P_transpose, label_permutation
-
+    ordering = [element[-1] for element in components.get_ordering()]
+    return ordering
 
 def canonical_sort(A: Sequence[Sequence[int]]) -> Triangularization:
     """
@@ -125,10 +113,8 @@ def canonical_sort(A: Sequence[Sequence[int]]) -> Triangularization:
     :return: an upper triangular matrix that is symmetrical to A (a relabeling of the graph vertices)
     """
 
-    P, P_t, label_permutation = _get_triangularization_permutation_matrices(A)
-
-    # triagularize A
-    return Triangularization((P @ A @ P_t), label_permutation)
+    ordering = _get_triangularization_ordering(A)
+    return Triangularization(permute(A, ordering), ordering)
 
 def triangularize(A: Sequence[Sequence[int]]) -> Triangularization:
     """
@@ -146,11 +132,6 @@ def triangularize(A: Sequence[Sequence[int]]) -> Triangularization:
     """
 
     # step 1: determine topological ordering of nodes in the graph
-    n = len(A)
     ordering = topological_sort(A)
-    # step 2: setup the permutation matrix
-    P = np.zeros(shape=(n, n), dtype=np.int32)
-    for idx, i in enumerate(ordering):
-        P[idx][i] = 1
-    # step 3: permute the matrix and return triangularization
-    return Triangularization(P @ A @ P.T, ordering)
+    # step 2: permute the matrix and return triangularization
+    return Triangularization(permute(A, ordering), ordering)
