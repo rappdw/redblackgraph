@@ -132,6 +132,29 @@ def test_ordering():
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1]
     ]
     components = find_components_extended(A)
+    vertices =                     [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21]
+    assert components.ids ==       [ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] # which component does a vertex belong to
+    assert components.max_rel ==   [ 2, 3, 0, 0, 5, 0, 4, 0, 0,11, 2, 0, 0, 0, 3, 8, 3, 0, 0, 0, 9,10] # for a given vertex, what is its maximum ancestor position
+    assert components.rel_count == [10, 0,18, 2, 2,18, 2,18, 6, 0, 0, 6,10, 6, 0, 0, 0, 6, 6, 6, 0, 0] # for a given vertex, how many ancestors (weighted by distance) does it have
+    assert components.size_map[0] == 19
+    assert components.size_map[1] == 3
+    # the following vertex groups have components that are indistinguishable aside from vertex id and color (in some cases)
+    # [2, 5, 7]
+    # [8, 11, 13, 17, 18, 19]
+    # [1, 16]
+    # so, whatever the ordering, this should be adjacent
     ordering = components.get_ordering()
-    for idx, order in enumerate(ordering):
-        assert vertex_key[order[-1]][0] == idx
+    group0 = {2, 5, 7}
+    group1 = {8, 11, 13, 17, 18, 19}
+    group2 = {1, 16}
+    indistinguishable = [
+        [False, group0],
+        [False, group1],
+        [False, group2],
+    ]
+    for idx, element in enumerate(ordering):
+        for i, [scanned, group] in enumerate(indistinguishable):
+            if not scanned and element[-1] in group:
+                for j in range(len(group)):
+                    assert ordering[j + idx][-1] in group
+                indistinguishable[i][0] = True
