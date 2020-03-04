@@ -6,6 +6,7 @@ from collections import defaultdict
 from .components import find_components
 from .util import MSB
 from .permutation import permute
+from ..util.capture import capture
 
 from redblackgraph.reference.topological_sort import topological_sort
 
@@ -16,7 +17,7 @@ class Components:
     max_rel: Sequence[int]
     size_map: Dict[int, int] # keyed by component id, valued by size of component
 
-    def get_ordering(self) -> List[Tuple[int, int, int, int, int]]:
+    def get_ordering(self) -> List[int]:
         # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
         #   - the size of the component
         #   - the component id of the vertex
@@ -24,10 +25,10 @@ class Components:
         #   - max(rel(u,v)) for the vertex (column operation)
         #   - the vertex id
         # This is the default sort ordering used by Traingularization
-        basis = [(self.size_map[element[1][0]],) + element[1] + (element[0],) for element in
-                         enumerate(zip(self.ids, self.rel_count, self.max_rel))]
-        # sort descending on size of component and "ancestor count", asecending on all other elements
-        return sorted(basis, key=lambda element: (-element[0], element[1], -element[2], element[3], element[4]))
+        basis = [i for i in range(len(self.ids))]
+        # sort descending on size of component and "ancestor count", ascending on all other elements
+        basis.sort(key=lambda x: (-self.size_map[self.ids[x]], self.ids[x], -self.rel_count[x], self.max_rel[x], x))
+        return basis
 
 @dataclass
 class Triangularization:
@@ -47,24 +48,15 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
       [2] - a vector matching length of A with a count of ancestors for the corresponding row
       [3] - a dictionary keyed by component id and valued by size of component
     """
-    # 60 seconds execution time (3633 vertices)
-    # q = defaultdict(lambda: 0)
-    # component_for_vertex = find_components(A, q)
-    #
-    # vertices = range(len(A))
-    # max_rel_for_vertex = [reduce(max, [A[j][i] for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices)]) for i in vertices]
-    #
-    # return Components(component_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
+    # 3 seconds exeuction time (3633 vertices)
 
     q = defaultdict(lambda: 0)
     component_for_vertex = find_components(A, q)
 
-    # 70 seconds exeuction time (3633 vertices)
     n = len(A)
     max_rel_for_vertex = [0] * n
     ancester_count_for_vertex = [0] * n
     vertices = range(n)
-    # if this loop is removed, execution time is: 17 seconds (3633 vertices)
     for i in vertices:
         for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices):
             max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
@@ -79,9 +71,7 @@ def _get_triangularization_ordering(A: Sequence[Sequence[int]]) -> Sequence[int]
     :param A: transitively closed RB Graph
     :return: ordering
     """
-    components = find_components_extended(A)
-    ordering = [element[-1] for element in components.get_ordering()]
-    return ordering
+    return find_components_extended(A).get_ordering()
 
 def canonical_sort(A: Sequence[Sequence[int]]) -> Triangularization:
     """
