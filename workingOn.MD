@@ -34,3 +34,15 @@ The basic numbering scheme is the same as the Ahnen number (see: [Wikipedia Refe
 ## Look at GPU implementation for Floyd-Warshall
 See [Discussion thread on GPU impl of Floyd-Warshall](https://devtalk.nvidia.com/default/topic/534223/simple-cuda-implementation-of-the-floyd-warshall-graph-algorithm/)
 it points out several implementations on github
+
+* [APSP for Large Graphs on the GPU](https://www.cis.upenn.edu/~cis565/LECTURES/APSP.pdf) (Slide Deck)
+* [APSP for Large Graphs on the GPU](https://repository.upenn.edu/cgi/viewcontent.cgi?article=1213&context=hms) (Paper)
+* [Efficient Multi-GPU Computation of APSP](https://public.lanl.gov/sunil/pubs/ipdps14.pdf) (paper)
+* [APSP in quadratic time with high probability](https://www.youtube.com/watch?v=cn9W2zvD25U&list=ULXZyNMWCZht4&index=3867) (video)
+
+## Distributed Analysis of Large Graphs
+
+* [Experimental Analysis of Distributed Graph Systems](https://arxiv.org/pdf/1806.08082.pdf)
+* [Pregel Slides](http://people.apache.org/~edwardyoon/documents/pregel.pdf)
+* [Pregel: A System for Large-Scale Graph Processing](https://kowshik.github.io/JPregel/pregel_paper.pdf)
+* [Solving APSP Problem in Large Graphs Using Apache Spark](https://arxiv.org/pdf/1902.04446.pdf) (paper)
