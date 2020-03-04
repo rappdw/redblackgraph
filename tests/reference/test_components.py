@@ -132,7 +132,7 @@ def test_ordering():
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1]
     ]
     components = find_components_extended(A)
-    vertices =                     [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21]
+    #vertices =                    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21]
     assert components.ids ==       [ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] # which component does a vertex belong to
     assert components.max_rel ==   [ 2, 3, 0, 0, 5, 0, 4, 0, 0,11, 2, 0, 0, 0, 3, 8, 3, 0, 0, 0, 9,10] # for a given vertex, what is its maximum ancestor position
     assert components.rel_count == [10, 0,18, 2, 2,18, 2,18, 6, 0, 0, 6,10, 6, 0, 0, 0, 6, 6, 6, 0, 0] # for a given vertex, how many ancestors (weighted by distance) does it have
@@ -154,9 +154,9 @@ def test_ordering():
     ]
     for idx, element in enumerate(ordering):
         for i, [scanned, group, _] in enumerate(indistinguishable):
-            if not scanned and element[-1] in group:
+            if not scanned and element in group:
                 for j in range(len(group)):
-                    assert ordering[j + idx][-1] in group
+                    assert ordering[j + idx] in group
                 indistinguishable[i][0] = True
                 indistinguishable[i][-1] = idx
     # this next set of assertions is a bit implementation specific rather than validating the invariants,
@@ -171,8 +171,8 @@ def test_ordering():
     vertices_to_verify = {0, 2, 4, 6, 8, 20, 21}
     topological_order = dict()
     for idx, element in enumerate(ordering):
-        if element[-1] in vertices_to_verify:
-            topological_order[element[-1]] = idx
+        if element in vertices_to_verify:
+            topological_order[element] = idx
     assert topological_order[2] < topological_order[0]
     assert topological_order[0] < topological_order[4]
     assert topological_order[4] < topological_order[21]
