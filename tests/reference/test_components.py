@@ -148,13 +148,18 @@ def test_ordering():
     group1 = {8, 11, 13, 17, 18, 19}
     group2 = {1, 16}
     indistinguishable = [
-        [False, group0],
-        [False, group1],
-        [False, group2],
+        [False, group0, -1],
+        [False, group1, -1],
+        [False, group2, -1],
     ]
     for idx, element in enumerate(ordering):
-        for i, [scanned, group] in enumerate(indistinguishable):
+        for i, [scanned, group, _] in enumerate(indistinguishable):
             if not scanned and element[-1] in group:
                 for j in range(len(group)):
                     assert ordering[j + idx][-1] in group
                 indistinguishable[i][0] = True
+                indistinguishable[i][-1] = idx
+    # this next set of assertions is a bit implementation specific rather than validating the invariants,
+    # but keep it in for now
+    assert indistinguishable[0][-1] < indistinguishable[1][-1]
+    assert indistinguishable[1][-1] < indistinguishable[2][-1]
