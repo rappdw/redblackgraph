@@ -163,3 +163,19 @@ def test_ordering():
     # but keep it in for now
     assert indistinguishable[0][-1] < indistinguishable[1][-1]
     assert indistinguishable[1][-1] < indistinguishable[2][-1]
+
+    # whatever the specific ordering is the following topological ordering needs to be observed
+    # pos[2] < pos[0] < pos[4] < pos[21]
+    # pos[8] < pos[6] < pos[20]
+
+    vertices_to_verify = {0, 2, 4, 6, 8, 20, 21}
+    topological_order = dict()
+    for idx, element in enumerate(ordering):
+        if element[-1] in vertices_to_verify:
+            topological_order[element[-1]] = idx
+    assert topological_order[2] < topological_order[0]
+    assert topological_order[0] < topological_order[4]
+    assert topological_order[4] < topological_order[21]
+
+    assert topological_order[8] < topological_order[6]
+    assert topological_order[6] < topological_order[20]
