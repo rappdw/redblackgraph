@@ -205,7 +205,7 @@ class RedBlackGraphWriter:
         workbook, formats = self._open_workbook(kwargs.get('output_file', '/tmp/rbg.csv'))
         worksheet = workbook.add_worksheet()
         worksheet.set_default_row(hide_unused_rows=True)
-        R = args[0].tolist()
+        R = args[0]
         n = len(R)
         if n > MAX_COLUMNS_EXCEL:
             logging.error("Graph exceeds max size allowable by Excel")
