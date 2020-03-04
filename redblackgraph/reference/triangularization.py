@@ -6,6 +6,7 @@ from collections import defaultdict
 from .components import find_components
 from .util import MSB
 from .permutation import permute
+from ..util.capture import capture
 
 from redblackgraph.reference.topological_sort import topological_sort
 
