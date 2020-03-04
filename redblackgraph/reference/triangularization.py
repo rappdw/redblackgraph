@@ -12,22 +12,24 @@ from redblackgraph.reference.topological_sort import topological_sort
 
 @dataclass
 class Components:
+    A: Sequence[Sequence[int]]
     ids: Sequence[int]
     rel_count: Sequence[int]
     max_rel: Sequence[int]
     size_map: Dict[int, int] # keyed by component id, valued by size of component
 
     def get_ordering(self) -> List[int]:
-        # This yields a list of tuples. Every vertex is represented in this list and each tuple is:
-        #   - the size of the component
-        #   - the component id of the vertex
-        #   - count(rel(u,v)) for the vertex (row operation)
-        #   - max(rel(u,v)) for the vertex (column operation)
-        #   - the vertex id
         # This is the default sort ordering used by Traingularization
+        # it sorts by:
+        #   * size of component, descending
+        #   * component id, ascending
+        #   * relationship count, descending
+        #   * max ancestor: ascending
+        #   * color: descending
+        #   * vertex_id: ascending
         basis = [i for i in range(len(self.ids))]
         # sort descending on size of component and "ancestor count", ascending on all other elements
-        basis.sort(key=lambda x: (-self.size_map[self.ids[x]], self.ids[x], -self.rel_count[x], self.max_rel[x], x))
+        basis.sort(key=lambda x: (-self.size_map[self.ids[x]], self.ids[x], -self.rel_count[x], self.max_rel[x], -self.A[x][x], x))
         return basis
 
 @dataclass
@@ -62,7 +64,7 @@ def find_components_extended(A: Sequence[Sequence[int]]) -> Components:
             max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
             ancester_count_for_vertex[i] += MSB(A[i][j])
 
-    return Components(component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
+    return Components(A, component_for_vertex, ancester_count_for_vertex, max_rel_for_vertex, {k:v for k,v in q.items() if v != 0})
 
 def _get_triangularization_ordering(A: Sequence[Sequence[int]]) -> Sequence[int]:
     """
