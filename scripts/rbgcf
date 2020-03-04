@@ -6,7 +6,7 @@ from pathlib import Path
 
 import redblackgraph as rb
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
-from redblackgraph.reference.triangularization import canonical_sort
+from redblackgraph.reference.triangularization import canonical_sort, triangularize
 
 MAX_PRACTICAL_SIZE = 1500
 
@@ -25,12 +25,17 @@ if __name__ == '__main__':
                         default=["BiologicalParent", "UntypedParent", "UnspecifiedParentType"], type=str,
                         nargs="+", help="Number of hops to include in graph")
     parser.add_argument("-r", "--replace", action="store_true", default=False, help="Replace existing output files")
+    parser.add_argument("-t", "--topologicalsort", action="store_true", default=False,
+                        help="Perform topological sort in addition to cannonical sort")
+    parser.add_argument("-c", "--closure", action="store_true", default=False,
+                        help="Save the transitive closure as well")
 
     # extract arguments from the command line
     try:
         parser.error = parser.exit
         args = parser.parse_args()
-    except SystemExit:
+    except SystemExit as e:
+        print(e)
         parser.print_help()
         sys.exit(2)
 
@@ -57,7 +62,9 @@ if __name__ == '__main__':
         outdir = Path(outdir)
 
     outputfile = outdir / f"{basename}.{hops}.simple.xlsx"
+    closurefile = outdir / f"{basename}.{hops}.closure.xlsx"
     cannonicalfile = outdir / f"{basename}.{hops}.cannonical.xlsx"
+    topologicalfile = outdir / f"{basename}.{hops}.topological.xlsx"
     if not args.replace:
         if outputfile.exists():
             sys.stderr.write(f"{outputfile} already exists")
@@ -85,12 +92,23 @@ if __name__ == '__main__':
 
     R_star = graph.transitive_closure().W
 
+    if args.closure:
+        logger.info(f"Writing out transitive closure to {closurefile}")
+        writer(R_star, output_file=closurefile)
+
     logger.info("Computing cannonical form of Graph")
 
     R_cannonical = canonical_sort(R_star)
 
     logger.info(f"Writing out cannonical form to {cannonicalfile}")
     writer(R_cannonical.A, output_file=cannonicalfile, key_permutation=R_cannonical.label_permutation)
+
+    if args.topologicalsort:
+        logger.info(f"Computing topological sort")
+        R_topological = triangularize(R_star)
+        logger.info(f"Writing out topological sort to {topologicalfile}")
+        writer(R_topological.A, output_file=topologicalfile, key_permutation=R_topological.label_permutation)
+
 
 
 
