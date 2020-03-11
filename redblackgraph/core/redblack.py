@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray, asarray
 from .avos import einsum
-from ._multiarray import warshall, vertex_relational_composition, edge_relational_composition
+from ._redblackgraph import warshall, vertex_relational_composition, edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
 __all__ = ['array', 'matrix']

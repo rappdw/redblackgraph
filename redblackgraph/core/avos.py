@@ -1,4 +1,4 @@
-from ._multiarray import c_einsum_avos, c_avos_sum, c_avos_product
+from ._redblackgraph import c_einsum_avos, c_avos_sum, c_avos_product
 
 __all__ = ['einsum', 'avos_sum', 'avos_product']
 

@@ -1,4 +1,4 @@
-#RedBlackMultiArray
+#RedBlackGraph
 
 _multiarray is a Numpy Extension Module that makes use
 of the Numpy C-API to implement C optimized RedBlack linear algebra
