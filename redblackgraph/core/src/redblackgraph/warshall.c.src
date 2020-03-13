@@ -9,28 +9,17 @@
 #include <Python.h>
 #include <math.h>
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <numpy/npy_3kcompat.h>
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
+
+#define NPY_NO_DEPRECATED_API NPY_API_VERSION
+#include <numpy/noprefix.h>
+#include <numpy/ndarraytypes.h>
+#include <numpy/ndarrayobject.h>
 #include <numpy/arrayscalars.h>
-#include <numpy/arrayobject.h>
 #include <numpy/ufuncobject.h>
 
-/**** this is in numpy src arrayscalars.h ****/
-#define PyArrayScalar_False ((PyObject *)(&(_PyArrayScalar_BoolValues[0])))
-#define PyArrayScalar_True ((PyObject *)(&(_PyArrayScalar_BoolValues[1])))
-
-/**** this is in numpy src common.h ****/
-#ifdef NPY_ALLOW_THREADS
-#define NPY_BEGIN_THREADS_NDITER(iter) \
-        do { \
-            if (!NpyIter_IterationNeedsAPI(iter)) { \
-                NPY_BEGIN_THREADS_THRESHOLDED(NpyIter_GetIterSize(iter)); \
-            } \
-        } while(0)
-#else
-#define NPY_BEGIN_THREADS_NDITER(iter)
-#endif
-
+#include "redblack.h"
 #include "rbg_math.h"
 
 /*

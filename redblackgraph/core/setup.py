@@ -11,6 +11,7 @@ def configuration(parent_package='',top_path=None):
     src_dir = os.path.join('src', 'redblackgraph')
     config.add_extension('_redblackgraph',
                          [
+                             os.path.join(src_dir, 'redblackgraphmodule.c'),
                              os.path.join(src_dir, 'rbg_math.h.src'),
                              os.path.join(src_dir, 'rbg_math.c.src'),
                              os.path.join(src_dir, 'redblack.c.src'),
