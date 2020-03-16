@@ -7,16 +7,15 @@
 #include <functional>
 #include <cmath>
 #include <iostream>
-
 using namespace std;
 
 // see: https://github.com/klmr/named-operator
 // for how to define named operator in C++
-template <class T>
-const int MSB(T x)
+template <class T, class U>
+const short MSB(T x)
 {
-    int targetlevel = 0;
-    if ((T)~x == 0) {
+    short targetlevel = 0;
+    if ((U)~x == 0) {
         return targetlevel;
     }
     while (x >>= 1) {
@@ -25,48 +24,58 @@ const int MSB(T x)
     return targetlevel;
 }
 
-template <class T>
-const T avos_product(const T& lhs, const T& rhs)
+template <class T, class U>
+const U avos_product(const T& lhs, const T& rhs)
 {
-    T x = lhs;
-    T y = rhs;
+    U x = (U)lhs;
+    U y = (U)rhs;
 
     // zero property
     if (x == 0 || y == 0) {
         return 0;
     }
     // Special case -1 * 1 or -1 * -1
-    // TODO: there is a problem with unsigned char and unsigned short (~<unsigned char> is <int>)
-    if ((T)~x == 0) {
+    // There is an oddity in bitwise NOT of an unsigned char, ~<unsigned char> temporary is an <int> rather
+    // than an <unsigned char>. Because of this, cast ~x and ~y to the appropriate type
+    if (lhs == (T)-1) {
         if (y == 1) {
             return x;
         }
         x = 1;
     }
-    if ((T)~y == 0) {
+    if (rhs == (T)-1) {
         if (x == 1) {
             return y;
         }
         y = 1;
     }
 
-    int bit_position = MSB(y);
-//    if (bit_position == (sizeof(x) * 8) - 1) {
-//        // Overflow Error
-//        PyErr_Format(PyExc_OverflowError,
-//                         "Avos product of %d and %d, results in an overflow", \
-//                         lhs, rhs
-//                         );
-//    }
-    return (y & ((npy_int)pow(2, bit_position) - 1)) | (x << bit_position);
+    short bit_position = MSB<T,U>(y);
+    short result_size = MSB<T,U>(x) + bit_position;
+    if (result_size == (sizeof(x) * 8) - 1) {
+        // Overflow Error
+        PyErr_Format(PyExc_OverflowError,
+                         "Avos product of %lu and %lu, results in an overflow. (Result size would require %u bits; Type provides %u bits)", \
+                         lhs, rhs, result_size + 1, (short)(sizeof(x) * 8)
+                         );
+    }
+    U result = ((y & ((U)pow(2, bit_position) - 1)) | (x << bit_position));
+    if (result == (U)-1) {
+        // Overflow Error
+        PyErr_Format(PyExc_OverflowError,
+        "Avos product of %lu and %lu, results in an overflow. Result of avos product collides with 'red' 1 (-1).", \
+                                 lhs, rhs
+        );
+    }
+    return result;
 }
 
-template <class T>
+template <class T, class U>
 const T& avos_sum(const T& a, const T& b)
 {
-    if (a == 0 || ~b == 0) return b;
-    if (b == 0 || ~a == 0) return a;
-    if (a < b) return a;
+    if (a == 0 || (U)~b == 0) return b;
+    if (b == 0 || (U)~a == 0) return a;
+    if ((U)a < (U)b) return a;
     return b;
 }
 
@@ -122,7 +131,7 @@ void rbm_matmat_pass1(const I n_row,
  * row pointer Cp[] computed in Pass 1.
  *
  */
-template <class I, class T>
+template <class I, class T, class U>
 void rbm_matmat_pass2(const I n_row,
       	              const I n_col,
       	              const I Ap[],
@@ -147,13 +156,13 @@ void rbm_matmat_pass2(const I n_row,
 
         for(I jj = Ap[i]; jj < Ap[i+1]; jj++){
             I j = Aj[jj];
-            T v = Ax[jj];
+            U v = (U)Ax[jj];
 
             for(I kk = Bp[j]; kk < Bp[j+1]; kk++){
                 I k = Bj[kk];
 
                 // change 1: redefinition of matrix multiplication, change + to <avos_sum> and * to <avos_product>
-                sums[k] = avos_sum(sums[k], avos_product(v, Bx[kk]));
+                sums[k] = avos_sum<T, U>(sums[k], avos_product<T, U>(v, Bx[kk]));
 
                 if(next[k] == -1){
                     next[k] = head;
