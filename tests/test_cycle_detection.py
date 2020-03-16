@@ -14,12 +14,10 @@ def test_relational_composition():
     v = rb.array([0, 0, 0, 3, 0])
 
     try:
-        A_lambda = A_star.vertex_relational_composition(u, v, 1)
-        print(A_lambda)
+        _ = A_star.vertex_relational_composition(u, v, 1)
         assert False
-    except ValueError:
-        # expected
-        pass
+    except ValueError as e:
+        assert str(e) == 'Relational composition would result in a cycle. Idx: 0, u_i: 6, v_i: 9'
 
 def test_reference_impl():
     # test transitive closure loop detection

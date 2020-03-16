@@ -18,12 +18,12 @@ redblackgraph/sparsetools/CMakeLists.txt
 _sparsetools.cpython-36m-darwin.so
 redblackgraph/sparsetools/cmake-build-debug/
 _sparsetools.cpython-36m-x86_64-linux-gnu.so
-redblackgraph/core/src/multiarray/redblack.c
-redblackgraph/core/src/multiarray/rbg_math.c
-redblackgraph/core/src/multiarray/rbg_math.h
-redblackgraph/core/src/multiarray/relational_composition.c
-redblackgraph/core/src/multiarray/transitive_closure.c
-redblackgraph/core/src/multiarray/warshall.c
+redblackgraph/core/src/redblackgraph/redblack.c
+redblackgraph/core/src/redblackgraph/rbg_math.c
+redblackgraph/core/src/redblackgraph/rbg_math.h
+redblackgraph/core/src/redblackgraph/relational_composition.c
+redblackgraph/core/src/redblackgraph/transitive_closure.c
+redblackgraph/core/src/redblackgraph/warshall.c
 redblackgraph/__config__.py
 redblackgraph/*.so
 redblackgraph/tests/resources/closure.results.csv
@@ -39,5 +39,5 @@ notebooks/.diff
 .pytest_cache
 **/.ipynb_checkpoints
 .Trash-*
-_multiarray.*.so
+_redblackgraph.*.so
 _sparsetools.*.so

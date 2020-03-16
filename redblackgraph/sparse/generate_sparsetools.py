@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+python generate_sparsetools.py
+
 Generate manual wrappers for C++ sparsetools code.
 
 Type codes used:
@@ -12,6 +14,7 @@ Type codes used:
     'W':  std::vector<data>*
     '*':  indicates that the next argument is an output argument
     'v':  void
+    'l':  64-bit integer scalar
 
 See sparsetools.cxx for more details.
 
@@ -41,24 +44,24 @@ COMPILATION_UNITS = [
 # List of the supported index typenums and the corresponding C++ types
 #
 I_TYPES = [
-    ('NPY_INT32', 'npy_int32'),
-    ('NPY_INT64', 'npy_int64'),
+    ('NPY_INT32', 'npy_int32', 'npy_uint32'),
+    ('NPY_INT64', 'npy_int64', 'npy_uint64'),
 ]
 
 #
 # List of the supported data typenums and the corresponding C++ types
 #
 T_TYPES = [
-    ('NPY_BYTE', 'npy_byte'),
-    ('NPY_UBYTE', 'npy_ubyte'),
-    ('NPY_SHORT', 'npy_short'),
-    ('NPY_USHORT', 'npy_ushort'),
-    ('NPY_INT', 'npy_int'),
-    ('NPY_UINT', 'npy_uint'),
-    ('NPY_LONG', 'npy_long'),
-    ('NPY_ULONG', 'npy_ulong'),
-    ('NPY_LONGLONG', 'npy_longlong'),
-    ('NPY_ULONGLONG', 'npy_ulonglong'),
+    ('NPY_BYTE', 'npy_byte', 'npy_ubyte'),
+    ('NPY_UBYTE', 'npy_ubyte', 'npy_ubyte'),
+    ('NPY_SHORT', 'npy_short', 'npy_ushort'),
+    ('NPY_USHORT', 'npy_ushort', 'npy_ushort'),
+    ('NPY_INT', 'npy_int', 'npy_uint'),
+    ('NPY_UINT', 'npy_uint', 'npy_uint'),
+    ('NPY_LONG', 'npy_long', 'npy_ulong'),
+    ('NPY_ULONG', 'npy_ulong', 'npy_ulong'),
+    ('NPY_LONGLONG', 'npy_longlong', 'npy_ulonglong'),
+    ('NPY_ULONGLONG', 'npy_ulonglong', 'npy_ulonglong'),
 ]
 
 #
@@ -66,7 +69,7 @@ T_TYPES = [
 #
 
 THUNK_TEMPLATE = """
-static Py_ssize_t %(name)s_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG %(name)s_thunk(int I_typenum, int T_typenum, void **a)
 {
     %(thunk_content)s
 }
@@ -118,21 +121,21 @@ def get_thunk_type_set():
 
     getter_code = "    if (0) {}"
 
-    for I_typenum, I_type in I_TYPES:
+    for I_typenum, I_type, U_type in I_TYPES:
         piece = """
         else if (I_typenum == %(I_typenum)s) {
             if (T_typenum == -1) { return %(j)s; }"""
         getter_code += piece % dict(I_typenum=I_typenum, j=j)
 
-        i_types.append((j, I_typenum, None, I_type, None))
+        i_types.append((j, I_typenum, None, I_type, None, None))
         j += 1
 
-        for T_typenum, T_type in T_TYPES:
+        for T_typenum, T_type, U_type in T_TYPES:
             piece = """
             else if (T_typenum == %(T_typenum)s) { return %(j)s; }"""
             getter_code += piece % dict(T_typenum=T_typenum, j=j)
 
-            it_types.append((j, I_typenum, T_typenum, I_type, T_type))
+            it_types.append((j, I_typenum, T_typenum, I_type, T_type, U_type))
             j += 1
 
         getter_code += """
@@ -199,12 +202,12 @@ def parse_routine(name, args, types):
     # type combinations inside.
     thunk_content = """int j = get_thunk_case(I_typenum, T_typenum);
     switch (j) {"""
-    for j, I_typenum, T_typenum, I_type, T_type in types:
+    for j, I_typenum, T_typenum, I_type, T_type, U_type in types:
         arglist = get_arglist(I_type, T_type)
         if T_type is None:
             dispatch = "%s" % (I_type,)
         else:
-            dispatch = "%s,%s" % (I_type, T_type)
+            dispatch = "%s,%s,%s" % (I_type, T_type, U_type)
         if 'B' in arg_spec:
             dispatch += ",npy_bool_wrapper"
 
@@ -302,6 +305,12 @@ def main():
     for name in names:
         method_struct += """
         {"%(name)s", (PyCFunction)%(name)s_method, METH_VARARGS, NULL},""" % dict(name=name)
+    # add in avos arithmetic functions for testing purposes
+    method_struct += '''
+        {"c_avos_sum",      (PyCFunction)c_avos_sum_impl,       METH_VARARGS,               "avos sum"},'''
+    method_struct += '''
+        {"c_avos_product",  (PyCFunction)c_avos_product_impl,   METH_VARARGS,               "avos product"},'''
+
     method_struct += """
         {NULL, NULL, 0, NULL}
     };"""

@@ -34,7 +34,7 @@ static int get_thunk_case(int I_typenum, int T_typenum)
     return -1;
 }
 
-static Py_ssize_t rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
 {
     int j = get_thunk_case(I_typenum, T_typenum);
     switch (j) {
@@ -49,69 +49,69 @@ static Py_ssize_t rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
     }
 }
 
-static Py_ssize_t rbm_matmat_pass2_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG rbm_matmat_pass2_thunk(int I_typenum, int T_typenum, void **a)
 {
     int j = get_thunk_case(I_typenum, T_typenum);
     switch (j) {
         case 1:
-            (void)rbm_matmat_pass2<npy_int32,npy_byte>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_byte*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_byte*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_byte*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_byte,npy_ubyte>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_byte*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_byte*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_byte*)a[10]);
             return 0;
         case 2:
-            (void)rbm_matmat_pass2<npy_int32,npy_ubyte>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ubyte*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ubyte*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ubyte*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_ubyte,npy_ubyte>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ubyte*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ubyte*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ubyte*)a[10]);
             return 0;
         case 3:
-            (void)rbm_matmat_pass2<npy_int32,npy_short>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_short*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_short*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_short*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_short,npy_ushort>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_short*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_short*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_short*)a[10]);
             return 0;
         case 4:
-            (void)rbm_matmat_pass2<npy_int32,npy_ushort>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ushort*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ushort*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ushort*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_ushort,npy_ushort>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ushort*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ushort*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ushort*)a[10]);
             return 0;
         case 5:
-            (void)rbm_matmat_pass2<npy_int32,npy_int>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_int*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_int*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_int*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_int,npy_uint>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_int*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_int*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_int*)a[10]);
             return 0;
         case 6:
-            (void)rbm_matmat_pass2<npy_int32,npy_uint>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_uint*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_uint*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_uint*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_uint,npy_uint>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_uint*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_uint*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_uint*)a[10]);
             return 0;
         case 7:
-            (void)rbm_matmat_pass2<npy_int32,npy_long>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_long*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_long*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_long*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_long,npy_ulong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_long*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_long*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_long*)a[10]);
             return 0;
         case 8:
-            (void)rbm_matmat_pass2<npy_int32,npy_ulong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ulong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ulong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ulong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_ulong,npy_ulong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ulong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ulong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ulong*)a[10]);
             return 0;
         case 9:
-            (void)rbm_matmat_pass2<npy_int32,npy_longlong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_longlong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_longlong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_longlong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_longlong,npy_ulonglong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_longlong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_longlong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_longlong*)a[10]);
             return 0;
         case 10:
-            (void)rbm_matmat_pass2<npy_int32,npy_ulonglong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ulonglong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ulonglong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ulonglong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int32,npy_ulonglong,npy_ulonglong>(*(const npy_int32*)a[0], *(const npy_int32*)a[1], (const npy_int32*)a[2], (const npy_int32*)a[3], (const npy_ulonglong*)a[4], (const npy_int32*)a[5], (const npy_int32*)a[6], (const npy_ulonglong*)a[7], (npy_int32*)a[8], (npy_int32*)a[9], (npy_ulonglong*)a[10]);
             return 0;
         case 12:
-            (void)rbm_matmat_pass2<npy_int64,npy_byte>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_byte*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_byte*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_byte*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_byte,npy_ubyte>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_byte*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_byte*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_byte*)a[10]);
             return 0;
         case 13:
-            (void)rbm_matmat_pass2<npy_int64,npy_ubyte>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ubyte*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ubyte*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ubyte*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_ubyte,npy_ubyte>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ubyte*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ubyte*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ubyte*)a[10]);
             return 0;
         case 14:
-            (void)rbm_matmat_pass2<npy_int64,npy_short>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_short*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_short*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_short*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_short,npy_ushort>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_short*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_short*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_short*)a[10]);
             return 0;
         case 15:
-            (void)rbm_matmat_pass2<npy_int64,npy_ushort>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ushort*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ushort*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ushort*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_ushort,npy_ushort>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ushort*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ushort*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ushort*)a[10]);
             return 0;
         case 16:
-            (void)rbm_matmat_pass2<npy_int64,npy_int>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_int*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_int*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_int*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_int,npy_uint>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_int*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_int*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_int*)a[10]);
             return 0;
         case 17:
-            (void)rbm_matmat_pass2<npy_int64,npy_uint>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_uint*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_uint*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_uint*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_uint,npy_uint>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_uint*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_uint*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_uint*)a[10]);
             return 0;
         case 18:
-            (void)rbm_matmat_pass2<npy_int64,npy_long>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_long*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_long*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_long*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_long,npy_ulong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_long*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_long*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_long*)a[10]);
             return 0;
         case 19:
-            (void)rbm_matmat_pass2<npy_int64,npy_ulong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ulong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ulong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ulong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_ulong,npy_ulong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ulong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ulong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ulong*)a[10]);
             return 0;
         case 20:
-            (void)rbm_matmat_pass2<npy_int64,npy_longlong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_longlong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_longlong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_longlong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_longlong,npy_ulonglong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_longlong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_longlong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_longlong*)a[10]);
             return 0;
         case 21:
-            (void)rbm_matmat_pass2<npy_int64,npy_ulonglong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ulonglong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ulonglong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ulonglong*)a[10]);
+            (void)rbm_matmat_pass2<npy_int64,npy_ulonglong,npy_ulonglong>(*(const npy_int64*)a[0], *(const npy_int64*)a[1], (const npy_int64*)a[2], (const npy_int64*)a[3], (const npy_ulonglong*)a[4], (const npy_int64*)a[5], (const npy_int64*)a[6], (const npy_ulonglong*)a[7], (npy_int64*)a[8], (npy_int64*)a[9], (npy_ulonglong*)a[10]);
             return 0;
     default:
         throw std::runtime_error("internal error: invalid argument typenums");

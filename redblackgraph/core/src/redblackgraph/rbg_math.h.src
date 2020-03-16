@@ -9,7 +9,7 @@ extern "C" {
  */
 
 NPY_NO_EXPORT @type@ @name@_avos_sum(@type@ a, @type@ b);
-NPY_NO_EXPORT int @name@_MSB(@type@ x);
+NPY_NO_EXPORT short @name@_MSB(@type@ x);
 NPY_NO_EXPORT @utype@ @name@_avos_product(@type@ x, @type@ y);
 
 /**end repeat**/
