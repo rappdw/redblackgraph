@@ -7,5 +7,7 @@ NPY_VISIBILITY_HIDDEN PyObject *rbm_matmat_pass2_method(PyObject *, PyObject *);
 static struct PyMethodDef sparsetools_methods[] = {
         {"rbm_matmat_pass1", (PyCFunction)rbm_matmat_pass1_method, METH_VARARGS, NULL},
         {"rbm_matmat_pass2", (PyCFunction)rbm_matmat_pass2_method, METH_VARARGS, NULL},
+        {"c_avos_sum",      (PyCFunction)c_avos_sum_impl,       METH_VARARGS,               "avos sum"},
+        {"c_avos_product",  (PyCFunction)c_avos_product_impl,   METH_VARARGS,               "avos product"},
         {NULL, NULL, 0, NULL}
     };

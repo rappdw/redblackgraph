@@ -14,7 +14,6 @@ extern "C" {
 #include <functional>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 // see: https://github.com/klmr/named-operator
 // for how to define named operator in C++
@@ -59,7 +58,7 @@ const U avos_product(const T& lhs, const T& rhs)
 
     short bit_position = MSB<T,U>(y);
     short result_size = MSB<T,U>(x) + bit_position;
-    if (result_size == (sizeof(x) * 8) - 1) {
+    if (result_size >= (short)(sizeof(x) * 8)) {
         // Overflow Error
         PyErr_Format(PyExc_OverflowError,
                          "Avos product of %lu and %lu, results in an overflow. (Result size would require %u bits; Type provides %u bits)", \
@@ -75,15 +74,6 @@ const U avos_product(const T& lhs, const T& rhs)
         );
     }
     return result;
-}
-
-template <class T, class U>
-const T& avos_sum(const T& a, const T& b)
-{
-    if (a == 0 || (U)~b == 0) return b;
-    if (b == 0 || (U)~a == 0) return a;
-    if ((U)a < (U)b) return a;
-    return b;
 }
 
 /*

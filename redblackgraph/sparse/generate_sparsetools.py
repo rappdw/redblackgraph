@@ -302,6 +302,12 @@ def main():
     for name in names:
         method_struct += """
         {"%(name)s", (PyCFunction)%(name)s_method, METH_VARARGS, NULL},""" % dict(name=name)
+    # add in avos arithmetic functions for testing purposes
+    method_struct += '''
+        {"c_avos_sum",      (PyCFunction)c_avos_sum_impl,       METH_VARARGS,               "avos sum"},'''
+    method_struct += '''
+        {"c_avos_product",  (PyCFunction)c_avos_product_impl,   METH_VARARGS,               "avos product"},'''
+
     method_struct += """
         {NULL, NULL, 0, NULL}
     };"""

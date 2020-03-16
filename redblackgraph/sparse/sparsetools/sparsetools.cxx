@@ -33,6 +33,7 @@
 
 #include "numpy/ndarrayobject.h"
 
+#include <rbm.h>
 #include "sparsetools.h"
 
 #define MAX_ARGS 16
@@ -565,6 +566,52 @@ static PyObject *c_array_from_object(PyObject *obj, int typenum, int is_output)
     }
 }
 
+
+static PyObject *
+c_avos_sum_impl(PyObject *self, PyObject *args) {
+    // given two arguments of python int (PyLong), use long_avos_sum to provide a result
+    PyObject *arg0, *arg1;
+
+    if (PyTuple_GET_SIZE(args) != 2) {
+        PyErr_SetString(PyExc_ValueError, "two operands are required");
+        return NULL;
+    }
+
+    arg0 = PyTuple_GET_ITEM(args, 0);
+    arg1 = PyTuple_GET_ITEM(args, 1);
+
+    npy_longlong l0 = PyLong_AsLongLong(arg0);
+    npy_longlong l1 = PyLong_AsLongLong(arg1);
+    npy_ulonglong result = avos_sum<npy_longlong, npy_ulonglong>(l0, l1);
+
+    if (result == NPY_MAX_ULONGLONG) return PyLong_FromLong(-1);
+    return PyLong_FromUnsignedLongLong(result);
+}
+
+static PyObject *
+c_avos_product_impl(PyObject *self, PyObject *args) {
+    // given two arguments of python int (PyLong), use long_avos_product to provide a result
+    PyObject *arg0, *arg1;
+
+    if (PyTuple_GET_SIZE(args) != 2) {
+        PyErr_SetString(PyExc_ValueError, "two operands are required");
+        return NULL;
+    }
+
+    arg0 = PyTuple_GET_ITEM(args, 0);
+    arg1 = PyTuple_GET_ITEM(args, 1);
+
+    npy_longlong l0 = PyLong_AsLongLong(arg0);
+    npy_longlong l1 = PyLong_AsLongLong(arg1);
+    npy_ulonglong result = avos_product<npy_longlong, npy_ulonglong>(l0, l1);
+
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
+
+    if (result == NPY_MAX_ULONGLONG) return PyLong_FromLong(-1);
+    return PyLong_FromUnsignedLongLong(result);
+}
 
 /*
  * Python module initialization
