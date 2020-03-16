@@ -34,19 +34,20 @@ char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
 /**begin repeat
  * #name   = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
  * #type   = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
- */
+ * #utype  = npy_ubyte,     npy_ubyte,     npy_ushort,     npy_ushort,     npy_uint,     npy_uint,     npy_ulong,     npy_ulong,     npy_ulonglong,     npy_ulonglong#
+*/
 
 static void
 @name@_vector_avos(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, @type@ beta, @type@ np)
 {
     @type@ r = 0;
     const char *ip0 = (char*)ip0_, *ip1 = (char*)ip1_;
-    npy_intp i;
+    npy_uint i;
     for (i = 0; i < n; i++) {
         @type@ lhs = *(@type@ *)ip0;
         // if np is non-zero, then replace it as the LHS for column beta, otherwise this is a
         // straight avos product
-        if (np != 0 && i == beta) {
+        if (np != 0 && (@type@)i == beta) {
             lhs = np;
         }
         r = @name@_avos_sum(r, @name@_avos_product(lhs, *(@type@ *)ip1));
@@ -98,7 +99,7 @@ static void
     /* Step 2, copy input to output, transitively closing any new columns as necessary */
     for (m = 0; m < dn; m++) {
         @type@ lhs = *(@type@ *)(ipR2 + isR_j * alpha);
-        if (m != alpha) {
+        if ((@type@)m != alpha) {
             for (p = 0; p < dn; p++) {
                 if (*(@type@ *)ipR1 != 0) {
                     *(@type@ *)op = @name@_avos_sum(*(@type@ *)ipR2, @name@_avos_product(lhs, *(@type@ *)ipR1));
@@ -213,13 +214,10 @@ static void
         if ((*(@type@ *)ipv != 0) && (*(@type@ *)ipu != 0)) {
             // This condition indicates a violation of the cycle constraint
             // raise an exception
-            char s[100];
-            memset(s, 0, 100*sizeof(char));
-            long u_i = *(@type@ *)ipu;
-            long v_i = *(@type@ *)ipv;
-            sprintf(s,"Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", n, u_i, v_i);
-
-            PyErr_SetString(PyExc_ValueError, s);
+            PyErr_Format(PyExc_ValueError,
+                             "Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", \
+                             n, *(@type@ *)ipu, *(@type@ *)ipv
+                             );
             return;
         }
         ipu += os_j;

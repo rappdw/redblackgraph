@@ -389,10 +389,97 @@ finish:
 }
 
 static PyObject *
+c_avos_sum_test(PyObject *self, PyObject *args) {
+    // It appears that some compilers (g++) emit a spurious warning on comparison of unsigned promotion.
+    // This test case ensures that we are correct for all types we operate on.
+
+    npy_byte a = -1;
+    npy_byte b = 1;
+    npy_byte c = byte_avos_sum(a, b);
+    if (c != -1) {
+        PyErr_Format(PyExc_ValueError, "Byte avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_ubyte a1 = -1;
+    npy_ubyte b1 = 1;
+    npy_ubyte c1 = ubyte_avos_sum(a1, b1);
+    if (c1 != (npy_ubyte)-1) {
+        PyErr_Format(PyExc_ValueError, "UByte avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_short a2 = -1;
+    npy_short b2 = 1;
+    npy_short c2 = short_avos_sum(a2, b2);
+    if (c2 != -1) {
+        PyErr_Format(PyExc_ValueError, "Short avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_ushort a3 = -1;
+    npy_ushort b3 = 1;
+    npy_ushort c3 = ushort_avos_sum(a3, b3);
+    if (c3 != (npy_ushort)-1) {
+        PyErr_Format(PyExc_ValueError, "UShort avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_int a4 = -1;
+    npy_int b4 = 1;
+    npy_int c4 = int_avos_sum(a4, b4);
+    if (c4 != -1) {
+        PyErr_Format(PyExc_ValueError, "Int avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_uint a5 = -1;
+    npy_uint b5 = 1;
+    npy_uint c5 = uint_avos_sum(a5, b5);
+    if (c5 != (npy_uint)-1) {
+        PyErr_Format(PyExc_ValueError, "UInt avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_long a6 = -1;
+    npy_long b6 = 1;
+    npy_long c6 = long_avos_sum(a6, b6);
+    if (c6 != -1) {
+        PyErr_Format(PyExc_ValueError, "Long avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_ulong a7 = -1;
+    npy_ulong b7 = 1;
+    npy_ulong c7 = ulong_avos_sum(a7, b7);
+    if (c7 != (npy_ulong)-1) {
+        PyErr_Format(PyExc_ValueError, "ULong avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_longlong a8 = -1;
+    npy_longlong b8 = 1;
+    npy_longlong c8 = longlong_avos_sum(a8, b8);
+    if (c8 != -1) {
+        PyErr_Format(PyExc_ValueError, "LongLong avos sum returned incorrect results");
+        return NULL;
+    }
+
+    npy_ulonglong a9 = -1;
+    npy_ulonglong b9 = 1;
+    npy_ulonglong c9 = ulonglong_avos_sum(a9, b9);
+    if (c9 != (npy_ulonglong)-1) {
+        PyErr_Format(PyExc_ValueError, "ULongLong avos sum returned incorrect results");
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(1);
+}
+
+static PyObject *
 c_avos_sum_impl(PyObject *self, PyObject *args) {
     // given two arguments of python int (PyLong), use long_avos_sum to provide a result
     PyObject *arg0, *arg1;
-    PyObject *rtn;
 
     if (PyTuple_GET_SIZE(args) != 2) {
         PyErr_SetString(PyExc_ValueError, "two operands are required");
@@ -414,7 +501,6 @@ static PyObject *
 c_avos_product_impl(PyObject *self, PyObject *args) {
     // given two arguments of python int (PyLong), use long_avos_product to provide a result
     PyObject *arg0, *arg1;
-    PyObject *rtn;
 
     if (PyTuple_GET_SIZE(args) != 2) {
         PyErr_SetString(PyExc_ValueError, "two operands are required");
@@ -440,6 +526,7 @@ static struct PyMethodDef redblackgraph_module_methods[] = {
     {"c_einsum_avos",   (PyCFunction)array_einsum2,         METH_VARARGS|METH_KEYWORDS, "einsum avos function"},
     {"c_avos_sum",      (PyCFunction)c_avos_sum_impl,       METH_VARARGS,               "avos sum"},
     {"c_avos_product",  (PyCFunction)c_avos_product_impl,   METH_VARARGS,               "avos product"},
+    {"c_avos_sum_test", (PyCFunction)c_avos_sum_test,       METH_VARARGS,               "test avos sum"},
     {NULL, NULL, 0, NULL}                /* sentinel */
 };
 

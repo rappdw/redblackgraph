@@ -34,6 +34,7 @@ char *warshall_signature = "(m,m)->(m,m),()";
  * #name      = byte,          ubyte,         short,          ushort,         int,          uint,         long,          ulong,         longlong,          ulonglong#
  * #type      = npy_byte,      npy_ubyte,     npy_short,      npy_ushort,     npy_int,      npy_uint,     npy_long,      npy_ulong,     npy_longlong,      npy_ulonglong#
  * #utype     = npy_ubyte,     npy_ubyte,     npy_ushort,     npy_ushort,     npy_uint,     npy_uint,     npy_ulong,     npy_ulong,     npy_ulonglong,     npy_ulonglong#
+ * #format    = u,             u,             u,              u,              u,            u,            lu,            lu,            llu,               llu#
  */
 
 static void
@@ -58,7 +59,7 @@ static void
     npy_intp i, j, k;
 
     /* diameter holder */
-    npy_intp diameter = 0;
+    @type@ diameter = 0;
 
     /* Step 1, copy input matrix to output matrix */
     memcpy(args[1], args[0], dn * isR_i);
@@ -69,14 +70,13 @@ static void
             for (j = 0; j < dn; j++) {
                 product = @name@_avos_product((*(@type@ *)ipR1), (*(@type@ *)ipR2));
                 if (i == j && !(product == (@type@)-1 || product == 0 || product == 1)) {
-                    char s[100];
-                    memset(s, 0, 100*sizeof(char));
-                    sprintf(s,"Error: cycle detected! Vertex %li has a path to itself. A(%li,%li)=%li, A(%li,%li)=%li", i, i, k, (*(@type@ *)ipR1), k, j, (*(@type@ *)ipR2));
-
-                    PyErr_SetString(PyExc_ValueError, s);
+                    PyErr_Format(PyExc_ValueError,
+                                     "Error: cycle detected! Vertex %ld has a path to itself. A(%ld,%ld)=%@format@, A(%ld,%ld)=%@format@", \
+                                     i, i, k, (@utype@)(*(@type@ *)ipR1), k, j, (@utype@)(*(@type@ *)ipR2)
+                                     );
                 }
                 *(@type@ *)op = @name@_avos_sum(*(@type@ *)op, product);
-                if ((@utype@)~*(@type@ *)op != 0 && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
+                if ((@utype@)(~*(@type@ *)op) != 0 && *(@type@ *)op > diameter) diameter = *(@type@ *)op;
 
                 // advance column of output, advance column of R2
                 ipR2 += isR_j;

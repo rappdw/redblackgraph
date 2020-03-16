@@ -1,4 +1,4 @@
-from ._redblackgraph import c_einsum_avos, c_avos_sum, c_avos_product
+from ._redblackgraph import c_einsum_avos, c_avos_sum, c_avos_product, c_avos_sum_test
 
 __all__ = ['einsum', 'avos_sum', 'avos_product']
 
@@ -13,3 +13,6 @@ def avos_sum(lhs: int, rhs: int) -> int:
 
 def avos_product(lhs: int, rhs: int) -> int:
     return c_avos_product(lhs, rhs)
+
+def avos_sum_test() -> int:
+    return c_avos_sum_test()

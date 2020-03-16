@@ -1,4 +1,5 @@
 from redblackgraph import avos_product, avos_sum
+from redblackgraph.core.avos import avos_sum_test
 
 def test_simple_avos_product():
     result = avos_product(7, 4)
@@ -58,3 +59,5 @@ def test_avos_overflow():
     except OverflowError as e:
         pass # this is expected, collides with using -1 to represent red node
 
+def test_avos_sum_impl():
+    assert avos_sum_test() == 1
