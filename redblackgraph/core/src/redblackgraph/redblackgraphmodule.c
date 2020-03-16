@@ -366,6 +366,11 @@ array_einsum2(PyObject *NPY_UNUSED(dummy), PyObject *args, PyObject *kwds)
     ret = (PyObject *)PyArray_EinsteinSum2(subscripts, nop, op, dtype,
                                         order, casting, out);
 
+    if (PyErr_Occurred()) {
+        ret = NULL;
+        goto finish;
+    }
+
     /* If no output was supplied, possibly convert to a scalar */
     if (ret != NULL && out == NULL) {
         ret = PyArray_Return((PyArrayObject *)ret);
@@ -422,6 +427,10 @@ c_avos_product_impl(PyObject *self, PyObject *args) {
     npy_longlong l0 = PyLong_AsLongLong(arg0);
     npy_longlong l1 = PyLong_AsLongLong(arg1);
     npy_ulonglong result = ulonglong_avos_product(l0, l1);
+
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
 
     if (result == NPY_MAX_ULONGLONG) return PyLong_FromLong(-1);
     return PyLong_FromUnsignedLongLong(result);

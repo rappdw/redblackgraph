@@ -37,6 +37,24 @@ def test_product():
     assert not errors
 
 def test_edge_cases_product():
-    assert avos_product(9223372036854775807, 2) > 0
-    assert avos_product(-1, 1) < 0
-    assert avos_product(1, -1) < 0
+    assert avos_product(9223372036854775807, 2) == 18446744073709551614 # largest ahnen number representable in 64 bits
+    assert avos_product(-1, 1) == -1
+    assert avos_product(1, -1) == -1
+
+def test_avos_overflow():
+    x = y = 4294967296
+    try:
+        _ = avos_product(x, y)
+        assert False
+    except OverflowError as e:
+        pass # this is expected, overflows from 64 bit representation
+
+    x = 9223372036854775807
+    y = 3
+    try:
+        z = avos_product(x, y)
+        print(z)
+        assert False
+    except OverflowError as e:
+        pass # this is expected, collides with using -1 to represent red node
+
