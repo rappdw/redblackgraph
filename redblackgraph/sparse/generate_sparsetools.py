@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+python generate_sparsetools.py
+
 Generate manual wrappers for C++ sparsetools code.
 
 Type codes used:
@@ -12,6 +14,7 @@ Type codes used:
     'W':  std::vector<data>*
     '*':  indicates that the next argument is an output argument
     'v':  void
+    'l':  64-bit integer scalar
 
 See sparsetools.cxx for more details.
 
@@ -66,7 +69,7 @@ T_TYPES = [
 #
 
 THUNK_TEMPLATE = """
-static Py_ssize_t %(name)s_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG %(name)s_thunk(int I_typenum, int T_typenum, void **a)
 {
     %(thunk_content)s
 }

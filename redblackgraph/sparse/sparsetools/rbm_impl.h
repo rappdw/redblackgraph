@@ -34,7 +34,7 @@ static int get_thunk_case(int I_typenum, int T_typenum)
     return -1;
 }
 
-static Py_ssize_t rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
 {
     int j = get_thunk_case(I_typenum, T_typenum);
     switch (j) {
@@ -49,7 +49,7 @@ static Py_ssize_t rbm_matmat_pass1_thunk(int I_typenum, int T_typenum, void **a)
     }
 }
 
-static Py_ssize_t rbm_matmat_pass2_thunk(int I_typenum, int T_typenum, void **a)
+static PY_LONG_LONG rbm_matmat_pass2_thunk(int I_typenum, int T_typenum, void **a)
 {
     int j = get_thunk_case(I_typenum, T_typenum);
     switch (j) {
