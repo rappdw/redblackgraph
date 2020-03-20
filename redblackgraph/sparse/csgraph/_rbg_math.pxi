@@ -1,10 +1,10 @@
-cdef inline DTYPE_t MSB(DTYPE_t x):
+cdef inline unsigned short MSB(DTYPE_t x):
     '''
     Given an integer, return the bit position of it's most significant bit
     :param x: operand
     :return: bit position of leftmost significant bit
     '''
-    cdef DTYPE_t bit_position = 0
+    cdef unsigned short bit_position = 0
     while (x > 1):
         x >>= 1
         bit_position += 1
@@ -33,8 +33,8 @@ cdef inline DTYPE_t avos_product(DTYPE_t lhs, DTYPE_t rhs):
     :return: avos product
     '''
     cdef UDTYPE_t red_one = -1
-    cdef UDTYPE_t x = rhs
-    cdef UDTYPE_t y = lhs
+    cdef UDTYPE_t x = <UDTYPE_t>lhs
+    cdef UDTYPE_t y = <UDTYPE_t>rhs
 
     # The zero property of the avos product
     if x == 0 or y == 0:
@@ -49,5 +49,5 @@ cdef inline DTYPE_t avos_product(DTYPE_t lhs, DTYPE_t rhs):
             return -1
         y = 1
 
-    bit_position = MSB(y)
+    cdef unsigned short bit_position = MSB(y)
     return ((y & (2 ** bit_position - 1)) | (x << bit_position))
