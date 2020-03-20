@@ -1,6 +1,16 @@
-from redblackgraph.reference.util import MSB
+cdef inline DTYPE_t MSB(DTYPE_t x):
+    '''
+    Given an integer, return the bit position of it's most significant bit
+    :param x: operand
+    :return: bit position of leftmost significant bit
+    '''
+    cdef DTYPE_t bit_position = 0
+    while (x > 1):
+        x >>= 1
+        bit_position += 1
+    return bit_position
 
-def avos_sum(x: int, y: int) -> int:
+cdef inline DTYPE_t avos_sum(DTYPE_t x, DTYPE_t y):
     '''
     The avos sum is the non-zero minumum of x and y
     :param x: operand 1
@@ -15,26 +25,26 @@ def avos_sum(x: int, y: int) -> int:
         return x
     return y
 
-def avos_product(x: int, y: int) -> int:
+cdef inline DTYPE_t avos_product(DTYPE_t lhs, DTYPE_t rhs):
     '''
     The avos product replaces the left most significant bit of operand 2 with operand 1
     :param x: operand 1
     :param y: operand 2
     :return: avos product
     '''
+    cdef UDTYPE_t red_one = -1
+    cdef UDTYPE_t x = rhs
+    cdef UDTYPE_t y = lhs
 
-    # negative values are invalid (aside from -1)
-    if x < -1 or y < -1:
-        raise ValueError(f"Invalid input. Negative values (aside from -1) are not allowed. x: {x}, y:{y}")
     # The zero property of the avos product
     if x == 0 or y == 0:
         return 0
     # Special case -1 * 1 or -1 * -1
-    if x == -1:
+    if x == red_one:
         if y == 1:
             return -1
         x = 1
-    if y == -1:
+    if y == red_one:
         if x == 1:
             return -1
         y = 1

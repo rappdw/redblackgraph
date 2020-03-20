@@ -3,7 +3,7 @@
 #define NPY_NO_DEPRECATED_API NPY_API_VERSION
 
 #include "sparsetools.h"
-#include "rbm.h"
+#include "rbm_math.h"
 extern "C" {
 #include "rbm_impl.h"
 }

@@ -1,4 +1,4 @@
-from redblackgraph.reference.avos import avos_product, avos_sum
+from redblackgraph.reference.rbg_math import avos_product, avos_sum
 
 
 def test_simple_avos_product():

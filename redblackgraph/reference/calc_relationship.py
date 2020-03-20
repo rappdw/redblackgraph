@@ -1,6 +1,6 @@
 from typing import Sequence
 from redblackgraph.types.relationship import Relationship
-from redblackgraph.reference.util import MSB
+from redblackgraph.reference import MSB
 
 
 def lookup_relationship(da: int, db: int) -> str:

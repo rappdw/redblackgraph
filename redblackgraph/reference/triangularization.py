@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Dict, Sequence, Tuple, List
 from collections import defaultdict
 from .components import find_components
-from .util import MSB
+from . import MSB
 from .permutation import permute
 from ..util.capture import capture
 

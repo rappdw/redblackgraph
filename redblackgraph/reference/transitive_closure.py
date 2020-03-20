@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Sequence
-from redblackgraph.reference.avos import avos_sum, avos_product
-from redblackgraph.reference.util import MSB
+from redblackgraph.reference.rbg_math import avos_sum, avos_product
+from redblackgraph.reference import MSB
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
 

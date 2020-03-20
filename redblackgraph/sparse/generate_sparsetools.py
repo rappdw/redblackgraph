@@ -29,7 +29,7 @@ from distutils.dep_util import newer
 # The first code indicates the return value, the rest the arguments.
 #
 
-# rbm.h
+# rbm_math.h
 RBM_ROUTINES = """
 rbm_matmat_pass1    v iiIIII*I
 rbm_matmat_pass2    v iiIITIIT*I*I*T
