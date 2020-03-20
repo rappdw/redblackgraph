@@ -96,11 +96,10 @@ def test_avos_overflow(product):
     x = 9223372036854775807
     y = 3
     try:
-        z = product(x, y)
-        print(z)
+        _ = product(x, y)
         assert False
     except OverflowError as e:
-        pass # this is expected, collides with using -1 to represent red node
+        pass # this is expected, collides with using -1 to represent red one
 
 @pytest.mark.parametrize(
     "sum_test",
