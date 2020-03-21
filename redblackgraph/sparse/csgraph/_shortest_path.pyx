@@ -1,5 +1,3 @@
-#!python
-#cython: language_level=3
 """
 Routines for performing shortest-path graph searches
 
@@ -153,7 +151,7 @@ def shortest_path(csgraph, method='auto',
     """
     # validate here to catch errors early but don't store the result;
     # we'll validate again later
-    validate_graph(csgraph, directed, ITYPE,
+    validate_graph(csgraph, directed, DTYPE,
                    copy_if_dense=(not overwrite),
                    copy_if_sparse=(not overwrite))
 
@@ -290,10 +288,9 @@ def floyd_warshall(csgraph, directed=True,
            [    1,     3,     3, -9999]], dtype=int32)
 
     """
-    dist_matrix = validate_graph(csgraph, directed, ITYPE,
+    dist_matrix = validate_graph(csgraph, directed, DTYPE,
                                  csr_output=False,
-                                 copy_if_dense=not overwrite,
-                                 null_value_out=0)
+                                 copy_if_dense=not overwrite)
     if not isspmatrix(csgraph):
         # for dense array input, zero entries represent non-edge
         dist_matrix[dist_matrix == 0] = INFINITY
@@ -307,19 +304,36 @@ def floyd_warshall(csgraph, directed=True,
     else:
         predecessor_matrix = np.empty((0, 0), dtype=ITYPE)
 
-    _floyd_warshall(dist_matrix,
-                    predecessor_matrix,
-                    int(directed))
+    _floyd_warshall_avos(dist_matrix)
+    # _floyd_warshall(dist_matrix,
+    #                 predecessor_matrix,
+    #                 int(directed))
+    #
+    # if np.any(dist_matrix.diagonal() < 0):
+    #     raise NegativeCycleError("Negative cycle in nodes %s"
+    #                              % np.where(dist_matrix.diagonal() < 0)[0])
 
     if return_predecessors:
         return dist_matrix, predecessor_matrix
     else:
         return dist_matrix
 
+@cython.boundscheck(False)
+cdef void _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix):
+    cdef int N = dist_matrix.shape[0]
+    cdef unsigned int i, j, k
+    cdef DTYPE_t d_ijk
+    for k in range(N):
+        for i in range(N):
+            for j in range(N):
+                d_ijk = avos_product(dist_matrix[i, k], dist_matrix[k, j])
+                if i == j and not (d_ijk == -1 or d_ijk == 0 or d_ijk == 1):
+                    raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dist_matrix[i][k]}, A({k},{j})={dist_matrix[k][j]}")
+                dist_matrix[i, j] = avos_sum(dist_matrix[i][j], d_ijk)
 
 @cython.boundscheck(False)
 cdef void _floyd_warshall(
-               np.ndarray[ITYPE_t, ndim=2, mode='c'] dist_matrix,
+               np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix,
                np.ndarray[ITYPE_t, ndim=2, mode='c'] predecessor_matrix,
                int directed=0):
     # dist_matrix : in/out
@@ -333,20 +347,20 @@ cdef void _floyd_warshall(
 
     cdef unsigned int i, j, k
 
-    cdef ITYPE_t d_ijk
+    cdef DTYPE_t d_ijk
 
     # ----------------------------------------------------------------------
     #  Initialize distance matrix
-    #   - set diagonal to zero (Not applicable for RedBlack Matrix)
+    #   - set diagonal to zero
     #   - symmetrize matrix if non-directed graph is desired
-    # dist_matrix.flat[::N + 1] = 0
-    # if not directed:
-    #     for i in range(N):
-    #         for j in range(i + 1, N):
-    #             if dist_matrix[j, i] <= dist_matrix[i, j]:
-    #                 dist_matrix[i, j] = dist_matrix[j, i]
-    #             else:
-    #                 dist_matrix[j, i] = dist_matrix[i, j]
+    dist_matrix.flat[::N + 1] = 0
+    if not directed:
+        for i in range(N):
+            for j in range(i + 1, N):
+                if dist_matrix[j, i] <= dist_matrix[i, j]:
+                    dist_matrix[i, j] = dist_matrix[j, i]
+                else:
+                    dist_matrix[j, i] = dist_matrix[i, j]
 
     #----------------------------------------------------------------------
     #  Initialize predecessor matrix
@@ -373,9 +387,9 @@ cdef void _floyd_warshall(
                 if dist_matrix[i, k] == INFINITY:
                     continue
                 for j in range(N):
-                    d_ijk = avos_product(dist_matrix[i, k], dist_matrix[k, j])
+                    d_ijk = dist_matrix[i, k] + dist_matrix[k, j]
                     if d_ijk < dist_matrix[i, j]:
-                        dist_matrix[i, j] = avos_sum(d_ijk, dist_matrix[i, j])
+                        dist_matrix[i, j] = d_ijk
                         predecessor_matrix[i, j] = predecessor_matrix[k, j]
     else:
         for k in range(N):
@@ -383,7 +397,9 @@ cdef void _floyd_warshall(
                 if dist_matrix[i, k] == INFINITY:
                     continue
                 for j in range(N):
-                    dist_matrix[i, j] = avos_sum(avos_product(dist_matrix[i, k], dist_matrix[k, j]), dist_matrix[i, j])
+                    d_ijk = dist_matrix[i, k] + dist_matrix[k, j]
+                    if d_ijk < dist_matrix[i, j]:
+                        dist_matrix[i, j] = d_ijk
 
 
 def dijkstra(csgraph, directed=True, indices=None,

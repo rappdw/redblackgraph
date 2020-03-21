@@ -328,7 +328,7 @@ def csgraph_to_dense(csgraph, null_value=0):
 
     # create the output array
     graph = np.empty(csgraph.shape, dtype=DTYPE)
-    graph.fill(np.inf)
+    graph.fill(0)
     _populate_graph(data, indices, indptr, graph, null_value)
     return graph
 
@@ -388,7 +388,7 @@ cdef void _populate_graph(np.ndarray[DTYPE_t, ndim=1, mode='c'] data,
                           np.ndarray[DTYPE_t, ndim=2, mode='c'] graph,
                           DTYPE_t null_value):
     # data, indices, indptr are the csr attributes of the sparse input.
-    # on input, graph should be filled with infinities, and should be
+    # on input, graph should be filled with zero, and should be
     # of size [N, N], which is also the size of the sparse matrix
     cdef unsigned int N = graph.shape[0]
     cdef np.ndarray null_flag = np.ones((N, N), dtype=bool, order='C')
@@ -400,7 +400,7 @@ cdef void _populate_graph(np.ndarray[DTYPE_t, ndim=1, mode='c'] data,
             col = indices[i]
             null_ptr[col] = 0
             # in case of multiple edges, we'll choose the smallest
-            if data[i] < graph[row, col]:
+            if graph[row, col] == 0 or data[i] < graph[row, col]:
                 graph[row, col] = data[i]
         null_ptr += N
 
