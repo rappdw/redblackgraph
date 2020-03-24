@@ -34,4 +34,5 @@ def test_warshall(dtype, method):
     results = shortest_path(a, method=method, directed=True, overwrite=False)
     # print()
     # print(results)
-    assert_equal(results, expected)
+    assert_equal(results[0], expected)
+    assert results[1] == 2
