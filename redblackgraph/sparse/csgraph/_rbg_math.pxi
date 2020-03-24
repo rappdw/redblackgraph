@@ -10,6 +10,11 @@ cdef inline unsigned short MSB(DTYPE_t x):
         bit_position += 1
     return bit_position
 
+cdef inline bint avos_lt(DTYPE_t x, DTYPE_t y):
+    if y == 0:
+        return x != 0
+    return x < y
+
 cdef inline DTYPE_t avos_sum(DTYPE_t x, DTYPE_t y):
     '''
     The avos sum is the non-zero minumum of x and y

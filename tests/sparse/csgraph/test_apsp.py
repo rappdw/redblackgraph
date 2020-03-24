@@ -9,7 +9,7 @@ import redblackgraph as rb
 
 
 @pytest.mark.parametrize("dtype", [np.int32, np.uint32])
-@pytest.mark.parametrize("method", ['FW', 'D', 'BF', 'J'])
+@pytest.mark.parametrize("method", ['FW', 'D']) # TODO: should we even consider Bellman-Ford and Johnson?, 'BF', 'J'])
 def test_warshall(dtype, method):
     a = rb_matrix(
         coo_matrix(
@@ -22,6 +22,7 @@ def test_warshall(dtype, method):
             ),
         dtype=dtype)
     )
+
     expected = rb.array([[-1, 2, 3, 6, 7, 4, 5],
                          [ 0,-1, 0, 0, 0, 2, 3],
                          [ 0, 0, 1, 2, 3, 0, 0],
@@ -31,4 +32,6 @@ def test_warshall(dtype, method):
                          [ 0, 0, 0, 0, 0, 0, 1]], dtype=np.int32)
 
     results = shortest_path(a, method=method, directed=True, overwrite=False)
+    print()
+    print(results)
     assert_equal(results, expected)
