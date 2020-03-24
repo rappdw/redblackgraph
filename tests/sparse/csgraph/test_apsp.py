@@ -32,6 +32,6 @@ def test_warshall(dtype, method):
                          [ 0, 0, 0, 0, 0, 0, 1]], dtype=np.int32)
 
     results = shortest_path(a, method=method, directed=True, overwrite=False)
-    print()
-    print(results)
+    # print()
+    # print(results)
     assert_equal(results, expected)
