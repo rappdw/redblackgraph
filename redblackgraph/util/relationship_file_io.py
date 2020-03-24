@@ -7,6 +7,7 @@ One that defines the edges with 2 columns: source_external_id, destination_exter
 """
 from abc import ABC, abstractmethod
 import csv
+import itertools
 import logging
 from collections import defaultdict
 from typing import Optional, Dict, Tuple, List
@@ -65,6 +66,7 @@ class PersonIdentifier:
 
 class GraphBuilder:
     def __init__(self):
+        self.count = 0
         self.rbg_dictionary = defaultdict(lambda: {})
 
     def add_vertex(self, vertex_id:int, color:int, red_vertex_id:int=None, black_vertex_id:int=None):
@@ -78,26 +80,41 @@ class GraphBuilder:
         """
         if vertex_id is not None:
             self.rbg_dictionary[vertex_id][vertex_id] = color
+            self.count += 1
             if not red_vertex_id is None:
                 self.rbg_dictionary[vertex_id][red_vertex_id] = 2
                 self.rbg_dictionary[red_vertex_id][red_vertex_id] = -1
+                self.count += 2
             if not black_vertex_id is None:
                 self.rbg_dictionary[vertex_id][black_vertex_id] = 3
                 self.rbg_dictionary[black_vertex_id][black_vertex_id] = 1
+                self.count += 2
 
     def add_edge(self, source_vertex: int, destination_vertex: int):
         self.rbg_dictionary[source_vertex][destination_vertex] = 2 \
             if self.rbg_dictionary[destination_vertex][destination_vertex] == -1 else 3
+        self.count += 1
 
     def generate_graph(self):
-        # create an numpy array with the correct shape and load it with the tuples
-        m = len(self.rbg_dictionary)
-        R = np.zeros((m, m), dtype=np.int32).view(rb.array)
-        for i in range(m):
+        # create a rb_matrix (sparse)
+        data = np.zeros(self.count, dtype=np.int32)
+        indices = np.zeros(self.count, dtype=np.int32)
+        indptr = np.zeros(len(self.rbg_dictionary) + 1, dtype=np.int32)
+
+        N = len(self.rbg_dictionary)
+        ind_idx = 0
+        idx = 0
+        for i in range(N):
             row = self.rbg_dictionary[i]
+            indptr[ind_idx] = idx
+            ind_idx += 1
             for key in row.keys():
-                R[i][key] = row[key]
-        return R
+                data[idx] = row[key]
+                indices[idx] = key
+                idx += 1
+        indptr[ind_idx] = idx
+
+        return rb.sparse.rb_matrix((data, indices, indptr))
 
 
 class VertexInfo(ABC):
@@ -119,7 +136,7 @@ class RelationshipFileReader(VertexInfo):
         self.hop = hop
         self.filter = filter
 
-    def __call__(self, *args, **kwargs):
+    def read(self):
         hop_frontier = set()
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
@@ -150,8 +167,8 @@ class RelationshipFileReader(VertexInfo):
                 external_id = row[0]
                 hop = int(row[3])
                 color = row[1]
+                name = row[2]
                 if external_id in linked:
-                    name = row[2]
                     if hop <= self.hop:
                         if color != '':
                             color = int(color)
@@ -200,47 +217,41 @@ class RedBlackGraphWriter:
     @staticmethod
     def _calc_width(len_of_max_string):
         return max(len_of_max_string + 0.83, 2.67)
-    
-    def __call__(self, *args, **kwargs):
-        workbook, formats = self._open_workbook(kwargs.get('output_file', '/tmp/rbg.csv'))
+
+    def write(self, R, output_file='/tmp/rbg.csv', key_permutation=None):
+        workbook, formats = self._open_workbook(output_file)
         worksheet = workbook.add_worksheet()
         worksheet.set_default_row(hide_unused_rows=True)
-        R = args[0]
-        n = len(R)
+        n = R.shape[0] if isinstance(R, rb.sparse.rb_matrix) else len(R)
         if n > MAX_COLUMNS_EXCEL:
             logging.error("Graph exceeds max size allowable by Excel")
-        key_permutation = kwargs.get('key_permutation', np.arange(n))
-        row = 0
+        if not key_permutation:
+            key_permutation = np.arange(n)
 
         max_key = 0
         max_np = 0
 
         if self.vertex_key:
-            column = 0
-            worksheet.write(row, column, ' ')
-            column += 1
-            for column_idx in range(n):
-                vertex_key = self.vertex_key[key_permutation[column_idx]]
+            worksheet.write(0, 0, ' ')
+            for idx in range(n):
+                vertex_key = self.vertex_key[key_permutation[idx]]
                 cell_data = f"{vertex_key[0]} - {vertex_key[1]}"
                 max_key = max(max_key, len(cell_data))
-                worksheet.write(row, column_idx + column, cell_data, formats[ROTATE_90])
-            row += 1
+                worksheet.write(0, idx + 1, cell_data, formats[ROTATE_90])
+                worksheet.write(idx + 1, 0, cell_data)
 
         logger.debug(f"Graph size: {n}")
-        for row_idx in range(n):
-            if (row_idx + 1) % 500 == 0:
-                logger.debug(f"completed row {row_idx + 1} of {n}")
-            column = 0
-            if self.vertex_key:
-                vertex_key = self.vertex_key[key_permutation[row_idx]]
-                cell_data = f"{vertex_key[0]} - {vertex_key[1]}"
-                worksheet.write(row + row_idx, 0, cell_data)
-                column += 1
-            for column_idx in range(n):
-                cell_data = R[row_idx][column_idx]
+        if isinstance(R, rb.sparse.rb_matrix):
+            for i, j in zip(*R.nonzero()):
+                cell_data = R[i, j]
+                max_np = max(max_np, cell_data)
+                worksheet.write(i + 1, j + 1, cell_data)
+        else:
+            for i, j in itertools.product(range(n), repeat=2):
+                cell_data = R[i][j]
                 if cell_data != 0:
                     max_np = max(max_np, cell_data)
-                    worksheet.write(row + row_idx, column + column_idx, cell_data)
+                    worksheet.write(i + 1, j + 1, cell_data)
         column_width = self._calc_width(len(f"{max_np}"))
         worksheet.freeze_panes(1, 1)
         worksheet.set_column(0, 0, self._calc_width(max_key))

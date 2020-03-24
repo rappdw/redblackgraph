@@ -520,10 +520,10 @@ def dijkstra(csgraph, directed=True, indices=None,
     csgraph = validate_graph(csgraph, directed, DTYPE,
                              dense_output=False)
 
-    if np.any(csgraph.data < 0):
-        warnings.warn("Graph has negative weights: dijkstra will give "
-                      "inaccurate results if the graph contains negative "
-                      "cycles. Consider johnson or bellman_ford.")
+    # if np.any(csgraph.data < 0):
+    #     warnings.warn("Graph has negative weights: dijkstra will give "
+    #                   "inaccurate results if the graph contains negative "
+    #                   "cycles. Consider johnson or bellman_ford.")
 
     N = csgraph.shape[0]
 
