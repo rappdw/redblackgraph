@@ -110,6 +110,8 @@ def shortest_path(csgraph, method='auto',
         predecessors[i, j] gives the index of the previous node in the
         path from point i to point j.  If no path exists between point
         i and j, then predecessors[i, j] = -9999
+    diameter : DTYPE
+        The diameter of the graph
 
     Raises
     ------
@@ -249,6 +251,9 @@ def floyd_warshall(csgraph, directed=True,
         predecessors[i, j] gives the index of the previous node in the
         path from point i to point j.  If no path exists between point
         i and j, then predecessors[i, j] = -9999
+
+    diameter : DTYPE
+        The diameter of the graph
 
     Raises
     ------
@@ -480,6 +485,9 @@ def dijkstra(csgraph, directed=True, indices=None,
         this will contain -9999.  The value at the indices passed
         will be equal to that index (i.e. the fastest way to reach
         node i, is to start on node i).
+
+    diameter : DTYPE
+        The diameter of the graph
 
     Notes
     -----

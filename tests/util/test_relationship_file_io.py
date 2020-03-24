@@ -1,6 +1,7 @@
 import os
 import tempfile
 import redblackgraph as rb
+from redblackgraph.sparse.csgraph import transitive_closure
 from redblackgraph.reference.triangularization import canonical_sort
 
 def test_rel_file():
@@ -20,7 +21,7 @@ def test_rel_file():
         writer.write(graph, output_file=tmpfile)
         assert os.path.isfile(tmpfile)
 
-        R_star = rb.sparse.csgraph.shortest_path(graph, method='D', directed=True, overwrite=False)
+        R_star = transitive_closure(graph).W
         R_cannonical = canonical_sort(R_star)
 
         tmpfile_cannonical = os.path.join(tmpdir, 'test_file_cannonical.xlsx')

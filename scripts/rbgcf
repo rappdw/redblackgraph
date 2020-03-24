@@ -6,6 +6,7 @@ from pathlib import Path
 
 import redblackgraph as rb
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
+from redblackgraph.sparse.csgraph import transitive_closure
 from redblackgraph.reference.triangularization import canonical_sort, triangularize
 
 MAX_PRACTICAL_SIZE = 1500
@@ -90,7 +91,7 @@ if __name__ == '__main__':
 
     logger.info("Simple format created. Computing transitive closure of Graph")
 
-    R_star = rb.sparse.csgraph.shortest_path(graph, method='D', directed=True, overwrite=False)
+    R_star = transitive_closure(graph).W
 
     if args.closure:
         logger.info(f"Writing out transitive closure to {closurefile}")

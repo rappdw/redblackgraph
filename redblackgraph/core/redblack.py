@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray, asarray
 from .avos import einsum
-from ._redblackgraph import warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.core._redblackgraph import warshall, vertex_relational_composition, edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
 __all__ = ['array', 'matrix']
@@ -45,8 +45,7 @@ class _Avos(ndarray):
         }
 
     def transitive_closure(self) -> TransitiveClosure:
-        res = warshall(self)
-        return TransitiveClosure(res[0], res[1])
+        return TransitiveClosure(*warshall(self))
 
     def vertex_relational_composition(self, u, v, c, compute_closure=False):
         '''
