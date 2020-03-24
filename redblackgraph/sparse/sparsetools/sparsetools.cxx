@@ -33,7 +33,7 @@
 
 #include "numpy/ndarrayobject.h"
 
-#include "rbm.h"
+#include "rbm_math.h"
 #include "sparsetools.h"
 
 #define MAX_ARGS 16

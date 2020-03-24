@@ -1,5 +1,5 @@
-#ifndef __RBM_H__
-#define __RBM_H__
+#ifndef __RBM_MATH_H__
+#define __RBM_MATH_H__
 
 #include <set>
 #include <vector>

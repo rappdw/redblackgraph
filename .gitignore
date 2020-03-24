@@ -41,3 +41,4 @@ notebooks/.diff
 .Trash-*
 _redblackgraph.*.so
 _sparsetools.*.so
+cythonize.dat

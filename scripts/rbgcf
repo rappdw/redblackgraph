@@ -76,38 +76,40 @@ if __name__ == '__main__':
     logger.info("Reading graph input files")
 
     reader = RelationshipFileReader(vertices_file, edges_file, hops, args.filter)
-    graph: rb.array = reader()
+    graph: rb.sparse.rb_matrix = reader.read()
 
-    if len(graph) >= MAX_COLUMNS_EXCEL:
-        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({len(graph)} vertices)")
-    if len(graph) >= MAX_PRACTICAL_SIZE:
-        logger.warning(f"This graph is on the large size ({len(graph)}). Processing times for graphs in excess of {MAX_PRACTICAL_SIZE} nodes are noticably slower.")
+    if graph.shape[0] >= MAX_COLUMNS_EXCEL:
+        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({graph.shape[0]} vertices)")
+    if graph.shape[0] >= MAX_PRACTICAL_SIZE:
+        logger.warning(f"This graph is on the large size ({graph.shape[0]}). Processing times for graphs in excess of {MAX_PRACTICAL_SIZE} nodes are noticably slower.")
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")
 
     writer = rb.RedBlackGraphWriter(reader)
-    writer(graph, output_file=outputfile)
+    writer.write(graph, output_file=outputfile)
 
     logger.info("Simple format created. Computing transitive closure of Graph")
 
-    R_star = graph.transitive_closure().W
+    R_star = rb.sparse.csgraph.shortest_path(graph, method='D', directed=True, overwrite=False)
 
     if args.closure:
         logger.info(f"Writing out transitive closure to {closurefile}")
-        writer(R_star, output_file=closurefile)
+        writer.write(R_star, output_file=closurefile)
 
     logger.info("Computing cannonical form of Graph")
 
     R_cannonical = canonical_sort(R_star)
 
     logger.info(f"Writing out cannonical form to {cannonicalfile}")
-    writer(R_cannonical.A, output_file=cannonicalfile, key_permutation=R_cannonical.label_permutation)
+    writer.write(R_cannonical.A, output_file=cannonicalfile, key_permutation=R_cannonical.label_permutation)
 
     if args.topologicalsort:
         logger.info(f"Computing topological sort")
         R_topological = triangularize(R_star)
         logger.info(f"Writing out topological sort to {topologicalfile}")
-        writer(R_topological.A, output_file=topologicalfile, key_permutation=R_topological.label_permutation)
+        writer.write(R_topological.A, output_file=topologicalfile, key_permutation=R_topological.label_permutation)
+
+    logger.info("Done.")
 
 
 

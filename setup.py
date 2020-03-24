@@ -2,6 +2,7 @@ import setuptools # needed for bdist_wheel
 import os
 import subprocess
 import sys
+import sysconfig
 import versioneer
 
 from os import path
@@ -18,16 +19,67 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('redblackgraph')
     return config
 
-# def generate_cython():
-#     cwd = os.path.abspath(os.path.dirname(__file__))
-#     print("Cythonizing sources")
-#     p = subprocess.call([sys.executable,
-#                          os.path.join(cwd, 'tools', 'cythonize.py'),
-#                          'redblackgraph'],
-#                         cwd=cwd)
-#     if p != 0:
-#         raise RuntimeError("Running cythonize failed!")
-#
+def generate_cython():
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    print("Cythonizing sources")
+    p = subprocess.call([sys.executable,
+                         os.path.join(cwd, 'tools', 'cythonize.py'),
+                         'redblackgraph'],
+                        cwd=cwd)
+    if p != 0:
+        raise RuntimeError("Running cythonize failed!")
+
+def get_build_ext_override():
+    """
+    Custom build_ext command to tweak extension building.
+    """
+    from numpy.distutils.command.build_ext import build_ext as old_build_ext
+
+    class build_ext(old_build_ext):
+        def build_extension(self, ext):
+            # When compiling with GNU compilers, use a version script to
+            # hide symbols during linking.
+            if self.__is_using_gnu_linker(ext):
+                export_symbols = self.get_export_symbols(ext)
+                text = '{global: %s; local: *; };' % (';'.join(export_symbols),)
+
+                script_fn = os.path.join(self.build_temp, 'link-version-{}.map'.format(ext.name))
+                with open(script_fn, 'w') as f:
+                    f.write(text)
+                    # line below fixes gh-8680
+                    ext.extra_link_args = [arg for arg in ext.extra_link_args if not "version-script" in arg]
+                    ext.extra_link_args.append('-Wl,--version-script=' + script_fn)
+
+            # Allow late configuration
+            if hasattr(ext, '_pre_build_hook'):
+                ext._pre_build_hook(self, ext)
+
+            old_build_ext.build_extension(self, ext)
+
+        def __is_using_gnu_linker(self, ext):
+            if not sys.platform.startswith('linux'):
+                return False
+
+            # Fortran compilation with gfortran uses it also for
+            # linking. For the C compiler, we detect gcc in a similar
+            # way as distutils does it in
+            # UnixCCompiler.runtime_library_dir_option
+            if ext.language == 'f90':
+                is_gcc = (self._f90_compiler.compiler_type in ('gnu', 'gnu95'))
+            elif ext.language == 'f77':
+                is_gcc = (self._f77_compiler.compiler_type in ('gnu', 'gnu95'))
+            else:
+                is_gcc = False
+                if self.compiler.compiler_type == 'unix':
+                    cc = sysconfig.get_config_var("CC")
+                    if not cc:
+                        cc = ""
+                    compiler_name = os.path.basename(cc)
+                    is_gcc = "gcc" in compiler_name or "g++" in compiler_name
+            return is_gcc and sysconfig.get_config_var('GNULD') == 'yes'
+
+    return build_ext
+
 
 if __name__ == "__main__":
 
@@ -43,10 +95,12 @@ if __name__ == "__main__":
     with open(path.join(here, 'README.md'), encoding='utf-8') as f:
         long_description = f.read()
 
+    cmdclass = versioneer.get_cmdclass()
+
     metadata = dict(
         name="RedBlackGraph",
         version=versioneer.get_version(),
-        cmdclass=versioneer.get_cmdclass(),
+        cmdclass=cmdclass,
         maintainer = "Daniel Rapp",
         maintainer_email = "rappdw@gmail.com",
         description = 'Red Black Graph',
@@ -85,9 +139,10 @@ if __name__ == "__main__":
             ],
         },
         setup_requires=[
-            'numpy>=0.14.0',
+            'numpy>=0.18.1',
             'cython'
         ],
+        python_requires='>=3.6',
         scripts=[
             'scripts/rbgcf',
         ]
@@ -100,6 +155,15 @@ if __name__ == "__main__":
 
     if run_build:
         from numpy.distutils.core import setup
+
+        # Customize extension building
+        cmdclass['build_ext'] = get_build_ext_override()
+
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        if not os.path.exists(os.path.join(cwd, 'PKG-INFO')):
+            # Generate Cython sources, unless building from source release
+            generate_cython()
+
         metadata['configuration'] = configuration
     else:
         # Don't import numpy here - non-build actions are required to succeed

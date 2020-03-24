@@ -11,7 +11,7 @@ def configuration(parent_package='',top_path=None):
     config = Configuration('sparse',parent_package,top_path)
 
     # config.add_subpackage('linalg')
-    # config.add_subpackage('csgraph')
+    config.add_subpackage('csgraph')
 
     def get_sparsetools_sources(ext, build_dir):
         # Defer generation of source files
@@ -22,7 +22,7 @@ def configuration(parent_package='',top_path=None):
         return []
 
     depends = ['sparsetools_impl.h',
-               'rbm.h',
+               'rbm_math.h',
                'rbm_impl.h',
                'sparsetools.h']
     depends = [os.path.join('sparsetools', hdr) for hdr in depends],

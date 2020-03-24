@@ -3,6 +3,7 @@ import pytest
 import redblackgraph.reference as ref
 import redblackgraph.core as core
 import redblackgraph.sparse as sparse
+import redblackgraph.sparse.csgraph._rbg_math as csgraph
 
 @pytest.mark.parametrize(
     "product",
@@ -10,6 +11,7 @@ import redblackgraph.sparse as sparse
         (ref.avos_product),
         (core.avos_product),
         (sparse.avos_product),
+        (csgraph.py_avos_product)
     ]
 )
 def test_avos_product(product):
@@ -47,6 +49,7 @@ def test_avos_product(product):
         (ref.avos_sum),
         (core.avos_sum),
         (sparse.avos_sum),
+        (csgraph.py_avos_sum)
     ]
 )
 def test_avos_sum(sum):
@@ -73,6 +76,7 @@ def test_avos_sum(sum):
         (ref.avos_product),
         (core.avos_product),
         (sparse.avos_product),
+#        (csgraph.py_avos_product), # TODO: figure out fuesed type implementation
     ]
 )
 def test_edge_cases_product(product):
