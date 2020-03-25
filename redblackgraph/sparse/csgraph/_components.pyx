@@ -1,12 +1,18 @@
+import numpy as np
+cimport numpy as np
+
 import itertools as it
 
 from dataclasses import dataclass
+from redblackgraph.core.redblack import array as rb_array
 from typing import List
-from . import MSB
 from collections import defaultdict
 from typing import Dict, Optional, Sequence
 
-def find_components(A: Sequence[Sequence[int]], q:Optional[Dict[int, int]] = None) -> Sequence[int]:
+include 'parameters.pxi'
+include '_rbg_math.pxi'
+
+def find_components(A: rb_array, q:Optional[Dict[int, int]] = None) -> Sequence[int]:
     """
     Given an input adjacency matrix compute the connected components
     :param A: input adjacency matrix (this implementation assumes that it is transitively closed)
@@ -58,13 +64,14 @@ def find_components(A: Sequence[Sequence[int]], q:Optional[Dict[int, int]] = Non
         component_id += 1
     return component_for_vertex
 
-@dataclass
 class Components:
-    A: Sequence[Sequence[int]]
-    ids: Sequence[int]
-    rel_count: Sequence[int]
-    max_rel: Sequence[int]
-    size_map: Dict[int, int] # keyed by component id, valued by size of component
+
+    def __init__(self, A, ids, rel_count, max_rel, size_map):
+        self.A = A
+        self.ids = ids
+        self.rel_count = rel_count
+        self.max_rel = max_rel
+        self.size_map = size_map
 
     def get_ordering(self) -> List[int]:
         # This is the default sort ordering used by Traingularization

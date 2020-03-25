@@ -1,7 +1,9 @@
 from .generation import get_traversal_path
 from .rbg_math import avos_sum, avos_product, MSB
 from .components import find_components
-from .triangularization import find_components_extended, canonical_sort, triangularize, Components, Triangularization
+from .ordering import find_components_extended, avos_canonical_ordering, topological_ordering
+from ..types.ordering import Ordering
+from .components import Components
 from .transitive_closure import transitive_closure
 from .vec_avos import vec_avos
 from .mat_avos import mat_avos

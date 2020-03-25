@@ -1,9 +1,19 @@
-from redblackgraph.reference import find_components, find_components_extended, transitive_closure
+import redblackgraph.reference as ref
+import redblackgraph.sparse.csgraph as sparse
+import pytest
+
+from numpy.testing import assert_equal
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 
-
-def test_find_components():
+@pytest.mark.parametrize(
+    "transitive_closure,find_components,find_components_extended",
+    [
+        (ref.transitive_closure, ref.find_components, ref.find_components_extended),
+        (sparse.transitive_closure, sparse.find_components, sparse.find_components_extended)
+    ]
+)
+def test_find_components(transitive_closure, find_components, find_components_extended):
     A = [
         [-1, 0, 0, 0, 3, 2, 0, 0, 0, 0],
         [ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -31,7 +41,7 @@ def test_find_components():
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
     ]
 
-    assert A_star.tolist() == expected_transitive_closure
+    assert_equal(A_star, expected_transitive_closure)
 
     components = find_components(A_star)
     assert components == [0, 0, 0, 1, 0, 0, 0, 1, 1, 0]
@@ -42,7 +52,13 @@ def test_find_components():
     assert extended_components.size_map[0] == 7
     assert extended_components.size_map[1] == 3
 
-def test_find_components_use_case_2():
+@pytest.mark.parametrize(
+    "transitive_closure,find_components,find_components_extended",
+    [
+        (ref.transitive_closure, ref.find_components, ref.find_components_extended),
+    ]
+)
+def test_find_components_use_case_2(transitive_closure, find_components, find_components_extended):
     A = [[-1, 0, 0, 2, 0, 3, 0],
          [ 0,-1, 0, 0, 0, 0, 0],
          [ 2, 0, 1, 0, 0, 0, 0],
@@ -84,7 +100,13 @@ def test_find_components_dfs():
     assert components[0] == 2
     assert components[1].tolist() == [0, 1, 0, 0, 1, 0, 1]
 
-def test_ordering():
+@pytest.mark.parametrize(
+    "transitive_closure,find_components,find_components_extended",
+    [
+        (ref.transitive_closure, ref.find_components, ref.find_components_extended),
+    ]
+)
+def test_ordering(transitive_closure, find_components, find_components_extended):
     vertex_key = {0: (10, 'DWR'),
                    1: (11, 'LEJ'),
                    2: (0, 'ISR'),
