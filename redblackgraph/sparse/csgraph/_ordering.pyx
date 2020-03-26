@@ -1,15 +1,16 @@
-import itertools as it
 import numpy as np
+cimport numpy as np
+
+import itertools as it
 
 from collections import defaultdict
 from typing import Dict, List, Sequence
-from .components import find_components
-from .permutation import permute
-from .rbg_math import MSB
-
-from redblackgraph.reference.topological_sort import topological_sort
 from redblackgraph.types.ordering import Ordering
+from ._components import find_components
+from ._permutation import permute
 
+include 'parameters.pxi'
+include '_rbg_math.pxi'
 
 def _get_permutation(A: Sequence[Sequence[int]], q: Dict[int, int], ids: Sequence[int]) -> List[int]:
     # This is the default sort ordering used by Traingularization
@@ -51,23 +52,5 @@ def avos_canonical_ordering(A: Sequence[Sequence[int]]) -> Ordering:
 
     q = defaultdict(lambda: 0) # dictionary keyed by component id, value is count of vertices in componenet
     components = find_components(A, q)
-    perumutation =  _get_permutation(A, q, components)
+    perumutation = np.array(_get_permutation(A, q, components), dtype=ITYPE)
     return Ordering(permute(A, perumutation), perumutation)
-
-def topological_ordering(A: Sequence[Sequence[int]]) -> Ordering:
-    """
-    Relabel the graph so that the resultant Red Black adjacency matrix is upper triangular
-
-    This ordering is not canonical, it is only guaranteed to produce an upper
-    triangular representation. It does so by topologically sorting the graph (O(V+E)).
-
-    Whereas canonical_sort assumes that the input matrix is transitively closed,
-    this version does not.
-    :param A: input red black adjacency matrix
-    :return: an upper triangular matrix that is symmetrical to A (a relabeling of the graph vertices)
-    """
-
-    # step 1: determine topological ordering of nodes in the graph
-    ordering = topological_sort(A)
-    # step 2: permute the matrix and return triangularization
-    return Ordering(permute(A, ordering), ordering)
