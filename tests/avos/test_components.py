@@ -44,7 +44,7 @@ def test_find_components(transitive_closure, find_components):
     assert_equal(A_star, expected_transitive_closure)
 
     components = find_components(A_star)
-    assert components == [0, 0, 0, 1, 0, 0, 0, 1, 1, 0]
+    assert_equal(components, [0, 0, 0, 1, 0, 0, 0, 1, 1, 0])
 
 @pytest.mark.parametrize(
     "transitive_closure,find_components",
@@ -74,7 +74,7 @@ def test_find_components_use_case_2(transitive_closure, find_components):
     assert A_star.tolist() == expected_transitive_closure
 
     components = find_components(A_star)
-    assert components == [0, 1, 0, 0, 1, 0, 1]
+    assert_equal(components, [0, 1, 0, 0, 1, 0, 1])
 
 def test_find_components_dfs():
     A = [[-1, 0, 0, 2, 0, 3, 0],

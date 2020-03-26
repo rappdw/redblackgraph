@@ -82,7 +82,7 @@ if __name__ == '__main__':
     if graph.shape[0] >= MAX_COLUMNS_EXCEL:
         logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({graph.shape[0]} vertices)")
     if graph.shape[0] >= MAX_PRACTICAL_SIZE:
-        logger.warning(f"This graph is on the large size ({graph.shape[0]}). Processing times for graphs in excess of {MAX_PRACTICAL_SIZE} nodes are noticably slower.")
+        logger.warning(f"This graph is on the large size ({graph.shape[0]}). It will take a few seconds more to write the xlsx file.")
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")
 

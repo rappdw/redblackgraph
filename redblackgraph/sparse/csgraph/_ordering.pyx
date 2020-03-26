@@ -1,9 +1,6 @@
 import numpy as np
 cimport numpy as np
 
-import itertools as it
-
-from collections import defaultdict
 from typing import Dict, List, Sequence
 from redblackgraph.types.ordering import Ordering
 from ._components import find_components
@@ -21,14 +18,17 @@ def _get_permutation(A: Sequence[Sequence[int]], q: Dict[int, int], ids: Sequenc
     #   * max ancestor: ascending
     #   * color: descending
     #   * vertex_id: ascending
-    n = len(A)
-    max_rel_for_vertex = np.zeros((n), dtype=np.int32)
-    ancester_count_for_vertex = np.zeros((n), dtype=np.int32)
+    cdef unsigned int n = len(A)
+    cdef DTYPE_t[:] max_rel_for_vertex = np.zeros((n), dtype=np.int32)
+    cdef DTYPE_t[:] ancester_count_for_vertex = np.zeros((n), dtype=np.int32)
+    cdef DTYPE_t[:, :] Am = A
     vertices = range(n)
     for i in vertices:
-        for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices):
-            max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
-            ancester_count_for_vertex[i] += MSB(A[i][j])
+        for j in vertices:
+            if Am[i][j]:
+                ancester_count_for_vertex[i] += MSB(Am[i][j])
+            if Am[j][i]:
+                max_rel_for_vertex[i] = max(max_rel_for_vertex[i], Am[j][i])
 
     basis = [i for i in range(len(ids))]
     # sort descending on size of component and "ancestor count", ascending on all other elements
@@ -50,7 +50,7 @@ def avos_canonical_ordering(A: Sequence[Sequence[int]]) -> Ordering:
     :return: an upper triangular matrix that is isomorphic to A
     """
 
-    q = defaultdict(lambda: 0) # dictionary keyed by component id, value is count of vertices in componenet
+    q = dict() # dictionary keyed by component id, value is count of vertices in component
     components = find_components(A, q)
     perumutation = np.array(_get_permutation(A, q, components), dtype=ITYPE)
     return Ordering(permute(A, perumutation), perumutation)

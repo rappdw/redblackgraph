@@ -18,6 +18,9 @@ cdef DTYPE_t _permute(np.ndarray[DTYPE_t, ndim=2, mode='c'] A, np.ndarray[DTYPE_
     cdef unsigned int i, j, start, N = B.shape[0]
     assert B.shape[1] == N
     assert p.shape[0] == N
+    cdef DTYPE_t[:, :] Am = A
+    cdef DTYPE_t[:, :] Bm = B
+    cdef ITYPE_t[:] pm = p
 
     for i in range(N):
         if assume_upper_triangular:
@@ -26,4 +29,4 @@ cdef DTYPE_t _permute(np.ndarray[DTYPE_t, ndim=2, mode='c'] A, np.ndarray[DTYPE_
             start = 0
 
         for j in range(start, N):
-            B[i][j] = A[p[i]][p[j]]
+            Bm[i][j] = Am[pm[i]][pm[j]]

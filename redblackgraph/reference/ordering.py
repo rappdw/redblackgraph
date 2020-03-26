@@ -1,4 +1,3 @@
-import itertools as it
 import numpy as np
 
 from collections import defaultdict
@@ -25,9 +24,11 @@ def _get_permutation(A: Sequence[Sequence[int]], q: Dict[int, int], ids: Sequenc
     ancester_count_for_vertex = np.zeros((n), dtype=np.int32)
     vertices = range(n)
     for i in vertices:
-        for j in it.filterfalse(lambda x: (A[i][x] == 0 and A[x][i] == 0) or x == i, vertices):
-            max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
-            ancester_count_for_vertex[i] += MSB(A[i][j])
+        for j in vertices:
+            if A[i][j]:
+                ancester_count_for_vertex[i] += MSB(A[i][j])
+            if A[j][i]:
+                max_rel_for_vertex[i] = max(max_rel_for_vertex[i], A[j][i])
 
     basis = [i for i in range(len(ids))]
     # sort descending on size of component and "ancestor count", ascending on all other elements
