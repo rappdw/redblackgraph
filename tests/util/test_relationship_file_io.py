@@ -1,7 +1,8 @@
 import os
 import tempfile
 import redblackgraph as rb
-from redblackgraph.reference.triangularization import canonical_sort
+from redblackgraph.sparse.csgraph import transitive_closure
+from redblackgraph.reference.ordering import avos_canonical_ordering
 
 def test_rel_file():
     test_persons_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.vertices.csv")
@@ -20,8 +21,8 @@ def test_rel_file():
         writer.write(graph, output_file=tmpfile)
         assert os.path.isfile(tmpfile)
 
-        R_star = rb.sparse.csgraph.shortest_path(graph, method='D', directed=True, overwrite=False)
-        R_cannonical = canonical_sort(R_star)
+        R_star = transitive_closure(graph).W
+        R_cannonical = avos_canonical_ordering(R_star)
 
         tmpfile_cannonical = os.path.join(tmpdir, 'test_file_cannonical.xlsx')
         writer.write(R_cannonical.A, output_file=tmpfile_cannonical, key_permutation=R_cannonical.label_permutation)

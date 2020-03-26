@@ -110,6 +110,8 @@ def shortest_path(csgraph, method='auto',
         predecessors[i, j] gives the index of the previous node in the
         path from point i to point j.  If no path exists between point
         i and j, then predecessors[i, j] = -9999
+    diameter : DTYPE
+        The diameter of the graph
 
     Raises
     ------
@@ -250,6 +252,9 @@ def floyd_warshall(csgraph, directed=True,
         path from point i to point j.  If no path exists between point
         i and j, then predecessors[i, j] = -9999
 
+    diameter : DTYPE
+        The diameter of the graph
+
     Raises
     ------
     NegativeCycleError:
@@ -304,7 +309,8 @@ def floyd_warshall(csgraph, directed=True,
     else:
         predecessor_matrix = np.empty((0, 0), dtype=ITYPE)
 
-    _floyd_warshall_avos(dist_matrix)
+    cdef DTYPE_t diameter = 0
+    diameter = _floyd_warshall_avos(dist_matrix)
     # _floyd_warshall(dist_matrix,
     #                 predecessor_matrix,
     #                 int(directed))
@@ -314,12 +320,13 @@ def floyd_warshall(csgraph, directed=True,
     #                              % np.where(dist_matrix.diagonal() < 0)[0])
 
     if return_predecessors:
-        return dist_matrix, predecessor_matrix
+        return dist_matrix, predecessor_matrix, diameter
     else:
-        return dist_matrix
+        return dist_matrix, diameter
 
 @cython.boundscheck(False)
-cdef void _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix):
+cdef DTYPE_t _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix):
+    cdef DTYPE_t diameter = 0
     cdef int N = dist_matrix.shape[0]
     cdef unsigned int i, j, k
     cdef DTYPE_t d_ijk
@@ -330,6 +337,8 @@ cdef void _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix
                 if i == j and not (d_ijk == -1 or d_ijk == 0 or d_ijk == 1):
                     raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dist_matrix[i][k]}, A({k},{j})={dist_matrix[k][j]}")
                 dist_matrix[i, j] = avos_sum(dist_matrix[i][j], d_ijk)
+                diameter = max(diameter, dist_matrix[i, j])
+    return MSB(diameter)
 
 @cython.boundscheck(False)
 cdef void _floyd_warshall(
@@ -477,6 +486,9 @@ def dijkstra(csgraph, directed=True, indices=None,
         will be equal to that index (i.e. the fastest way to reach
         node i, is to start on node i).
 
+    diameter : DTYPE
+        The diameter of the graph
+
     Notes
     -----
     As currently implemented, Dijkstra's algorithm does not work for
@@ -580,6 +592,7 @@ def dijkstra(csgraph, directed=True, indices=None,
     else:
         csr_data = csgraph.data
 
+    cdef DTYPE_t diameter = 0
     if directed:
         if min_only:
             _dijkstra_directed_multi(indices,
@@ -588,9 +601,9 @@ def dijkstra(csgraph, directed=True, indices=None,
                                      dist_matrix, predecessor_matrix,
                                      source_matrix, limitf)
         else:
-            _dijkstra_directed(indices,
-                               csr_data, csgraph.indices, csgraph.indptr,
-                               dist_matrix, predecessor_matrix, limitf)
+            diameter = _dijkstra_directed(indices,
+                                          csr_data, csgraph.indices, csgraph.indptr,
+                                          dist_matrix, predecessor_matrix, limitf)
     else:
         csgraphT = csgraph.T.tocsr()
         if unweighted:
@@ -615,12 +628,15 @@ def dijkstra(csgraph, directed=True, indices=None,
         if min_only:
             return (dist_matrix.reshape(return_shape),
                     predecessor_matrix.reshape(return_shape),
-                    source_matrix.reshape(return_shape))
+                    source_matrix.reshape(return_shape),
+                    diameter)
         else:
             return (dist_matrix.reshape(return_shape),
-                    predecessor_matrix.reshape(return_shape))
+                    predecessor_matrix.reshape(return_shape),
+                    diameter)
     else:
-        return dist_matrix.reshape(return_shape)
+        return (dist_matrix.reshape(return_shape),
+                diameter)
 
 @cython.boundscheck(False)
 cdef _dijkstra_setup_heap_multi(FibonacciHeap *heap,
@@ -726,7 +742,7 @@ cdef _dijkstra_scan_heap(FibonacciHeap *heap,
                         pred[i, j_current] = v.index
 
 @cython.boundscheck(False)
-cdef _dijkstra_directed(
+cdef DTYPE_t _dijkstra_directed(
             const int[:] source_indices,
             const int[:] csr_weights,
             const int[:] csr_indices,
@@ -735,6 +751,7 @@ cdef _dijkstra_directed(
             int[:, :] pred,
             DTYPE_t limit):
     cdef:
+        DTYPE_t diameter = 0
         unsigned int Nind = dist_matrix.shape[0]
         unsigned int N = dist_matrix.shape[1]
         unsigned int i, k, j_source, j_current
@@ -772,8 +789,10 @@ cdef _dijkstra_directed(
 
             # v has now been scanned: add the distance to the results
             dist_matrix[i, v.index] = v.val
+            diameter = max(diameter, v.val)
 
     free(nodes)
+    return MSB(diameter)
 
 @cython.boundscheck(False)
 cdef _dijkstra_directed_multi(

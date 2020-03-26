@@ -1,6 +1,6 @@
 import numpy as np
 import redblackgraph as rb
-from redblackgraph.reference import triangularize
+from redblackgraph.reference import topological_ordering
 from numpy.testing import assert_equal
 import pytest
 
@@ -351,7 +351,7 @@ def test_triangularization():
                   [ 0, 0, 0, 0, 0, 0, 1]
                   ])
     A_star: rb.array = R.transitive_closure().W
-    A_cannonical = triangularize(A_star)
+    A_cannonical = topological_ordering(A_star)
     assert A_cannonical.label_permutation is not None
     for row in range(len(A_cannonical.A)):
         for col in range(row):

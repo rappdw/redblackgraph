@@ -1,10 +1,11 @@
 import numpy as np
-from scipy.sparse import csr_matrix, isspmatrix, isspmatrix_csc
+from scipy.sparse import isspmatrix, isspmatrix_csc
 from ._tools import csgraph_to_dense, csgraph_from_dense,\
     csgraph_masked_from_dense, csgraph_from_masked
 from redblackgraph.sparse import rb_matrix
+from redblackgraph.core import array as rb_array
 
-DTYPE = np.int32 # this should be the same as the definition in parameters.pxi
+DTYPE = np.int32  # this should be the same as the definition in parameters.pxi
 
 
 def validate_graph(csgraph, directed, dtype=DTYPE,
@@ -25,7 +26,7 @@ def validate_graph(csgraph, directed, dtype=DTYPE,
         if csr_output:
             csgraph = rb_matrix(csgraph, dtype=dtype, copy=copy_if_sparse)
         else:
-            csgraph = csgraph_to_dense(csgraph, null_value=null_value_out)
+            csgraph = csgraph_to_dense(csgraph, null_value=null_value_out).view(rb_array)
     elif np.ma.isMaskedArray(csgraph):
         if dense_output:
             mask = csgraph.mask

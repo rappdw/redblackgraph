@@ -225,7 +225,7 @@ class RedBlackGraphWriter:
         n = R.shape[0] if isinstance(R, rb.sparse.rb_matrix) else len(R)
         if n > MAX_COLUMNS_EXCEL:
             logging.error("Graph exceeds max size allowable by Excel")
-        if not key_permutation:
+        if key_permutation is None:
             key_permutation = np.arange(n)
 
         max_key = 0

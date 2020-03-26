@@ -12,6 +12,18 @@ def configuration(parent_package='', top_path=None):
                          sources=['_rbg_math.c'],
                          include_dirs=[numpy.get_include()])
 
+    config.add_extension('_components',
+                         sources=['_components.c'],
+                         include_dirs=[numpy.get_include()])
+
+    config.add_extension('_permutation',
+                         sources=['_permutation.c'],
+                         include_dirs=[numpy.get_include()])
+
+    config.add_extension('_ordering',
+                         sources=['_ordering.c'],
+                         include_dirs=[numpy.get_include()])
+
     # config.add_extension('_traversal',
     #                      sources=['_traversal.c'],
     #                      include_dirs=[numpy.get_include()])

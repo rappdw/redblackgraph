@@ -1,5 +1,5 @@
 from numpy.testing import assert_equal
-from redblackgraph.reference import canonical_sort, triangularize, transitive_closure
+from redblackgraph.reference import avos_canonical_ordering, topological_ordering, transitive_closure
 
 def test_triangularize_via_topological_sort():
     A = [[-1, 0, 0, 2, 0, 3, 0],
@@ -10,7 +10,7 @@ def test_triangularize_via_topological_sort():
          [ 0, 0, 0, 0, 0, 1, 0],
          [ 0, 0, 0, 0, 0, 0, 1]]
 
-    A_triangle = triangularize(A)
+    A_triangle = topological_ordering(A)
     assert_equal(A_triangle.label_permutation, [4, 6, 2, 1, 0, 3, 5])
 
     expected = [[-1, 3, 0, 2, 0, 0, 0],
@@ -31,7 +31,7 @@ def test_triangularization():
          [ 0, 0, 0, 0, 0, 1, 0],
          [ 0, 0, 0, 0, 0, 0, 1]]
     A_star = transitive_closure(A).W
-    A_star_canonical = canonical_sort(A_star)
+    A_star_canonical = avos_canonical_ordering(A_star)
     expected_canonical = [[ 1, 2, 4, 5, 0, 0, 0],
                           [ 0,-1, 2, 3, 0, 0, 0],
                           [ 0, 0,-1, 0, 0, 0, 0],

@@ -1,8 +1,8 @@
 """RedBlack matrix"""
 
 import numpy as np
-from ._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
-from redblackgraph.reference import Triangularization
+from redblackgraph.sparse._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
+from ..types.ordering import Ordering
 from scipy.sparse.csr import csr_matrix
 from scipy.sparse.sputils import (get_index_dtype, upcast)
 
@@ -83,7 +83,7 @@ class rb_matrix(csr_matrix):
         '''
         pass
 
-    def triangularize(self) -> Triangularization:
+    def triangularize(self) -> Ordering:
         pass
 
     def rc(self, u, v, color):

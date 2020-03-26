@@ -1,9 +1,16 @@
+import numpy as np
+cimport numpy as np
+
 import itertools as it
 
+from redblackgraph.core.redblack import array as rb_array
 from collections import defaultdict
 from typing import Dict, Optional, Sequence
 
-def find_components(A: Sequence[Sequence[int]], q:Optional[Dict[int, int]] = None) -> Sequence[int]:
+include 'parameters.pxi'
+include '_rbg_math.pxi'
+
+def find_components(A: rb_array, q:Optional[Dict[int, int]] = None) -> Sequence[int]:
     """
     Given an input adjacency matrix compute the connected components
     :param A: input adjacency matrix (this implementation assumes that it is transitively closed)
