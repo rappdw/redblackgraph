@@ -1,14 +1,23 @@
+import numpy as np
 import redblackgraph.reference as ref
 import redblackgraph.sparse.csgraph as sparse
 import pytest
 
+from numpy.testing import assert_equal
+
 from collections import defaultdict
+
+def find_components(A, q):
+    return sparse.find_components(np.array(A, dtype=np.int32), q)
+
+def get_permutation(A, q, components):
+    return sparse._get_permutation(np.array(A, dtype=np.int32), q, components)
 
 @pytest.mark.parametrize(
     "transitive_closure,find_components,get_permutation",
     [
         (ref.transitive_closure, ref.find_components, ref.ordering._get_permutation),
-        (sparse.transitive_closure, sparse.find_components, sparse._get_permutation),
+        (sparse.transitive_closure, find_components, get_permutation),
     ]
 )
 def test_ordering(transitive_closure, find_components, get_permutation):
@@ -58,10 +67,10 @@ def test_ordering(transitive_closure, find_components, get_permutation):
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1]
     ]
-    q = defaultdict(lambda: 0) # dictionary keyed by component id, value is count of vertices in componenet
+    q = dict() # dictionary keyed by component id, value is count of vertices in componenet
     components = find_components(A, q)
     #vertices =                    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21]
-    assert components ==       [ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] # which component does a vertex belong to
+    assert_equal(components,       [ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]) # which component does a vertex belong to
     assert q[0] == 19
     assert q[1] == 3
 

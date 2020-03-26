@@ -1,4 +1,5 @@
 import itertools as it
+import numpy as np
 
 from collections import defaultdict
 from typing import Dict, Optional, Sequence
@@ -19,38 +20,35 @@ def find_components(A: Sequence[Sequence[int]], q:Optional[Dict[int, int]] = Non
     # This is our algorithm:
     #
     # Allocate an array that will represent the component for each vertex
-    # Allocate a set that contains the vertices visited
-    # Iterate over each row not in the visited vertices:
-    #   This is a new component, so increment the component id and assign the vertex of the current row to that id
-    #   Allocate a set that holds vertices that will be added to this component
-    #   In a given row, iterate over the columns not in the visited vertices (since this is a new component,
-    #   no columns will be in the visited vertices):
-    #     Any non-zero columns in that row will be assigned to the row component and added to the set of added vertices
-    #
+    # Allocate an array that will represent the vertices that have been visited
+    # Iterate over each vertex that hasn't been visited:
+    #   This is a new component, so increment the component id
+    #   Allocate a set to hold ids to be added to this component
+    #   Add the current vertex to this set
+    #   while the set is not empty
+    #     pull a vextex from the set
+    #     add it to the current component
+    #     For each non-zero cell in the vertex's row and column add those vertices to the set for this component
 
     n = len(A)
     if q is None:
         q = defaultdict(lambda: 0)
-    component_for_vertex = [0] * n
     vertices = range(n)
-    visited_vertices = set()
+    component_for_vertex = np.zeros((n), dtype=np.uint32)
+    visited_vertices = np.zeros((n), dtype=np.bool_)
     component_id = 0
-    for i in it.filterfalse(lambda x: x in visited_vertices, vertices):
+    for i in it.filterfalse(lambda x: visited_vertices[x], vertices):
         vertices_added_to_component = set()
         vertex_count = 0
         vertices_added_to_component.add(i)
         while vertices_added_to_component:
             vertex = vertices_added_to_component.pop()
             vertex_count += 1
-            visited_vertices.add(vertex)
+            visited_vertices[vertex] = True
             component_for_vertex[vertex] = component_id
-            for j in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[vertex][x] == 0 or x == vertex, vertices):
-                vertices_added_to_component.add(j)
-                for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][j] == 0 or x == j, vertices):
-                    vertices_added_to_component.add(k)
-            # now we need to iterate the vertex's column
-            for k in it.filterfalse(lambda x: x in visited_vertices or x in vertices_added_to_component or A[x][vertex] == 0 or x == vertex, vertices):
-                vertices_added_to_component.add(k)
+            for j in vertices:
+                if not ((A[vertex][j] == 0 and A[j][vertex] == 0) or visited_vertices[j] or j in vertices_added_to_component):
+                    vertices_added_to_component.add(j)
         q[component_id] = vertex_count
         component_id += 1
     return component_for_vertex
