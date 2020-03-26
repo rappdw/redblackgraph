@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+cimport cython
 
 include 'parameters.pxi'
 include '_rbg_math.pxi'
@@ -14,6 +15,8 @@ def permute(A, p, assume_upper_triangular=False):
     _permute(A, B, p, assume_upper_triangular)
     return B
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef DTYPE_t _permute(np.ndarray[DTYPE_t, ndim=2, mode='c'] A, np.ndarray[DTYPE_t, ndim=2, mode='c'] B, np.ndarray[ITYPE_t, ndim=1, mode='c'] p, bint assume_upper_triangular):
     cdef unsigned int i, j, start, N = B.shape[0]
     assert B.shape[1] == N

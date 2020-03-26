@@ -231,16 +231,17 @@ class RedBlackGraphWriter:
         max_key = 0
         max_np = 0
 
-        if self.vertex_key:
-            worksheet.write(0, 0, ' ')
-            for idx in range(n):
+        worksheet.write(0, 0, ' ')
+        for idx in range(n):
+            if self.vertex_key:
                 vertex_key = self.vertex_key[key_permutation[idx]]
                 cell_data = f"{vertex_key[0]} - {vertex_key[1]}"
-                max_key = max(max_key, len(cell_data))
-                worksheet.write(0, idx + 1, cell_data, formats[ROTATE_90])
-                worksheet.write(idx + 1, 0, cell_data)
+            else:
+                cell_data = f"{idx}"
+            max_key = max(max_key, len(cell_data))
+            worksheet.write(0, idx + 1, cell_data, formats[ROTATE_90])
+            worksheet.write(idx + 1, 0, cell_data)
 
-        logger.debug(f"Graph size: {n}")
         if isinstance(R, rb.sparse.rb_matrix):
             for i, j in zip(*R.nonzero()):
                 cell_data = R[i, j]

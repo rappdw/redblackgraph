@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+cimport cython
 
 from redblackgraph.core.redblack import array as rb_array
 from typing import Dict, Optional, Sequence
@@ -7,6 +8,8 @@ from typing import Dict, Optional, Sequence
 include 'parameters.pxi'
 include '_rbg_math.pxi'
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def find_components(A: rb_array, q:Optional[Dict[int, int]] = None) -> Sequence[int]:
     """
     Given an input adjacency matrix compute the connected components

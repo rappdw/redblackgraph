@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+cimport cython
 
 from typing import Dict, List, Sequence
 from redblackgraph.types.ordering import Ordering
@@ -9,6 +10,8 @@ from ._permutation import permute
 include 'parameters.pxi'
 include '_rbg_math.pxi'
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def _get_permutation(A: Sequence[Sequence[int]], q: Dict[int, int], ids: Sequence[int]) -> List[int]:
     # This is the default sort ordering used by Traingularization
     # it sorts by:
