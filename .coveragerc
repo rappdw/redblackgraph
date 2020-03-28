@@ -1,11 +1,15 @@
 [run]
 branch = True
 omit =
-    */__config__.py,
-    */setup.py,
-    */_version.py,
-    */generate_sparsetools.py,
-
+    redblackgraph/tests/*,
+    redblackgraph/_version.py,
+    redblackgraph/sparse/generate_sparsetools.py,
+    redblackgraph/core/setup.py,
+    redblackgraph/setup.py,
+    redblackgraph/sparse/setup.py,
+    redblackgraph/core/__init__.py
+    redblackgraph/sparse/csgraph/setup.py
+    
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
