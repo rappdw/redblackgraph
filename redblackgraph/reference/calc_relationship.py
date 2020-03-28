@@ -3,6 +3,23 @@ from redblackgraph.types.relationship import Relationship
 from redblackgraph.reference import MSB
 
 
+
+def cousinth(generational):
+    if generational == 2:
+        return "1st cousin"
+    if generational == 3:
+        return "2nd cousin"
+    if generational == 4:
+        return "3rd cousin"
+    return f"{generational - 1}th cousin"
+
+def grandparentith(removal):
+    if removal == 4:
+        return "2nd"
+    if removal == 5:
+        return "3rd"
+    return f"{removal-2}th"
+
 def lookup_relationship(da: int, db: int) -> str:
     '''
     This is a very rudimentary implementation of a Consanguinity lookup and doesn't handle many
@@ -20,11 +37,18 @@ def lookup_relationship(da: int, db: int) -> str:
             return "grandparent"
         if removal == 3:
             return "great grandparent"
-        return f"{removal - 2} great grandparent"
+        return f"{grandparentith(removal)} great grandparent"
     else:
-        # cousin
         generational = min(da, db)
-        return f"{generational - 1} cousin {removal} removed"
+        if generational == 1 and removal == 0:
+            # sibling
+            return "sibling"
+        if generational == 1 and removal == 1:
+            # parent's sibling
+            return "aunt/uncle"
+        if removal == 0:
+            return cousinth(generational)
+        return f"{cousinth(generational)} {removal} removed"
 
 
 def calculate_relationship(a: Sequence[int], b: Sequence[int]) -> Relationship:
