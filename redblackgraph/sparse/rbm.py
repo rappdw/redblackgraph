@@ -2,7 +2,6 @@
 
 import numpy as np
 from redblackgraph.sparse._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
-from ..types.ordering import Ordering
 from scipy.sparse.csr import csr_matrix
 from scipy.sparse.sputils import (get_index_dtype, upcast)
 
@@ -57,43 +56,40 @@ class rb_matrix(csr_matrix):
                          indptr, indices, data)
 
         return self.__class__((data, indices, indptr), shape=(M, N))
-
-    def vertex_relational_composition(self, u, v, c, compute_closure=False):
-        '''
-        Given simple row vector u, and simple column vector v where
-        u, v represent a vertex, lambda, not currently represented in self, compose R_{lambda}
-        which is the transitive closure for this graph with lambda included
-        :param u: simple row vector for new vertex, lambda
-        :param v: simple column vector for new vertex, lambda
-        :param c: color of the new vertex, either -1 or 1
-        :param compute_closure: if True, compute the closure of R prior to performing the relational composition
-        :return: transitive closure for Red BLack graph with lambda
-        '''
-        pass
-
-    def edge_relational_composition(self, alpha, beta, relationship, compute_closure=False):
-        '''
-        Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
-        compose R_{lambda} which is the transitive closure for this graph with the edge added
-        :param alpha: index in self that is the source of relationship np
-        :param beta: index in self that is the targe of relationship np
-        :param relationship: r(alpha, beta)
-        :param compute_closure: if True, compute the closure of R prior to performing the relational composition
-        :return: transitive closure for Red BLack graph with lambda, new_diameter
-        '''
-        pass
-
-    def triangularize(self) -> Ordering:
-        pass
-
-    def rc(self, u, v, color):
-        '''
-        rc or Relational Composition is the mechanism used to add a new node
-        into a Red/Black Graph. (See README.md)
-
-        Keyword arguments:
-        u -- *simple* row vector
-        v -- *simple* column vector
-        color -- the coloring of the new node
-        '''
-        pass
+    #
+    # def vertex_relational_composition(self, u, v, c, compute_closure=False):
+    #     '''
+    #     Given simple row vector u, and simple column vector v where
+    #     u, v represent a vertex, lambda, not currently represented in self, compose R_{lambda}
+    #     which is the transitive closure for this graph with lambda included
+    #     :param u: simple row vector for new vertex, lambda
+    #     :param v: simple column vector for new vertex, lambda
+    #     :param c: color of the new vertex, either -1 or 1
+    #     :param compute_closure: if True, compute the closure of R prior to performing the relational composition
+    #     :return: transitive closure for Red BLack graph with lambda
+    #     '''
+    #     pass
+    #
+    # def edge_relational_composition(self, alpha, beta, relationship, compute_closure=False):
+    #     '''
+    #     Given simple two vertex indices, alpha and beta, along with the relationship ({2, 3}),
+    #     compose R_{lambda} which is the transitive closure for this graph with the edge added
+    #     :param alpha: index in self that is the source of relationship np
+    #     :param beta: index in self that is the targe of relationship np
+    #     :param relationship: r(alpha, beta)
+    #     :param compute_closure: if True, compute the closure of R prior to performing the relational composition
+    #     :return: transitive closure for Red BLack graph with lambda, new_diameter
+    #     '''
+    #     pass
+    #
+    # def rc(self, u, v, color):
+    #     '''
+    #     rc or Relational Composition is the mechanism used to add a new node
+    #     into a Red/Black Graph. (See README.md)
+    #
+    #     Keyword arguments:
+    #     u -- *simple* row vector
+    #     v -- *simple* column vector
+    #     color -- the coloring of the new node
+    #     '''
+    #     pass
