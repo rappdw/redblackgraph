@@ -4,7 +4,7 @@ __all__ = []
 
 from .rbm import rb_matrix
 from .avos import *
-from . import csgraph
+from .csgraph import *
 
 __all__ += ['rb_matrix']
 __all__ += avos.__all__
