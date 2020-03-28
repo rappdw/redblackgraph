@@ -17,7 +17,8 @@ def get_permutation(A, q, components):
     "transitive_closure,find_components,get_permutation",
     [
         (ref.transitive_closure, ref.find_components, ref.ordering._get_permutation),
-        (sparse.transitive_closure, find_components, get_permutation),
+        (sparse.transitive_closure_floyd_warshall, find_components, get_permutation),
+        (sparse.transitive_closure_dijkstra, find_components, get_permutation),
     ]
 )
 def test_ordering(transitive_closure, find_components, get_permutation):

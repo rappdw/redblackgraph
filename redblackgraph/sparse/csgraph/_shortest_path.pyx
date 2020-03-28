@@ -296,9 +296,9 @@ def floyd_warshall(csgraph, directed=True,
     dist_matrix = validate_graph(csgraph, directed, DTYPE,
                                  csr_output=False,
                                  copy_if_dense=not overwrite)
-    if not isspmatrix(csgraph):
-        # for dense array input, zero entries represent non-edge
-        dist_matrix[dist_matrix == 0] = INFINITY
+    # if not isspmatrix(csgraph):
+    #     # for dense array input, zero entries represent non-edge
+    #     dist_matrix[dist_matrix == 0] = INFINITY
 
     if unweighted:
         dist_matrix[~np.isinf(dist_matrix)] = 1
@@ -325,19 +325,20 @@ def floyd_warshall(csgraph, directed=True,
         return dist_matrix, diameter
 
 @cython.boundscheck(False)
-cdef DTYPE_t _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix):
+cdef DTYPE_t _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_matrix) except -1:
     cdef DTYPE_t diameter = 0
     cdef int N = dist_matrix.shape[0]
     cdef unsigned int i, j, k
     cdef DTYPE_t d_ijk
+    cdef DTYPE_t[:, :] dm = dist_matrix
     for k in range(N):
         for i in range(N):
             for j in range(N):
-                d_ijk = avos_product(dist_matrix[i, k], dist_matrix[k, j])
+                d_ijk = avos_product(dm[i, k], dm[k, j])
                 if i == j and not (d_ijk == -1 or d_ijk == 0 or d_ijk == 1):
-                    raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dist_matrix[i][k]}, A({k},{j})={dist_matrix[k][j]}")
-                dist_matrix[i, j] = avos_sum(dist_matrix[i][j], d_ijk)
-                diameter = max(diameter, dist_matrix[i, j])
+                    raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dm[i][k]}, A({k},{j})={dm[k][j]}")
+                dm[i, j] = avos_sum(dm[i][j], d_ijk)
+                diameter = max(diameter, dm[i, j])
     return MSB(diameter)
 
 @cython.boundscheck(False)
@@ -749,7 +750,7 @@ cdef DTYPE_t _dijkstra_directed(
             const int[:] csr_indptr,
             int[:, :] dist_matrix,
             int[:, :] pred,
-            DTYPE_t limit):
+            DTYPE_t limit) except -1:
     cdef:
         DTYPE_t diameter = 0
         unsigned int Nind = dist_matrix.shape[0]
@@ -788,6 +789,8 @@ cdef DTYPE_t _dijkstra_directed(
                                 pred, return_pred, limit, i)
 
             # v has now been scanned: add the distance to the results
+            if i != v.index and dist_matrix[v.index, i] != 0:
+                raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself.")
             dist_matrix[i, v.index] = v.val
             diameter = max(diameter, v.val)
 

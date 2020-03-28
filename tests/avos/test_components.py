@@ -10,7 +10,8 @@ from scipy.sparse.csgraph import connected_components
     "transitive_closure,find_components",
     [
         (ref.transitive_closure, ref.find_components),
-        (sparse.transitive_closure, sparse.find_components)
+        (sparse.transitive_closure_floyd_warshall, sparse.find_components),
+        (sparse.transitive_closure_dijkstra, sparse.find_components)
     ]
 )
 def test_find_components(transitive_closure, find_components):
@@ -50,7 +51,8 @@ def test_find_components(transitive_closure, find_components):
     "transitive_closure,find_components",
     [
         (ref.transitive_closure, ref.find_components),
-        (sparse.transitive_closure, sparse.find_components),
+        (sparse.transitive_closure_floyd_warshall, sparse.find_components),
+        (sparse.transitive_closure_dijkstra, sparse.find_components),
     ]
 )
 def test_find_components_use_case_2(transitive_closure, find_components):

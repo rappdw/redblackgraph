@@ -1,4 +1,13 @@
 import redblackgraph as rb
+import redblackgraph.reference as ref
+import redblackgraph.sparse as sparse
+from redblackgraph.util.capture import capture
+
+import pytest
+
+def core_transitive_closure(A):
+    A = rb.array(A)
+    return A.transitive_closure()
 
 def test_relational_composition():
     # test simple avos matmul
@@ -19,7 +28,16 @@ def test_relational_composition():
     except ValueError as e:
         assert str(e) == 'Relational composition would result in a cycle. Idx: 0, u_i: 6, v_i: 9'
 
-def test_reference_impl():
+@pytest.mark.parametrize(
+    "transitive_closure",
+    [
+        (ref.transitive_closure),
+        (core_transitive_closure),
+        (sparse.transitive_closure_dijkstra),
+        (sparse.transitive_closure_floyd_warshall),
+    ]
+)
+def test_apsp_detection(transitive_closure):
     # test transitive closure loop detection
     A = [[-1,  2,  3,  0,  0],
          [ 0, -1,  0,  2,  0],
@@ -27,21 +45,8 @@ def test_reference_impl():
          [ 0,  0,  0, -1,  3],
          [ 2,  0,  0,  0,  1]]
     try:
-        _ = rb.reference.transitive_closure(A).W
+        B = transitive_closure(A).W
+        print(capture(B))
         assert False
     except ValueError as e:
-        assert str(e) == 'Error: cycle detected! Vertex 4 has a path to itself. A(4,3)=8, A(3,4)=3'
-
-def test_numpy_impl():
-    # test transitive closure loop detection
-    A = rb.array([[-1,  2,  3,  0,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  3],
-                  [ 2,  0,  0,  0,  1]])
-    try:
-        _ = A.transitive_closure().W
-        assert False
-    except ValueError as e:
-        assert str(e) == 'Error: cycle detected! Vertex 3 has a path to itself. A(3,4)=3, A(4,3)=8'
-
+        assert 'Error: cycle detected!' in str(e)

@@ -39,15 +39,15 @@ def validate_graph(csgraph, directed, dtype=DTYPE,
             csgraph = csgraph_masked_from_dense(csgraph,
                                                 copy=copy_if_dense,
                                                 null_value=null_value_in,
-                                                nan_null=nan_null,
-                                                infinity_null=infinity_null)
+                                                nan_null=0,
+                                                infinity_null=0)
             mask = csgraph.mask
             csgraph = np.asarray(csgraph.data, dtype=dtype)
             csgraph[mask] = null_value_out
         else:
             csgraph = csgraph_from_dense(csgraph, null_value=null_value_in,
-                                         infinity_null=infinity_null,
-                                         nan_null=nan_null)
+                                         infinity_null=0,
+                                         nan_null=0)
 
     if csgraph.ndim != 2:
         raise ValueError("compressed-sparse graph must be 2-D")
