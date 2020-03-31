@@ -1,5 +1,5 @@
 import numpy as np
-from redblackgraph.reference import vertex_relational_composition, edge_relational_composition, transitive_closure
+from redblackgraph.reference import vertex_relational_composition, edge_relational_composition
 from numpy.testing import assert_equal
 
 def test_vertex_relational_composition():
