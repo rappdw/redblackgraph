@@ -4,7 +4,7 @@ from .avos import einsum
 from redblackgraph.core._redblackgraph import warshall, vertex_relational_composition, edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
-__all__ = ['array', 'matrix']
+__all__ = ['array', 'matrix', 'transitive_closure']
 
 
 class _Avos(ndarray):
@@ -115,3 +115,6 @@ class matrix(_Avos, np.matrix):
 
     def __rmatmul__(self, other):
         return super(matrix, self).__rmatmul__(other).view(matrix)
+
+def transitive_closure(A: array):
+    return A.transitive_closure()

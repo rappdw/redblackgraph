@@ -1,6 +1,7 @@
-from typing import Sequence
+import redblackgraph as rb
+from typing import Sequence, Union
 
-def capture(A: Sequence[Sequence[int]]):
+def _capture_list(A):
     vertices = range(len(A))
     data = '[\n'
     for i in vertices:
@@ -16,3 +17,16 @@ def capture(A: Sequence[Sequence[int]]):
         data += ']'
     data += '\n]'
     return data
+
+def _capture_rb_matrix(A):
+    A1 = [[0]* A.shape[0]] * A.shape[0]
+    for i, j in zip(*A.nonzero()):
+        A1[i][j] = A[i, j]
+    return _capture_list(A1)
+
+def capture(A: Union[Sequence[Sequence[int]], rb.rb_matrix]):
+    if isinstance(A, rb.rb_matrix):
+        return _capture_rb_matrix(A)
+    else:
+        return _capture_list(A)
+

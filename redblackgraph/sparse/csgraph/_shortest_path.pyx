@@ -14,6 +14,8 @@ import warnings
 import numpy as np
 cimport numpy as np
 
+from redblackgraph import array
+
 from scipy.sparse import csr_matrix, isspmatrix
 from redblackgraph.sparse.csgraph._validation import validate_graph
 
@@ -563,10 +565,10 @@ def dijkstra(csgraph, directed=True, indices=None,
     #------------------------------
     # initialize dist_matrix for output
     if min_only:
-        dist_matrix = np.full(N, 0, dtype=DTYPE)
+        dist_matrix = np.full(N, 0, dtype=DTYPE).view(array)
         dist_matrix[indices] = 0
     else:
-        dist_matrix = np.zeros((len(indices), N), dtype=DTYPE)
+        dist_matrix = np.zeros((len(indices), N), dtype=DTYPE).view(array)
         dist_matrix.fill(0)
         dist_matrix[np.arange(len(indices)), indices] = 0
 

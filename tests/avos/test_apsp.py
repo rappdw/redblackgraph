@@ -2,21 +2,25 @@ import numpy as np
 import pytest
 import redblackgraph as rb
 import redblackgraph.reference as ref
+import redblackgraph.core as core
 import redblackgraph.sparse as sparse
 from redblackgraph import rb_matrix
 from numpy.testing import assert_equal
 from scipy.sparse import coo_matrix
 
+def core_transitive_closure(A):
+    return core.transitive_closure(rb.array(A))
 
 @pytest.mark.parametrize(
-    "transitive_closure",
+    "transitive_closure,result_type",
     [
-        (ref.transitive_closure),
-        (sparse.transitive_closure_floyd_warshall),
-        (sparse.transitive_closure_dijkstra),
+        (ref.transitive_closure, np.ndarray),
+        (core_transitive_closure, rb.array),
+        (sparse.transitive_closure_floyd_warshall, rb.array),
+        (sparse.transitive_closure_dijkstra, rb.array),
     ]
 )
-def test_apsp(transitive_closure):
+def test_apsp(transitive_closure, result_type):
     # test transitive closure on the example matrix from our notebook
     A = [[-1, 2, 3, 0, 0],
            [ 0,-1, 0, 2, 0],
@@ -31,6 +35,7 @@ def test_apsp(transitive_closure):
     results = transitive_closure(A)
     assert_equal(results.W, expected)
     assert_equal(results.diameter, 3)
+    assert type(results.W) == result_type
 
 @pytest.mark.parametrize("dtype", [
     np.int8,

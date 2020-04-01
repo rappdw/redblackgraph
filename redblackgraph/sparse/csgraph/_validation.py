@@ -42,7 +42,7 @@ def validate_graph(csgraph, directed, dtype=DTYPE,
                                                 nan_null=0,
                                                 infinity_null=0)
             mask = csgraph.mask
-            csgraph = np.asarray(csgraph.data, dtype=dtype)
+            csgraph = np.asarray(csgraph.data, dtype=dtype).view(rb_array)
             csgraph[mask] = null_value_out
         else:
             csgraph = csgraph_from_dense(csgraph, null_value=null_value_in,
