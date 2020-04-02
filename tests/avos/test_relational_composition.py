@@ -19,13 +19,12 @@ def create_core_array(A, dtype=np.int32, shape=None):
     return rb.array(A, dtype=dtype)
 
 @pytest.mark.parametrize("dtype", [
-    np.int32,
-    np.uint32,
+    np.int32
 ])
 @pytest.mark.parametrize("vertex_relational_composition,edge_relational_composition,create_array", [
     (ref.vertex_relational_composition, ref.edge_relational_composition, create_ref_array),
     (core.vertex_relational_composition, core.edge_relational_composition, create_core_array),
-    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_ref_array),
+    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_core_array),
 ])
 def test_vertex_relational_composition(vertex_relational_composition, edge_relational_composition, create_array, dtype):
     # use the canonical ordering of A+ from the example in our notebook,
@@ -63,7 +62,7 @@ def test_vertex_relational_composition(vertex_relational_composition, edge_relat
 @pytest.mark.parametrize("vertex_relational_composition,edge_relational_composition,create_array", [
     (ref.vertex_relational_composition, ref.edge_relational_composition, create_ref_array),
     (core.vertex_relational_composition, core.edge_relational_composition, create_core_array),
-    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_ref_array),
+    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_core_array),
 ])
 def test_my_use_case_vertex(vertex_relational_composition,edge_relational_composition,create_array):
     #        D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em
@@ -113,7 +112,7 @@ def test_my_use_case_vertex(vertex_relational_composition,edge_relational_compos
 @pytest.mark.parametrize("vertex_relational_composition,edge_relational_composition,create_array", [
     (ref.vertex_relational_composition, ref.edge_relational_composition, create_ref_array),
     (core.vertex_relational_composition, core.edge_relational_composition, create_core_array),
-    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_ref_array),
+    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_core_array),
 ])
 def test_edge_relational_composition_simple(vertex_relational_composition,edge_relational_composition,create_array):
     R = create_array([[-1, 0, 3, 0, 0],
@@ -132,7 +131,7 @@ def test_edge_relational_composition_simple(vertex_relational_composition,edge_r
 @pytest.mark.parametrize("vertex_relational_composition,edge_relational_composition,create_array", [
     (ref.vertex_relational_composition, ref.edge_relational_composition, create_ref_array),
     (core.vertex_relational_composition, core.edge_relational_composition, create_core_array),
-    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_ref_array),
+    (sparse.vertex_relational_composition, sparse.edge_relational_composition, create_core_array),
 ])
 def test_my_use_case_edge(vertex_relational_composition,edge_relational_composition,create_array):
     #        D   E   R   M   H  Mi   A   I  Do  Ev   G  Ma   S  Em   J

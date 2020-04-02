@@ -24,6 +24,10 @@ def configuration(parent_package='', top_path=None):
                          sources=['_ordering.c'],
                          include_dirs=[numpy.get_include()])
 
+    config.add_extension('_relational_composition',
+                         sources=['_relational_composition.c'],
+                         include_dirs=[numpy.get_include()])
+
     # config.add_extension('_traversal',
     #                      sources=['_traversal.c'],
     #                      include_dirs=[numpy.get_include()])
