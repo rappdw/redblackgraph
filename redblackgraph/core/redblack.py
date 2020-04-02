@@ -1,10 +1,12 @@
 import numpy as np
 from numpy import ndarray, asarray
 from .avos import einsum
-from redblackgraph.core._redblackgraph import warshall, vertex_relational_composition, edge_relational_composition
+from redblackgraph.core._redblackgraph import warshall
+from redblackgraph.core._redblackgraph import vertex_relational_composition as _vertex_relational_composition
+from redblackgraph.core._redblackgraph import edge_relational_composition as _edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
-__all__ = ['array', 'matrix']
+__all__ = ['array', 'matrix', 'transitive_closure', 'vertex_relational_composition', 'edge_relational_composition']
 
 
 class _Avos(ndarray):
@@ -70,7 +72,7 @@ class _Avos(ndarray):
             v = v.reshape((1, R_star.shape[1]))[0]
 
         out = np.empty(shape=(R_star.shape[0] + 1, R_star.shape[1] + 1), dtype=R_star.dtype).view(type(self))
-        return vertex_relational_composition(u, R_star, v, c, out)
+        return _vertex_relational_composition(u, R_star, v, c, out)
 
     def edge_relational_composition(self, alpha, beta, relationship, compute_closure=False):
         '''
@@ -92,7 +94,7 @@ class _Avos(ndarray):
         if R_star[beta][alpha] != 0:
             raise ValueError("Relational composition would result in a cycle.")
 
-        return edge_relational_composition(R_star, alpha, beta, relationship)
+        return _edge_relational_composition(R_star, alpha, beta, relationship)
 
 
 class array(_Avos, ndarray):
@@ -115,3 +117,12 @@ class matrix(_Avos, np.matrix):
 
     def __rmatmul__(self, other):
         return super(matrix, self).__rmatmul__(other).view(matrix)
+
+def transitive_closure(A: array):
+    return A.transitive_closure()
+
+def vertex_relational_composition(u, A: array, v, c, compute_closure=False):
+    return A.vertex_relational_composition(u, v, c, compute_closure=compute_closure)
+
+def edge_relational_composition(A: array, alpha, beta, relationship, compute_closure=False):
+    return A.edge_relational_composition(alpha, beta, relationship, compute_closure=compute_closure)
