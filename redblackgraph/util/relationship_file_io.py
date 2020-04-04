@@ -9,7 +9,6 @@ from abc import ABC, abstractmethod
 import csv
 import itertools
 import logging
-from collections import defaultdict
 from typing import Optional, Dict, Tuple, List
 
 import numpy as np
@@ -24,7 +23,11 @@ MAX_COLUMNS_EXCEL = 16384
 
 class PersonIdentifier:
     def __init__(self):
-        self.person_dictionary = {'p_id': (0,)}
+        self.next_id = 0
+        self.person_dictionary = {}
+
+    def set_order(self, order):
+        self.order = order
 
     def add_person(self, external_id: str, name: str) -> Optional[int]:
         """
@@ -35,10 +38,9 @@ class PersonIdentifier:
         """
         if external_id:
             if not external_id in self.person_dictionary:
-                internal_id = self.person_dictionary['p_id'][0]
+                internal_id = self.next_id
                 self.person_dictionary[external_id] = (internal_id, name)
-                next_id = internal_id + 1
-                self.person_dictionary['p_id'] = (next_id,)
+                self.next_id += 1
                 return internal_id
         return None
 
@@ -60,14 +62,24 @@ class PersonIdentifier:
             return self.person_dictionary[id][1]
         return None
     
-    def get_vertex_key(self):
-        return {person_tuple[0]: (external_id, person_tuple[1]) for external_id, person_tuple in self.person_dictionary.items() if external_id != 'p_id'}
+    def get_vertex_key(self, order_lookup):
+        return {order_lookup[person_tuple[0]]: (external_id, person_tuple[1]) for external_id, person_tuple in self.person_dictionary.items()}
 
 
 class GraphBuilder:
     def __init__(self):
-        self.count = 0
-        self.rbg_dictionary = defaultdict(lambda: {})
+        self.count = 0 # count of how many data cells there should be (one for each edge)
+        self.rbg_dictionary = {}
+        self.vertex_color = None
+
+    def max_vertices(self, count):
+        if self.vertex_color is None:
+            self.vertex_color = [0] * count
+        elif count != len(self.vertex_color):
+            if count > len(self.vertex_color):
+                self.vertex_color = self.vertex_color[:count]
+            else:
+                logger.warn("unexpected condition. setting max vertices greater than initial estimate.")
 
     def add_vertex(self, vertex_id:int, color:int, red_vertex_id:int=None, black_vertex_id:int=None):
         """
@@ -79,39 +91,101 @@ class GraphBuilder:
         :return: None
         """
         if vertex_id is not None:
-            self.rbg_dictionary[vertex_id][vertex_id] = color
+            self.vertex_color[vertex_id] = color
             self.count += 1
-            if not red_vertex_id is None:
+            if red_vertex_id is not None:
+                if vertex_id not in self.rbg_dictionary:
+                    self.rbg_dictionary[vertex_id] = {}
                 self.rbg_dictionary[vertex_id][red_vertex_id] = 2
-                self.rbg_dictionary[red_vertex_id][red_vertex_id] = -1
+                self.vertex_color[red_vertex_id] = -1
                 self.count += 2
-            if not black_vertex_id is None:
+            if black_vertex_id is not None:
+                if vertex_id not in self.rbg_dictionary:
+                    self.rbg_dictionary[vertex_id] = {}
                 self.rbg_dictionary[vertex_id][black_vertex_id] = 3
-                self.rbg_dictionary[black_vertex_id][black_vertex_id] = 1
+                self.vertex_color[black_vertex_id] = 1
                 self.count += 2
 
     def add_edge(self, source_vertex: int, destination_vertex: int):
+        if source_vertex not in self.rbg_dictionary:
+            self.rbg_dictionary[source_vertex] = {}
         self.rbg_dictionary[source_vertex][destination_vertex] = 2 \
-            if self.rbg_dictionary[destination_vertex][destination_vertex] == -1 else 3
+            if self.vertex_color[destination_vertex] == -1 else 3
         self.count += 1
 
+    def _topological_visit(self, v, color, order):
+        """Run iterative DFS from node V"""
+        total = 0
+        stack = [v]  # create stack with starting vertex, stack to replace recursion with loop
+        while stack:  # while stack is not empty
+            v = stack[-1]  # peek top of stack
+            if color[v]:  # if already seen
+                v = stack.pop()  # done with this node, pop it from stack
+                if color[v] == 1:  # if GRAY, finish this node
+                    order.append(v)
+                    color[v] = 2  # BLACK, done
+            else:  # seen for first time
+                color[v] = 1  # GRAY: discovered
+                total += 1
+                if v in self.rbg_dictionary:
+                    for w in self.rbg_dictionary[v].keys():  # for all neighbors
+                        if not color[w]:
+                            stack.append(w)
+        return total
+
+    def _topological_sort(self):
+        """Run DFS on graph"""
+        N = len(self.vertex_color)
+        color = [0] * N
+        order = []  # stack to hold topological ordering of graph
+        for v in range(N):
+            if not color[v]:
+                self._topological_visit(v, color, order)
+        return order[::-1]
+
+
+    def _gen_graph_ordering(self):
+        """
+        Topologically order the graph. This ordering will then apply to both thee vertices of the
+        graph as well as to the vertex keys
+        :return: None
+        """
+
+        # order is the list that indicates the ordering of the vertices
+        # e.g. [2, 0, 1] indicates that the first vertex is id 2, the second is id 0 and the last is id 1
+        self.order = self._topological_sort()
+        intermediate = {id: idx for idx, id in enumerate(self.order)}
+        # order lookup is a list that indicates what the ordinal value is for a given vertex
+        # e.g. [1, 2, 0] indicates that id 0 is in the 2nd position, id 1 is in the last position and id 3 is in
+        # the first position
+        self.order_lookup = [intermediate[idx] for idx in range(len(self.order))]
+
+
     def generate_graph(self):
+        self._gen_graph_ordering()
+
+        N = len(self.vertex_color)
+
         # create a rb_matrix (sparse)
         data = np.zeros(self.count, dtype=np.int32)
         indices = np.zeros(self.count, dtype=np.int32)
-        indptr = np.zeros(len(self.rbg_dictionary) + 1, dtype=np.int32)
+        indptr = np.zeros(N + 1, dtype=np.int32)
 
-        N = len(self.rbg_dictionary)
         ind_idx = 0
         idx = 0
         for i in range(N):
-            row = self.rbg_dictionary[i]
+            vertex_id = self.order[i]
+            vertex_color = self.vertex_color[vertex_id]
             indptr[ind_idx] = idx
             ind_idx += 1
-            for key in row.keys():
-                data[idx] = row[key]
-                indices[idx] = key
-                idx += 1
+            data[idx] = vertex_color
+            indices[idx] = i
+            idx += 1
+            if vertex_id in self.rbg_dictionary:
+                for vertex, relationship in self.rbg_dictionary[vertex_id].items():
+                    data[idx] = relationship
+                    indices[idx] = self.order_lookup[vertex]
+                    idx += 1
         indptr[ind_idx] = idx
 
         return rb.sparse.rb_matrix((data, indices, indptr))
@@ -137,29 +211,11 @@ class RelationshipFileReader(VertexInfo):
         self.filter = filter
 
     def read(self):
-        hop_frontier = set()
+        # read through vertex file first and build a set of vertices to exclude. A vertex
+        # can be excluded if it has no color or if it is outside the range of the hop limit.
+        vertex_exclusions = set()
+        vertex_count = 0 # from this first loop, the count is an estimate as we could have some "island" vertices still
         with open(self.persons_file, "r") as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                if row[0].startswith("#"):
-                    continue
-                external_id = row[0]
-                hop = int(row[3])
-                if hop > self.hop:
-                    hop_frontier.add(external_id)
-        linked = set()
-        vertex_count = 0
-        with open(self.relationships_file, "r") as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                if row[0].startswith("#"):
-                    continue
-                if row[2] in self.filter:
-                    if row[0] not in hop_frontier and row[1] not in hop_frontier:
-                        linked.add(row[0])
-                        linked.add(row[1])
-        with open(self.persons_file, "r") as csvfile:
-            skipped_count = 0
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0].startswith("#"):
@@ -167,19 +223,51 @@ class RelationshipFileReader(VertexInfo):
                 external_id = row[0]
                 hop = int(row[3])
                 color = row[1]
-                name = row[2]
-                if external_id in linked:
-                    if hop <= self.hop:
-                        if color != '':
-                            color = int(color)
-                            vertex_id = self.person_identifier.add_person(external_id, name)
-                            self.graph_builder.add_vertex(vertex_id, color)
-                            vertex_count += 1
-                        else:
-                            skipped_count += 1
+                if hop > self.hop or color == '':
+                    vertex_exclusions.add(external_id)
                 else:
-                    if hop <= self.hop:
-                        skipped_count += 1
+                    vertex_count += 1
+
+        self.graph_builder.max_vertices(vertex_count)
+
+        # read through the edges file and identify all vertices that have edges
+        # excluding edges that cross the hop limit frontier
+        linked = set()
+        with open(self.relationships_file, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0].startswith("#"):
+                    continue
+                if row[2] in self.filter:
+                    if row[0] not in vertex_exclusions and row[1] not in vertex_exclusions:
+                        linked.add(row[0])
+                        linked.add(row[1])
+
+        # read through the vertex file and for any vertices that are
+        # linked and inside of the hop frontier, get a unique monotonically increasing
+        # vertex id and add it as a vertex to the graph
+        vertex_count = 0
+        skipped_count = 0
+        with open(self.persons_file, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0].startswith("#"):
+                    continue
+                external_id = row[0]
+                color = row[1]
+                name = row[2]
+                if external_id in linked and external_id not in vertex_exclusions:
+                    color = int(color)
+                    vertex_id = self.person_identifier.add_person(external_id, name)
+                    self.graph_builder.add_vertex(vertex_id, color)
+                    vertex_count += 1
+                else:
+                    skipped_count += 1
+
+        self.graph_builder.max_vertices(vertex_count)
+
+        # read through the edges file. if the edge type is in the accepted filter,
+        # add the edge to the graph
         with open(self.relationships_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -190,12 +278,13 @@ class RelationshipFileReader(VertexInfo):
                     destination_vertex = self.person_identifier.get_person_id(row[1])
                     if not source_vertex is None and not destination_vertex is None:
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
+
         logger.info(f"{vertex_count} vertices in graph. {skipped_count} vetices were"
                     f" removed from the graph as they either had no edges or no color.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
-        return self.person_identifier.get_vertex_key()
+        return self.person_identifier.get_vertex_key(self.graph_builder.order_lookup)
 
     def get_person_id(self, person):
         return self.person_identifier.get_person_id(person)

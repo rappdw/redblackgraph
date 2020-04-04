@@ -19,7 +19,8 @@ def _capture_list(A):
     return data
 
 def _capture_rb_matrix(A):
-    A1 = [[0]* A.shape[0]] * A.shape[0]
+    N = A.shape[0]
+    A1 = [[0] * N for _ in range(N)]
     for i, j in zip(*A.nonzero()):
         A1[i][j] = A[i, j]
     return _capture_list(A1)
