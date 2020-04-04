@@ -202,13 +202,14 @@ class VertexInfo(ABC):
 
 
 class RelationshipFileReader(VertexInfo):
-    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str]):
+    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None):
         self.persons_file = persons_file
         self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
         self.graph_builder = GraphBuilder()
         self.hop = hop
         self.filter = filter
+        self.invalid_edges_file = invalid_edges_file
 
     def read(self):
         # read through vertex file first and build a set of vertices to exclude. A vertex
@@ -218,7 +219,7 @@ class RelationshipFileReader(VertexInfo):
         hop_limit_count = 0
         no_color_count = 0
         no_edges_count = 0
-        skipped_count = 0
+        duplicate_edge_count = 0
 
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
@@ -251,6 +252,18 @@ class RelationshipFileReader(VertexInfo):
                     if row[0] not in vertex_exclusions and row[1] not in vertex_exclusions:
                         linked.add(row[0])
                         linked.add(row[1])
+
+        # if we are also reading the invalid file, do so here
+        if self.invalid_edges_file:
+            with open(self.invalid_edges_file, "r") as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    if row[0].startswith("#"):
+                        continue
+                    if row[2] in self.filter and row[3] != 'frontier':
+                        if row[0] not in vertex_exclusions and row[1] not in vertex_exclusions:
+                            linked.add(row[0])
+                            linked.add(row[1])
 
         # read through the vertex file and for any vertices that are
         # linked and inside of the hop frontier, get a unique monotonically increasing
@@ -289,9 +302,24 @@ class RelationshipFileReader(VertexInfo):
                     if not source_vertex is None and not destination_vertex is None:
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
 
+        # if we are also reading the invalid file, do so here
+        if self.invalid_edges_file:
+            with open(self.invalid_edges_file, "r") as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    if row[0].startswith("#"):
+                        continue
+                    if row[2] in self.filter and row[3] != 'frontier':
+                        source_vertex = self.person_identifier.get_person_id(row[0])
+                        destination_vertex = self.person_identifier.get_person_id(row[1])
+                        if not source_vertex is None and not destination_vertex is None:
+                            duplicate_edge_count += 1
+                            self.graph_builder.add_edge(source_vertex, destination_vertex)
+
         logger.info(f"{vertex_count} vertices in graph. {hop_limit_count} vetices were"
                     f" outside the hop limit. {no_edges_count} have no edges."
-                    f" {no_color_count} were removed due to no color.")
+                    f" {no_color_count} were removed due to no color."
+                    f" {duplicate_edge_count} duplicate parent edges exist.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):

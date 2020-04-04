@@ -30,6 +30,10 @@ if __name__ == '__main__':
                         help="Perform topological sort in addition to cannonical sort")
     parser.add_argument("-c", "--closure", action="store_true", default=False,
                         help="Save the transitive closure as well")
+    parser.add_argument("-i", "--readinvalid", action="store_true", default=False,
+                        help="Read and handle the invalid edges csv file and add them to the graph")
+    parser.add_argument("-d", "--dontwrite", action="store_true", default=False,
+                        help="Don't write any output files")
 
     # extract arguments from the command line
     try:
@@ -46,6 +50,7 @@ if __name__ == '__main__':
     basefile = args.basefile
     vertices_file = Path(basefile + ".vertices.csv")
     edges_file = Path(basefile + ".edges.csv")
+    invalid_edges_file = Path(basefile + '.invalid.edges.csv') if args.readinvalid else None
     basename = str(Path(basefile).parts[-1])
     hops = args.hops
 
@@ -76,7 +81,7 @@ if __name__ == '__main__':
 
     logger.info("Reading graph input files")
 
-    reader = RelationshipFileReader(vertices_file, edges_file, hops, args.filter)
+    reader = RelationshipFileReader(vertices_file, edges_file, hops, args.filter, invalid_edges_file)
     graph: rb.sparse.rb_matrix = reader.read()
 
     if graph.shape[0] >= MAX_COLUMNS_EXCEL:
@@ -86,29 +91,35 @@ if __name__ == '__main__':
 
     logger.info(f"Graph is created. Writing out simple format as xslx file to {outputfile}")
 
-    writer = rb.RedBlackGraphWriter(reader)
-    writer.write(graph, output_file=outputfile)
+    if args.dontwrite:
+        writer = None
+    else:
+        writer = rb.RedBlackGraphWriter(reader)
+        writer.write(graph, output_file=outputfile)
 
     logger.info("Simple format created. Computing transitive closure of Graph")
 
     R_star = transitive_closure(graph).W
 
     if args.closure:
-        logger.info(f"Writing out transitive closure to {closurefile}")
-        writer.write(R_star, output_file=closurefile)
+        if writer:
+            logger.info(f"Writing out transitive closure to {closurefile}")
+            writer.write(R_star, output_file=closurefile)
 
     logger.info("Computing canonical ordering")
 
     R_cannonical = avos_canonical_ordering(R_star)
 
-    logger.info(f"Writing out cannonical form to {canonicalfile}")
-    writer.write(R_cannonical.A, output_file=canonicalfile, key_permutation=R_cannonical.label_permutation)
+    if writer:
+        logger.info(f"Writing out cannonical form to {canonicalfile}")
+        writer.write(R_cannonical.A, output_file=canonicalfile, key_permutation=R_cannonical.label_permutation)
 
     if args.topologicalsort:
         logger.info(f"Computing topological sort")
         R_topological = topological_ordering(R_star)
-        logger.info(f"Writing out topological sort to {topologicalfile}")
-        writer.write(R_topological.A, output_file=topologicalfile, key_permutation=R_topological.label_permutation)
+        if writer:
+            logger.info(f"Writing out topological sort to {topologicalfile}")
+            writer.write(R_topological.A, output_file=topologicalfile, key_permutation=R_topological.label_permutation)
 
     logger.info("Done.")
 
