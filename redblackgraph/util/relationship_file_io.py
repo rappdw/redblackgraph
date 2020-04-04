@@ -76,10 +76,10 @@ class GraphBuilder:
         if self.vertex_color is None:
             self.vertex_color = [0] * count
         elif count != len(self.vertex_color):
-            if count > len(self.vertex_color):
+            if count < len(self.vertex_color):
                 self.vertex_color = self.vertex_color[:count]
             else:
-                logger.warn("unexpected condition. setting max vertices greater than initial estimate.")
+                raise ValueError(f"Unexpected condition. Setting max vertices, {count}, greater than initial estimate, {len(self.vertex_color)}.")
 
     def add_vertex(self, vertex_id:int, color:int, red_vertex_id:int=None, black_vertex_id:int=None):
         """
@@ -215,6 +215,11 @@ class RelationshipFileReader(VertexInfo):
         # can be excluded if it has no color or if it is outside the range of the hop limit.
         vertex_exclusions = set()
         vertex_count = 0 # from this first loop, the count is an estimate as we could have some "island" vertices still
+        hop_limit_count = 0
+        no_color_count = 0
+        no_edges_count = 0
+        skipped_count = 0
+
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -223,7 +228,11 @@ class RelationshipFileReader(VertexInfo):
                 external_id = row[0]
                 hop = int(row[3])
                 color = row[1]
-                if hop > self.hop or color == '':
+                if hop > self.hop:
+                    hop_limit_count += 1
+                    vertex_exclusions.add(external_id)
+                elif color == '':
+                    no_color_count += 1
                     vertex_exclusions.add(external_id)
                 else:
                     vertex_count += 1
@@ -246,8 +255,7 @@ class RelationshipFileReader(VertexInfo):
         # read through the vertex file and for any vertices that are
         # linked and inside of the hop frontier, get a unique monotonically increasing
         # vertex id and add it as a vertex to the graph
-        vertex_count = 0
-        skipped_count = 0
+        vertex_count = 0 # reset vertex count
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -256,13 +264,15 @@ class RelationshipFileReader(VertexInfo):
                 external_id = row[0]
                 color = row[1]
                 name = row[2]
-                if external_id in linked and external_id not in vertex_exclusions:
+                if external_id in vertex_exclusions:
+                    pass
+                else:
                     color = int(color)
                     vertex_id = self.person_identifier.add_person(external_id, name)
                     self.graph_builder.add_vertex(vertex_id, color)
                     vertex_count += 1
-                else:
-                    skipped_count += 1
+                    if external_id not in linked:
+                        no_edges_count += 1
 
         self.graph_builder.max_vertices(vertex_count)
 
@@ -279,8 +289,9 @@ class RelationshipFileReader(VertexInfo):
                     if not source_vertex is None and not destination_vertex is None:
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
 
-        logger.info(f"{vertex_count} vertices in graph. {skipped_count} vetices were"
-                    f" removed from the graph as they either had no edges or no color.")
+        logger.info(f"{vertex_count} vertices in graph. {hop_limit_count} vetices were"
+                    f" outside the hop limit. {no_edges_count} have no edges."
+                    f" {no_color_count} were removed due to no color.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
