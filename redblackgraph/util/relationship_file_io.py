@@ -202,7 +202,7 @@ class VertexInfo(ABC):
 
 
 class RelationshipFileReader(VertexInfo):
-    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None):
+    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None, invalid_filter:List[str]=None):
         self.persons_file = persons_file
         self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
@@ -210,6 +210,7 @@ class RelationshipFileReader(VertexInfo):
         self.hop = hop
         self.filter = filter
         self.invalid_edges_file = invalid_edges_file
+        self.invalid_filter = invalid_filter if invalid_filter else []
 
     def read(self):
         # read through vertex file first and build a set of vertices to exclude. A vertex
@@ -260,7 +261,7 @@ class RelationshipFileReader(VertexInfo):
                 for row in reader:
                     if row[0].startswith("#"):
                         continue
-                    if row[2] in self.filter and row[3] != 'frontier':
+                    if row[2] in self.filter and row[3] in self.invalid_filter:
                         if row[0] not in vertex_exclusions and row[1] not in vertex_exclusions:
                             linked.add(row[0])
                             linked.add(row[1])

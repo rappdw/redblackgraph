@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+import argparse
+import logging
+import sys
+from pathlib import Path
+
+import redblackgraph as rb
+from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
+from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering
+
+
+MAX_PRACTICAL_SIZE = 1500
+
+
+def init_argparse():
+    parser = argparse.ArgumentParser(
+        description="rbg - analyze Red Black Graph. Reads rbg ingest files and runs various algorithms",
+        add_help=False,
+        usage="rbga -f <base-file> -o <out-directory> (<base-file>.vertices.csv and <base-file>.edges.csv must exist)",
+    )
+    try:
+        parser.add_argument("-d", "--dontwrite", action="store_true", default=False,
+                            help="Don't write output files")
+        parser.add_argument("-f", "--basefile", metavar="<STR>", type=str, help="base file name", required=True)
+        parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
+        parser.add_argument("-i", "--ingestinvalid", action="store_true", default=False,
+                            help="In addition to vertex and edge, ingest the invalid edges")
+        parser.add_argument("--invalidfilter", action="append",
+                            default=["parent_cardinality"], type=str,
+                            nargs="+", help="Invalid reasons to accept")
+        parser.add_argument("-l", "--filter", action="append",
+                            default=["BiologicalParent", "UntypedParent", "UnspecifiedParentType"], type=str,
+                            nargs="+", help="Edge relationship type values to accept")
+        parser.add_argument("-o", "--outdir", metavar="<STR>", type=str,
+                            help="output directory (default is same directory as basefile")
+        parser.add_argument("-r", "--replace", action="store_true", default=False,
+                            help="Replace existing output files")
+        parser.add_argument("-v", "--verbose", action="store_true", default=False,
+                            help="Increase output verbosity [False]")
+
+        subparsers = parser.add_subparsers()
+        run_parser = subparsers.add_parser("run", help="run graph analysis")
+        run_parser.add_argument("-c", "--canonical", action="store_true", default=False,
+                                help="Run canonical ordering (requires closure)")
+        run_parser.add_argument("-l", "--closure", action="store_true", default=False,
+                                help="Run closure")
+        run_parser.add_argument("-t", "--topological", action="store_true", default=False,
+                                help="Run topological ordering")
+        run_parser.set_defaults(func=run_analysis)
+
+        # extract arguments from the command line
+        parser.error = parser.exit
+        arguments = parser.parse_args()
+        return arguments
+    except SystemExit as e:
+        print(e)
+        parser.print_help()
+        sys.exit(2)
+
+
+def write_results(args, writer, graph, name, description, key_permutation=None):
+    outputfile = get_file(args, name)
+    check_file(outputfile, args)
+    logger.info(f"Writing {description} to {outputfile}")
+    writer.write(graph, output_file=outputfile, key_permutation=key_permutation)
+    logger.info("  Writing complete")
+
+
+def run_analysis(args):
+    if args.dontwrite:
+        writer = None
+    else:
+        writer = rb.RedBlackGraphWriter(reader)
+
+    if args.topological:
+        # the graph topologically ordered during ingestion
+        write_results(args, writer, graph, "topological", "topological ordering")
+
+    R_star = None
+    R_canonical = None
+    if args.closure or args.canonical:
+        logger.info("Computing transitive closure")
+        R_star = transitive_closure(graph).W
+        logger.info("  Closure computation complete")
+        if args.closure and writer:
+            write_results(args, writer, R_star, "closure", "closure")
+
+    if args.canonical:
+        logger.info("Computing canonical ordering")
+        R_cannonical = avos_canonical_ordering(R_star)
+        logger.info("  Canonical ordering complete")
+        if writer:
+            write_results(args, writer, R_cannonical.A, "canonical", "canonical ordering", key_permutation=R_cannonical.label_permutation)
+
+
+def get_file(args, name: str, extension:str="xlsx", output=True):
+    basefile = args.basefile
+    basename = str(Path(basefile).parts[-1])
+    hops = args.hops
+    outdir = args.outdir
+    if not outdir:
+        outdir = Path(basefile).parent
+    else:
+        outdir = Path(outdir)
+    if output:
+        return outdir / f"{basename}.{hops}.{name}.{extension}"
+    else:
+        return Path(f"{basefile}.{name}.{extension}")
+
+
+def check_file(file: Path, args, existance_required=False):
+    if existance_required:
+        if not file.exists():
+            raise SystemError(f"{file} not found")
+    elif not args.replace:
+        if file.exists():
+            raise SystemError(f"{file} already exists.")
+
+
+if __name__ == '__main__':
+    args = init_argparse()
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG if args.verbose else logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    vertices_file = get_file(args, "vertices", "csv", output=False)
+    edges_file = get_file(args, "edges", "csv", output=False)
+    invalid_edges_file = get_file(args, "invalid.edges", "csv", output=False) if args.ingestinvalid else None
+
+    check_file(vertices_file, args, True)
+    check_file(edges_file, args, True)
+    if args.ingestinvalid:
+        check_file(invalid_edges_file, args, True)
+
+    logger.info("Reading graph input files")
+
+    reader = RelationshipFileReader(vertices_file, edges_file, args.hops, args.filter, invalid_edges_file,
+                                    args.invalidfilter)
+    graph: rb.sparse.rb_matrix = reader.read()
+
+    if graph.shape[0] >= MAX_COLUMNS_EXCEL:
+        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({graph.shape[0]} vertices)")
+    if graph.shape[0] >= MAX_PRACTICAL_SIZE:
+        logger.warning(f"This graph is on the large size ({graph.shape[0]}). "
+                       f"It will take a few seconds more to write the xlsx file.")
+
+    logger.info("  Reading complete")
+
+    args.func(args)
