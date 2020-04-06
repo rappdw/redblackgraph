@@ -73,3 +73,6 @@ def test_VIII():
         for b in r:
             for c in r:
                 assert avos_product(avos_sum(a, b), c) == avos_sum(avos_product(a, c), avos_product(b, c))
+
+# Closure:
+#    a_star = 1 + a * a_star = 1 + a_star * a
