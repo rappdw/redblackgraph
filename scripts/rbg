@@ -4,9 +4,11 @@ import logging
 import sys
 from pathlib import Path
 
+import numpy as np
 import redblackgraph as rb
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
 from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering
+from scipy.stats import describe
 
 
 MAX_PRACTICAL_SIZE = 1500
@@ -42,6 +44,8 @@ def init_argparse():
                                 help="Run canonical ordering (requires closure)")
         run_parser.add_argument("-l", "--closure", action="store_true", default=False,
                                 help="Run closure")
+        run_parser.add_argument("--row-and-column-info", action="store_true", default=False,
+                                help="Gather descriptive stats about the closed matrix' row and columns")
         run_parser.add_argument("-t", "--topological", action="store_true", default=False,
                                 help="Run topological ordering")
         run_parser.set_defaults(func=run_analysis)
@@ -79,7 +83,14 @@ def run_analysis(args):
     if args.closure or args.canonical:
         logger.info("Computing transitive closure")
         R_star = transitive_closure(graph).W
-        logger.info("  Closure computation complete")
+        logger.info(f"  Closure computation complete. There are {np.count_nonzero(R_star):,} edges in the graph.")
+        if args.row_and_column_info:
+            logger.info(f"  Gathering descriptive stats on rows and columns of closed matrix")
+            counts = (R_star != 0)
+            non_zero_cols = counts.sum(0)
+            non_zero_rows = counts.sum(1)
+            logger.info(f"    Row info: {describe(non_zero_rows)}")
+            logger.info(f"    Col info: {describe(non_zero_cols)}")
         if args.closure and writer:
             write_results(args, writer, R_star, "closure", "closure")
 
@@ -132,11 +143,10 @@ if __name__ == '__main__':
     graph: rb.sparse.rb_matrix = reader.read()
 
     if graph.shape[0] >= MAX_COLUMNS_EXCEL:
-        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle. ({graph.shape[0]} vertices)")
+        logger.error(f"Trying to ingest a graph that exceeds the size excel can handle (Max: {MAX_COLUMNS_EXCEL:,}).")
     if graph.shape[0] >= MAX_PRACTICAL_SIZE:
-        logger.warning(f"This graph is on the large size ({graph.shape[0]}). "
-                       f"It will take a few seconds more to write the xlsx file.")
+        logger.warning("This graph is on the large size. It will take a few seconds more to write the xlsx file.")
 
-    logger.info("  Reading complete")
+    logger.info(f"  Reading complete. There are {graph.nnz:,} edges in the graph.")
 
     args.func(args)

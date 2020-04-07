@@ -317,10 +317,10 @@ class RelationshipFileReader(VertexInfo):
                             duplicate_edge_count += 1
                             self.graph_builder.add_edge(source_vertex, destination_vertex)
 
-        logger.info(f"{vertex_count} vertices in graph. {hop_limit_count} vetices were"
-                    f" outside the hop limit. {no_edges_count} have no edges."
-                    f" {no_color_count} were removed due to no color."
-                    f" {duplicate_edge_count} duplicate parent edges exist.")
+        logger.info(f"{vertex_count:,} vertices in graph. {hop_limit_count:,} vetices were"
+                    f" outside the hop limit. {no_edges_count:,} have no edges."
+                    f" {no_color_count:,} were removed due to no color."
+                    f" {duplicate_edge_count:,} duplicate parent edges exist.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
