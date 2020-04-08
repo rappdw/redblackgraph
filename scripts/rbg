@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import redblackgraph as rb
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
-from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering
+from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering, CycleError
 from scipy.stats import describe
 
 
@@ -81,18 +81,23 @@ def run_analysis(args):
     R_star = None
     R_canonical = None
     if args.closure or args.canonical:
-        logger.info("Computing transitive closure")
-        R_star = transitive_closure(graph).W
-        logger.info(f"  Closure computation complete. There are {np.count_nonzero(R_star):,} edges in the graph.")
-        if args.row_and_column_info:
-            logger.info(f"  Gathering descriptive stats on rows and columns of closed matrix")
-            counts = (R_star != 0)
-            non_zero_cols = counts.sum(0)
-            non_zero_rows = counts.sum(1)
-            logger.info(f"    Row info: {describe(non_zero_rows)}")
-            logger.info(f"    Col info: {describe(non_zero_cols)}")
-        if args.closure and writer:
-            write_results(args, writer, R_star, "closure", "closure")
+        try:
+            logger.info("Computing transitive closure")
+            R_star = transitive_closure(graph).W
+            logger.info(f"  Closure computation complete. There are {np.count_nonzero(R_star):,} edges in the graph.")
+            if args.row_and_column_info:
+                logger.info(f"  Gathering descriptive stats on rows and columns of closed matrix")
+                counts = (R_star != 0)
+                non_zero_cols = counts.sum(0)
+                non_zero_rows = counts.sum(1)
+                logger.info(f"    Row info: {describe(non_zero_rows)}")
+                logger.info(f"    Col info: {describe(non_zero_cols)}")
+            if args.closure and writer:
+                write_results(args, writer, R_star, "closure", "closure")
+        except CycleError as e:
+            reader.get_vertex_key()
+            logger.info(f"  Error: cycle detected. {reader.get_vertex_key()[e.vertex]} has a path to itself.")
+            return
 
     if args.canonical:
         logger.info("Computing canonical ordering")

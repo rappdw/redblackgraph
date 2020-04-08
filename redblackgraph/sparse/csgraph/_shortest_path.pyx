@@ -18,6 +18,7 @@ from redblackgraph import array
 
 from scipy.sparse import csr_matrix, isspmatrix
 from redblackgraph.sparse.csgraph._validation import validate_graph
+from redblackgraph.sparse.csgraph.cycleerror import CycleError
 
 cimport cython
 
@@ -338,7 +339,7 @@ cdef DTYPE_t _floyd_warshall_avos(np.ndarray[DTYPE_t, ndim=2, mode='c'] dist_mat
             for j in range(N):
                 d_ijk = avos_product(dm[i, k], dm[k, j])
                 if i == j and not (d_ijk == -1 or d_ijk == 0 or d_ijk == 1):
-                    raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dm[i][k]}, A({k},{j})={dm[k][j]}")
+                    raise CycleError(f"Error: cycle detected! Vertex {i} has a path to itself. A({i},{k})={dm[i][k]}, A({k},{j})={dm[k][j]}", vertex=i)
                 dm[i, j] = avos_sum(dm[i][j], d_ijk)
                 diameter = max(diameter, dm[i, j])
     return MSB(diameter)
@@ -792,7 +793,7 @@ cdef DTYPE_t _dijkstra_directed(
 
             # v has now been scanned: add the distance to the results
             if i != v.index and dist_matrix[v.index, i] != 0:
-                raise ValueError(f"Error: cycle detected! Vertex {i} has a path to itself.")
+                raise CycleError(f"Error: cycle detected! Vertex {i} has a path to itself.", vertex=i)
             dist_matrix[i, v.index] = v.val
             diameter = max(diameter, v.val)
 
