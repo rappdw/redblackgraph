@@ -23,9 +23,9 @@ def init_argparse():
     try:
         parser.add_argument("-f", "--basefile", metavar="<STR>", type=str, help="base file name", required=True)
         parser.add_argument("-h", "--hops", default=4, type=int, help="Number of hops to include in graph")
-        parser.add_argument("-i", "--ingestinvalid", action="store_true", default=False,
+        parser.add_argument("-i", "--ingest-invalid", action="store_true", default=False,
                             help="In addition to vertex and edge, ingest the invalid edges")
-        parser.add_argument("--invalidfilter", action="append",
+        parser.add_argument("--invalid-filter", action="append",
                             default=["parent_cardinality"], type=str,
                             nargs="+", help="Invalid reasons to accept")
         parser.add_argument("-l", "--filter", action="append",
@@ -134,17 +134,20 @@ if __name__ == '__main__':
 
     vertices_file = get_file(args, "vertices", "csv", output=False)
     edges_file = get_file(args, "edges", "csv", output=False)
-    invalid_edges_file = get_file(args, "invalid.edges", "csv", output=False) if args.ingestinvalid else None
+    invalid_edges_file = get_file(args, "invalid.edges", "csv", output=False) if args.ingest_invalid else None
+    ignore_file = get_file(args, "ignore.edges", "csv", output=False)
+    if not ignore_file.exists():
+        ignore_file = None
 
     check_file(vertices_file, args, True)
     check_file(edges_file, args, True)
-    if args.ingestinvalid:
+    if args.ingest_invalid:
         check_file(invalid_edges_file, args, True)
 
     logger.info("Reading graph input files")
 
     reader = RelationshipFileReader(vertices_file, edges_file, args.hops, args.filter, invalid_edges_file,
-                                    args.invalidfilter)
+                                    args.invalid_filter, ignore_file)
     graph: rb.sparse.rb_matrix = reader.read()
 
     if graph.shape[0] >= MAX_COLUMNS_EXCEL:

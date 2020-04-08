@@ -202,7 +202,8 @@ class VertexInfo(ABC):
 
 
 class RelationshipFileReader(VertexInfo):
-    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None, invalid_filter:List[str]=None):
+    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None,
+                 invalid_filter:List[str]=None, ignore_file=None):
         self.persons_file = persons_file
         self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
@@ -211,10 +212,9 @@ class RelationshipFileReader(VertexInfo):
         self.filter = filter
         self.invalid_edges_file = invalid_edges_file
         self.invalid_filter = invalid_filter if invalid_filter else []
+        self.ignore_file = ignore_file
 
     def read(self):
-        # read through vertex file first and build a set of vertices to exclude. A vertex
-        # can be excluded if it has no color or if it is outside the range of the hop limit.
         vertex_exclusions = set()
         vertex_count = 0 # from this first loop, the count is an estimate as we could have some "island" vertices still
         hop_limit_count = 0
@@ -222,6 +222,8 @@ class RelationshipFileReader(VertexInfo):
         no_edges_count = 0
         duplicate_edge_count = 0
 
+        # read through vertex file first and build a set of vertices to exclude. A vertex
+        # can be excluded if it has no color or if it is outside the range of the hop limit.
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -290,6 +292,17 @@ class RelationshipFileReader(VertexInfo):
 
         self.graph_builder.max_vertices(vertex_count)
 
+        # if ignore file exists, read it and build dictionary of src -> dest edges that should
+        # be ignored
+        ignore = dict()
+        if self.ignore_file:
+            with open(self.ignore_file, "r") as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    if row[0].startswith("#"):
+                        continue
+                    ignore[self.person_identifier.get_person_id(row[0])] = self.person_identifier.get_person_id(row[1])
+
         # read through the edges file. if the edge type is in the accepted filter,
         # add the edge to the graph
         with open(self.relationships_file, "r") as csvfile:
@@ -301,6 +314,8 @@ class RelationshipFileReader(VertexInfo):
                     source_vertex = self.person_identifier.get_person_id(row[0])
                     destination_vertex = self.person_identifier.get_person_id(row[1])
                     if not source_vertex is None and not destination_vertex is None:
+                        if source_vertex in ignore and destination_vertex == ignore[source_vertex]:
+                            continue
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
 
         # if we are also reading the invalid file, do so here
@@ -314,13 +329,16 @@ class RelationshipFileReader(VertexInfo):
                         source_vertex = self.person_identifier.get_person_id(row[0])
                         destination_vertex = self.person_identifier.get_person_id(row[1])
                         if not source_vertex is None and not destination_vertex is None:
+                            if source_vertex in ignore and destination_vertex == ignore[source_vertex]:
+                                continue
                             duplicate_edge_count += 1
                             self.graph_builder.add_edge(source_vertex, destination_vertex)
 
         logger.info(f"{vertex_count:,} vertices in graph. {hop_limit_count:,} vetices were"
                     f" outside the hop limit. {no_edges_count:,} have no edges."
                     f" {no_color_count:,} were removed due to no color."
-                    f" {duplicate_edge_count:,} duplicate parent edges exist.")
+                    f" {duplicate_edge_count:,} duplicate parent edges exist."
+                    f" {len(ignore):,} were ignored.")
         return self.graph_builder.generate_graph()
 
     def get_vertex_key(self):
