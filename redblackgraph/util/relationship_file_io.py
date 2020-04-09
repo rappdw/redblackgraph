@@ -6,6 +6,7 @@ It takes 2 input files. One that defines the vertices with 3 columns: external_i
 One that defines the edges with 2 columns: source_external_id, destination_external_id
 """
 from abc import ABC, abstractmethod
+from collections import defaultdict
 import csv
 import itertools
 import logging
@@ -294,14 +295,14 @@ class RelationshipFileReader(VertexInfo):
 
         # if ignore file exists, read it and build dictionary of src -> dest edges that should
         # be ignored
-        ignore = dict()
+        ignore:Dict[str, set] = defaultdict(lambda : set())
         if self.ignore_file:
             with open(self.ignore_file, "r") as csvfile:
                 reader = csv.reader(csvfile)
                 for row in reader:
                     if row[0].startswith("#"):
                         continue
-                    ignore[self.person_identifier.get_person_id(row[0])] = self.person_identifier.get_person_id(row[1])
+                    ignore[row[0]].add(row[1])
 
         # read through the edges file. if the edge type is in the accepted filter,
         # add the edge to the graph
@@ -314,7 +315,7 @@ class RelationshipFileReader(VertexInfo):
                     source_vertex = self.person_identifier.get_person_id(row[0])
                     destination_vertex = self.person_identifier.get_person_id(row[1])
                     if not source_vertex is None and not destination_vertex is None:
-                        if source_vertex in ignore and destination_vertex == ignore[source_vertex]:
+                        if row[0] in ignore and row[1] in ignore[row[0]]:
                             continue
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
 
@@ -329,7 +330,7 @@ class RelationshipFileReader(VertexInfo):
                         source_vertex = self.person_identifier.get_person_id(row[0])
                         destination_vertex = self.person_identifier.get_person_id(row[1])
                         if not source_vertex is None and not destination_vertex is None:
-                            if source_vertex in ignore and destination_vertex == ignore[source_vertex]:
+                            if row[0] in ignore and row[1] in ignore[row[0]]:
                                 continue
                             duplicate_edge_count += 1
                             self.graph_builder.add_edge(source_vertex, destination_vertex)
