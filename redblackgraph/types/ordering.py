@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Dict, Sequence
 
 
 @dataclass
 class Ordering:
     A: Sequence[Sequence[int]]
     label_permutation: Sequence[int]
-    number_of_components: int
+    components: Dict[int, int]

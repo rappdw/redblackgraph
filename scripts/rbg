@@ -2,6 +2,7 @@
 import argparse
 import logging
 import sys
+from time import time
 from pathlib import Path
 
 import numpy as np
@@ -90,10 +91,14 @@ def run_analysis(args):
     R_canonical = None
     row_stats = None
     col_stats = None
+    time_closure = 0
+    time_canonical = 0
     if args.closure or args.canonical:
         try:
             logger.info("Computing transitive closure")
+            start = time()
             R_star = transitive_closure(graph).W
+            time_closure = time() - start
             logger.info(f"  Closure computation complete. There are {np.count_nonzero(R_star):,} edges in the graph.")
             if args.row_and_column_info:
                 logger.info(f"  Gathering descriptive stats on rows and columns of closed matrix")
@@ -116,23 +121,27 @@ def run_analysis(args):
 
     if args.canonical:
         logger.info("Computing canonical ordering")
+        start = time()
         R_canonical = avos_canonical_ordering(R_star)
+        time_canonical = time() - start
         logger.info("  Canonical ordering complete")
         if writer:
             write_results(args, writer, R_canonical.A, "canonical", "canonical ordering", key_permutation=R_canonical.label_permutation)
 
     if args.append_analysis:
+        comp_stats = describe([val for val in R_canonical.components.values()]) if R_canonical else None
         header_written = path.exists(args.append_analysis)
         with open(args.append_analysis, "a+") as file:
             if not header_written:
-                file.write("#name,hops,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis\n")
+                file.write("#name,hops,multi parents,vertices,edges (simple),edges (closure),time (closure),time (canonical),mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis,components,comp min,comp max,comp mean,comp variance,comp skewness,comp kurtosis\n")
             file.write(f"{args.basename},"                                               # name
                        f"{args.hops},"                                                   # hops
                        f"{'T' if args.ingest_invalid else 'F'},"                         # multiple parents allowed
                        f"{graph.shape[0]},"                                              # vertices
                        f"{graph.nnz},"                                                   # edges (simple)
                        f"{np.count_nonzero(R_star) if R_star is not None else ''},"      # edges (closed)
-                       f"{R_canonical.number_of_components if R_canonical else ''},"     # components
+                       f"{time_closure},"                                                # time (closure)
+                       f"{time_canonical},"                                              # time (canonical)
                        f"{row_stats.mean if row_stats is not None else ''},"             # mean
                        f"{row_stats.minmax[1] if row_stats is not None else ''},"        # row max
                        f"{row_stats.variance if row_stats is not None else ''},"         # row variance
@@ -142,6 +151,13 @@ def run_analysis(args):
                        f"{col_stats.variance if col_stats is not None else ''},"         # col variance
                        f"{col_stats.skewness if col_stats is not None else ''},"         # col skewness
                        f"{col_stats.kurtosis if col_stats is not None else ''},"         # col kurtosis
+                       f"{comp_stats.nobs if comp_stats else ''},"                       # components
+                       f"{comp_stats.minmax[0] if comp_stats is not None else ''},"      # comp min
+                       f"{comp_stats.minmax[1] if comp_stats is not None else ''},"      # comp max
+                       f"{comp_stats.mean if comp_stats is not None else ''},"           # comp mean
+                       f"{comp_stats.variance if comp_stats is not None else ''},"       # comp variance
+                       f"{comp_stats.skewness if comp_stats is not None else ''},"       # comp skewness
+                       f"{comp_stats.kurtosis if comp_stats is not None else ''},"       # comp kurtosis
                        f"\n")
 
 
