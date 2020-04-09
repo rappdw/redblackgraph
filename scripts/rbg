@@ -125,7 +125,7 @@ def run_analysis(args):
         anal_file_exists = path.exists('args.append_analysis')
         with open(args.append_analysis, "a+") as file:
             if not anal_file_exists:
-                file.write("#name,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis")
+                file.write("#name,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis\n")
             file.write(f"{args.basename},"                                               # name
                        f"{'T' if args.ingest_invalid else 'F'},"                         # multiple parents allowed
                        f"{graph.shape[0]},"                                              # vertices
@@ -141,7 +141,7 @@ def run_analysis(args):
                        f"{col_stats.variance if col_stats is not None else ''},"         # col variance
                        f"{col_stats.skewness if col_stats is not None else ''},"         # col skewness
                        f"{col_stats.kurtosis if col_stats is not None else ''},"         # col kurtosis
-                       f"")
+                       f"\n")
 
 
 def get_file(args, name: str, extension:str="xlsx", output=True):
