@@ -122,11 +122,12 @@ def run_analysis(args):
             write_results(args, writer, R_canonical.A, "canonical", "canonical ordering", key_permutation=R_canonical.label_permutation)
 
     if args.append_analysis:
-        anal_file_exists = path.exists('args.append_analysis')
+        header_written = path.exists(args.append_analysis)
         with open(args.append_analysis, "a+") as file:
-            if not anal_file_exists:
-                file.write("#name,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis\n")
+            if not header_written:
+                file.write("#name,hops,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis\n")
             file.write(f"{args.basename},"                                               # name
+                       f"{args.hops},"                                                   # hops
                        f"{'T' if args.ingest_invalid else 'F'},"                         # multiple parents allowed
                        f"{graph.shape[0]},"                                              # vertices
                        f"{graph.nnz},"                                                   # edges (simple)
