@@ -6,3 +6,4 @@ from typing import Sequence
 class Ordering:
     A: Sequence[Sequence[int]]
     label_permutation: Sequence[int]
+    number_of_components: int

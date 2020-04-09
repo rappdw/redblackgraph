@@ -6,6 +6,8 @@ from pathlib import Path
 
 import numpy as np
 import redblackgraph as rb
+
+from os import path
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
 from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering, CycleError
 from scipy.stats import describe
@@ -40,6 +42,8 @@ def init_argparse():
 
         subparsers = parser.add_subparsers()
         run_parser = subparsers.add_parser("run", help="run graph analysis")
+        run_parser.add_argument("-a", "--append-analysis", metavar="<STR>", type=str,
+                                help="filename to append analysis to")
         run_parser.add_argument("-c", "--canonical", action="store_true", default=False,
                                 help="Run canonical ordering (requires closure)")
         run_parser.add_argument("-l", "--closure", action="store_true", default=False,
@@ -68,6 +72,10 @@ def write_results(args, writer, graph, name, description, key_permutation=None):
     logger.info("  Writing complete")
 
 
+def format_descriptive_stats(stats):
+    return f"max: {stats.minmax[1]:,.2f}, mean: {stats.mean:,.2f}, variance: {stats.variance:,.2f}, skewness: {stats.skewness:,.2f}, kurtosis: {stats.kurtosis:,.2f}"
+
+
 def run_analysis(args):
     if args.outdir:
         writer = rb.RedBlackGraphWriter(reader)
@@ -80,6 +88,8 @@ def run_analysis(args):
 
     R_star = None
     R_canonical = None
+    row_stats = None
+    col_stats = None
     if args.closure or args.canonical:
         try:
             logger.info("Computing transitive closure")
@@ -87,11 +97,16 @@ def run_analysis(args):
             logger.info(f"  Closure computation complete. There are {np.count_nonzero(R_star):,} edges in the graph.")
             if args.row_and_column_info:
                 logger.info(f"  Gathering descriptive stats on rows and columns of closed matrix")
+
                 counts = (R_star != 0)
                 non_zero_cols = counts.sum(0)
                 non_zero_rows = counts.sum(1)
-                logger.info(f"    Row info: {describe(non_zero_rows)}")
-                logger.info(f"    Col info: {describe(non_zero_cols)}")
+                row_stats = describe(non_zero_rows)
+                col_stats = describe(non_zero_cols)
+
+                logger.info(f"    Row info: {format_descriptive_stats(row_stats)}")
+                logger.info(f"    Col info: {format_descriptive_stats(col_stats)}")
+
             if args.closure and writer:
                 write_results(args, writer, R_star, "closure", "closure")
         except CycleError as e:
@@ -101,15 +116,38 @@ def run_analysis(args):
 
     if args.canonical:
         logger.info("Computing canonical ordering")
-        R_cannonical = avos_canonical_ordering(R_star)
+        R_canonical = avos_canonical_ordering(R_star)
         logger.info("  Canonical ordering complete")
         if writer:
-            write_results(args, writer, R_cannonical.A, "canonical", "canonical ordering", key_permutation=R_cannonical.label_permutation)
+            write_results(args, writer, R_canonical.A, "canonical", "canonical ordering", key_permutation=R_canonical.label_permutation)
+
+    if args.append_analysis:
+        anal_file_exists = path.exists('args.append_analysis')
+        with open(args.append_analysis, "a+") as file:
+            if not anal_file_exists:
+                file.write("#name,multi parents,vertices,edges (simple),edges (closed),components,mean,row max,row variance,row skewness,row kurtosis,col max,col variance,col skewness,col kurtosis")
+            file.write(f"{args.basename},"                                               # name
+                       f"{'T' if args.ingest_invalid else 'F'},"                         # multiple parents allowed
+                       f"{graph.shape[0]},"                                              # vertices
+                       f"{graph.nnz},"                                                   # edges (simple)
+                       f"{np.count_nonzero(R_star) if R_star is not None else ''},"      # edges (closed)
+                       f"{R_canonical.number_of_components if R_canonical else ''},"     # components
+                       f"{row_stats.mean if row_stats is not None else ''},"             # mean
+                       f"{row_stats.minmax[1] if row_stats is not None else ''},"        # row max
+                       f"{row_stats.variance if row_stats is not None else ''},"         # row variance
+                       f"{row_stats.skewness if row_stats is not None else ''},"         # row skewness
+                       f"{row_stats.kurtosis if row_stats is not None else ''},"         # row kurtosis
+                       f"{col_stats.minmax[1] if col_stats is not None else ''},"        # col max
+                       f"{col_stats.variance if col_stats is not None else ''},"         # col variance
+                       f"{col_stats.skewness if col_stats is not None else ''},"         # col skewness
+                       f"{col_stats.kurtosis if col_stats is not None else ''},"         # col kurtosis
+                       f"")
 
 
 def get_file(args, name: str, extension:str="xlsx", output=True):
     basefile = args.basefile
     basename = str(Path(basefile).parts[-1])
+    args.basename = basename
     hops = args.hops
     if output:
         outdir = Path(args.outdir)

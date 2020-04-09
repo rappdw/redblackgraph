@@ -56,4 +56,4 @@ def avos_canonical_ordering(A: Sequence[Sequence[int]]) -> Ordering:
     q = dict() # dictionary keyed by component id, value is count of vertices in component
     components = find_components(A, q)
     perumutation = np.array(_get_permutation(A, q, components), dtype=ITYPE)
-    return Ordering(permute(A, perumutation), perumutation)
+    return Ordering(permute(A, perumutation), perumutation, len(q))
