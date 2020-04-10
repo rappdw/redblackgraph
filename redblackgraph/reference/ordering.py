@@ -53,7 +53,7 @@ def avos_canonical_ordering(A: Sequence[Sequence[int]]) -> Ordering:
     q = defaultdict(lambda: 0) # dictionary keyed by component id, value is count of vertices in componenet
     components = find_components(A, q)
     perumutation =  _get_permutation(A, q, components)
-    return Ordering(permute(A, perumutation), perumutation)
+    return Ordering(permute(A, perumutation), perumutation, q)
 
 def topological_ordering(A: Sequence[Sequence[int]]) -> Ordering:
     """
@@ -71,4 +71,4 @@ def topological_ordering(A: Sequence[Sequence[int]]) -> Ordering:
     # step 1: determine topological ordering of nodes in the graph
     ordering = topological_sort(A)
     # step 2: permute the matrix and return triangularization
-    return Ordering(permute(A, ordering), ordering)
+    return Ordering(permute(A, ordering), ordering, dict())
