@@ -15,7 +15,7 @@ from scipy.stats import describe
 
 
 MAX_PRACTICAL_SIZE = 1500
-MAX_ALLOWABLE_SIZE = 130000
+MAX_ALLOWABLE_SIZE = 35000 #130000
 
 
 def init_argparse():
@@ -169,8 +169,8 @@ def run_analysis(args):
 
 
 def get_file(args, name: str, extension:str="xlsx", output=True):
-    basefile = args.basefile
-    basename = str(Path(basefile).parts[-1])
+    basefile = Path(args.basefile)
+    basename = str(basefile.parts[-1])
     args.basename = basename
     hops = args.hops
     if output:
