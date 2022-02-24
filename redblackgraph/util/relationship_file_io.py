@@ -370,6 +370,8 @@ class RedBlackGraphWriter:
     def write(self, R, output_file='/tmp/rbg.csv', key_permutation=None):
         workbook, formats = self._open_workbook(output_file)
         worksheet = workbook.add_worksheet()
+        font_red = workbook.add_format()
+        font_red.set_font_color('#FF0000')
         worksheet.set_default_row(hide_unused_rows=True)
         n = R.shape[0] if isinstance(R, rb.sparse.rb_matrix) else len(R)
         if n > MAX_COLUMNS_EXCEL:
@@ -393,21 +395,25 @@ class RedBlackGraphWriter:
 
         if isinstance(R, rb.sparse.rb_matrix):
             for i, j in zip(*R.nonzero()):
-                cell_data = R[i, j]
-                max_np = max(max_np, cell_data)
-                worksheet.write(i + 1, j + 1, cell_data)
+                max_np = self.write_cell_data(R[i, j], i, j, max_np, worksheet, font_red)
         else:
             for i, j in itertools.product(range(n), repeat=2):
-                cell_data = R[i][j]
-                if cell_data != 0:
-                    max_np = max(max_np, cell_data)
-                    worksheet.write(i + 1, j + 1, cell_data)
+                max_np = self.write_cell_data(R[i][j], i, j, max_np, worksheet, font_red)
         column_width = self._calc_width(len(f"{max_np}"))
         worksheet.freeze_panes(1, 1)
         worksheet.set_column(0, 0, self._calc_width(max_key))
         worksheet.set_column(1, n, column_width)
         worksheet.set_column(n + 1, MAX_COLUMNS_EXCEL - 1, None, None, {'hidden': True})
         workbook.close()
+
+    def write_cell_data(self, cell_data, i, j, max_np, worksheet, font_red):
+        if cell_data != 0:
+            max_np = max(max_np, cell_data)
+            if cell_data == -1:
+                worksheet.write(i + 1, j + 1, 1, font_red)
+            else:
+                worksheet.write(i + 1, j + 1, cell_data)
+        return max_np
 
     def append_vertex_key(self, key):
         self.vertex_key[len(self.vertex_key)] = key

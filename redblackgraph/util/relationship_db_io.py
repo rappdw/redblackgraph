@@ -7,6 +7,8 @@ import redblackgraph as rb
 
 from scipy.sparse import coo_matrix
 from .relationship_file_io import VertexInfo
+from redblackgraph.sparse.csgraph import avos_canonical_ordering
+from redblackgraph.types import Ordering
 
 unordered_vertices = "SELECT ROWID, color FROM VERTEX;"
 unordered_edge_count = """
@@ -51,6 +53,16 @@ SELECT position, VERTEX.id, given_name, surname from VERTEX
 join ORDERING on ORDERING.id = VERTEX.ROWID
 ORDER BY position;
 """
+create_ordering_table = """
+CREATE TABLE IF NOT EXISTS ORDERING (
+        id INTEGER NOT NULL PRIMARY KEY,
+        position INTEGER
+        );
+"""
+create_ordering_index = """
+CREATE INDEX IF NOT EXISTS ORDER_INDEX ON ORDERING(position)
+"""
+
 
 
 def _read_graph_dense(conn, nv, vertex_query, edge_query):
@@ -137,7 +149,6 @@ def _read_graph(conn, nv, vertex_query, edge_query, sparse_size_threshold):
 class RelationshipDbReader(VertexInfo):
 
     # TODO: support hops
-    # TODO: create ordering if not present
 
     def __init__(self, db_file, hops):
         self.db_file = db_file
@@ -147,14 +158,26 @@ class RelationshipDbReader(VertexInfo):
         conn = sl.connect(self.db_file)
         nv = conn.execute("SELECT COUNT(*) FROM VERTEX").fetchone()[0]
         ordering_table_q = conn.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='ORDERING'")
-        ordering_count_q = conn.execute("SELECT COUNT(*) FROM ORDERING")
-        if ordering_table_q.fetchone()[0] == 0 or ordering_count_q.fetchone()[0] != nv:
-            # reading the graph using unordered vertices and edges and then do a topological
-            # sort to create the ordering
-            # g = _read_graph(conn, nv, unordered_vertices, unordered_edges, sparse_size_threshold)
-            # TODO: Topo sort and create ordering
-            pass
+        table_exists = ordering_table_q.fetchone()[0] == 1
+        ordering_count = 0
+        if table_exists:
+            ordering_count = conn.execute("SELECT COUNT(*) FROM ORDERING").fetchone()[0]
+        if not table_exists or ordering_count != nv:
+            # reading the graph using unordered vertices and edges and then, run transitive closure
+            # and then canonical ordering
+            g = _read_graph(conn, nv, unordered_vertices, unordered_edges, sparse_size_threshold)
+            ordering = avos_canonical_ordering(g.transitive_closure().W)
+            self.save_ordering(conn, ordering)
         return _read_graph(conn, nv, ordered_vertices, ordered_edges, sparse_size_threshold)
+
+    def save_ordering(self, conn, ordering: Ordering):
+        conn.execute(create_ordering_table)
+        conn.execute(create_ordering_index)
+        conn.execute("DELETE FROM ORDERING")
+        for idx, id in enumerate(ordering.label_permutation):
+            conn.execute(f"INSERT INTO ORDERING (id, position) values({id + 1}, {idx + 1})")
+        conn.commit()
+
 
     def get_vertex_key(self) -> Dict[int, Tuple[str, str]]:
         """

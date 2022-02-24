@@ -20,7 +20,7 @@ class rb_matrix(csr_matrix):
 
     def transitive_closure(self, method="D"):
         from .csgraph import transitive_closure
-        transitive_closure(self, method)
+        return transitive_closure(self, method)
 
     def _mul_sparse_matrix(self, other):
         # this is lifted from scipy.sparse.compressed._mul_sparse_matrix and is identical aside from explicitely
