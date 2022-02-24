@@ -35,7 +35,8 @@ class PersonIdentifier:
         Given an external id and name, add the person into the dictionary if it's not already into the dictionary
 
         If the person tuple is empty, returns None
-        :param person: tuple[ given name, surname ]
+        :param external_id: id for the person
+        :param name: tuple[ given name, surname ]
         """
         if external_id:
             if not external_id in self.person_dictionary:
@@ -350,7 +351,7 @@ class RelationshipFileReader(VertexInfo):
 
 
 class RedBlackGraphWriter:
-    def __init__(self, vertex_info:VertexInfo=None):
+    def __init__(self, vertex_info: VertexInfo = None):
         ''':parameter vertex_info - class providing information on the vertices'''
         self.vertex_key = vertex_info.get_vertex_key() if vertex_info else None
 

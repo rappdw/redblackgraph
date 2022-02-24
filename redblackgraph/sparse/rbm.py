@@ -5,6 +5,7 @@ from redblackgraph.sparse._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
 from scipy.sparse.csr import csr_matrix
 from scipy.sparse.sputils import (get_index_dtype, upcast)
 
+
 class rb_matrix(csr_matrix):
 
     # format = 'rbm' # keep format as csr, aside from matmul (and specifically csr_matmat_pass2) all
@@ -16,6 +17,10 @@ class rb_matrix(csr_matrix):
     def __rmatmul__(self, other):
         # convert to this format
         return self.__class__(other)._mul_sparse_matrix(self)
+
+    def transitive_closure(self, method="D"):
+        from .csgraph import transitive_closure
+        transitive_closure(self, method)
 
     def _mul_sparse_matrix(self, other):
         # this is lifted from scipy.sparse.compressed._mul_sparse_matrix and is identical aside from explicitely

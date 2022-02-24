@@ -9,6 +9,28 @@ from redblackgraph.sparse.csgraph import transitive_closure
 from redblackgraph.reference.ordering import avos_canonical_ordering
 
 
+def test_rel_db():
+    test_db_file = os.path.join(os.path.dirname(__file__), "resources/test.db")
+    reader = rb.RelationshipDbReader(test_db_file, 4)
+    graph = reader.read(1)
+
+    # expected graph
+    r = -1
+    vals = [r, 2, 3, r, 3, 2, 1, 3, 2, r, 2, 3, r, 3, 2, 1, 1, r, 3, 2, 1, r, 2, 3, 1, 1, r, r, 1]
+    rows = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7, 7, 7, 8, 9, 9, 9,10,11,12,13,14]
+    cols = [0, 4, 5, 1, 2, 4, 2, 8, 9, 3, 9,10, 4, 6, 7, 5, 6, 7,11,12, 8, 9,13,14,10,11,12,13,14]
+    expected = rb.rb_matrix(coo_matrix((vals, (rows, cols))))
+    for i, j in zip(*graph.nonzero()):
+        assert_equal(graph[i, j], expected[i, j])
+    for i, j in zip(*expected.nonzero()):
+        assert_equal(graph[i, j], expected[i, j])
+
+    closure_fw = graph.transitive_closure(method="FW")
+    closure_d = graph.transitive_closure(method="D")
+
+    assert closure_fw == closure_d
+
+
 def test_rel_file():
     test_persons_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.vertices.csv")
     test_relationships_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.edges.csv")
@@ -17,13 +39,11 @@ def test_rel_file():
     vertex_key = reader.get_vertex_key()
 
     # expected graph
-    expected = rb.rb_matrix(coo_matrix((
-            [-1, 3, 2, 1,-1, 3, 2, 1, 2, 3,-1, 2, 3,-1, 1, 1,-1, 2, 3,-1, 2, 3,-1, 2, 3,-1, 1, 1, 1],
-        (
-            [ 0, 0, 0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7, 8, 8, 8, 9, 9, 9,10,10,10,11,12,13,14],
-            [ 0, 1, 4, 1, 2, 3, 9, 3, 4, 7, 4, 5, 6, 5, 6, 7, 8, 9,14, 9,10,13,10,11,12,11,12,13,14]
-        )
-    )))
+    r = -1
+    vals = [r, 3, 2, 1, r, 3, 2, 1, 2, 3, r, 2, 3, r, 1, 1, r, 2, 3, r, 2, 3, r, 2, 3, r, 1, 1, 1]
+    rows = [0, 0, 0, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7, 8, 8, 8, 9, 9, 9,10,10,10,11,12,13,14]
+    cols = [0, 1, 4, 1, 2, 3, 9, 3, 4, 7, 4, 5, 6, 5, 6, 7, 8, 9,14, 9,10,13,10,11,12,11,12,13,14]
+    expected = rb.rb_matrix(coo_matrix((vals, (rows, cols))))
     for i, j in zip(*graph.nonzero()):
         assert_equal(graph[i, j], expected[i, j])
     for i, j in zip(*expected.nonzero()):
@@ -55,14 +75,14 @@ def test_rel_file():
 
     writer = rb.RedBlackGraphWriter(reader)
     with tempfile.TemporaryDirectory() as tmpdir:
-        tmpfile = os.path.join(tmpdir, 'test_file.xlsx')
-        writer.write(graph, output_file=tmpfile)
-        assert os.path.isfile(tmpfile)
+        tmp_file = os.path.join(tmpdir, 'test_file.xlsx')
+        writer.write(graph, output_file=tmp_file)
+        assert os.path.isfile(tmp_file)
 
         R_star = transitive_closure(graph).W
-        R_cannonical = avos_canonical_ordering(R_star)
+        R_canonical = avos_canonical_ordering(R_star)
 
-        tmpfile_cannonical = os.path.join(tmpdir, 'test_file_cannonical.xlsx')
-        writer.write(R_cannonical.A, output_file=tmpfile_cannonical, key_permutation=R_cannonical.label_permutation)
+        tmp_file_canonical = os.path.join(tmpdir, 'test_file_canonical.xlsx')
+        writer.write(R_canonical.A, output_file=tmp_file_canonical, key_permutation=R_canonical.label_permutation)
         # TODO: really should figure out a way to test the xlsx headers were written correctly...
-        assert os.path.isfile(tmpfile_cannonical)
+        assert os.path.isfile(tmp_file_canonical)

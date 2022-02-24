@@ -1,1 +1,2 @@
 from .relationship_file_io import RedBlackGraphWriter, RelationshipFileReader
+from .relationship_db_io import RelationshipDbReader

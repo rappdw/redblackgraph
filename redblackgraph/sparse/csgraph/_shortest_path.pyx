@@ -269,7 +269,7 @@ def floyd_warshall(csgraph, directed=True,
     >>> from scipy.sparse.csgraph import floyd_warshall
 
     >>> graph = [
-    ... [0, 1 , 2, 0],
+    ... [0, 1, 2, 0],
     ... [0, 0, 0, 1],
     ... [2, 0, 0, 3],
     ... [0, 0, 0, 0]

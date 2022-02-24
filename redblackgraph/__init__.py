@@ -5,7 +5,7 @@ del get_versions
 
 from .core import *
 from .sparse import *
-from .util import RelationshipFileReader, RedBlackGraphWriter
+from .util import RelationshipFileReader, RedBlackGraphWriter, RelationshipDbReader
 from redblackgraph.types.color import Color
 
 __all__ = ['__version__']
