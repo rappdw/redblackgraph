@@ -10,8 +10,9 @@ import numpy as np
 import redblackgraph as rb
 
 from os import path
+from fscrawler import RelationshipDbReader
 from redblackgraph.util.relationship_file_io import RelationshipFileReader, MAX_COLUMNS_EXCEL
-from redblackgraph.util.relationship_db_io import RelationshipDbReader
+from redblackgraph.util import RbgGraphBuilder
 from redblackgraph.sparse.csgraph import transitive_closure, avos_canonical_ordering, CycleError
 from scipy.stats import describe
 # noinspection PyProtectedMember
@@ -207,10 +208,10 @@ def run(run_args):
     db_file = get_file(run_args, None, "db", output=False)
     if db_file.exists():
         logger.info(f"Reading graph from database {db_file}")
-        reader = RelationshipDbReader(db_file, hops=run_args.hops)
+        reader = RelationshipDbReader(db_file, run_args.hops, RbgGraphBuilder())
     else:
         reader = init_file_reader(run_args)
-    graph: rb.sparse.rb_matrix = reader.read()
+    graph = reader.read()
 
     if MAX_COLUMNS_EXCEL <= graph.shape[0] <= MAX_ALLOWABLE_SIZE and run_args.outdir:
         logger.error(f"Trying to ingest a graph that exceeds the size excel can handle (Max: {MAX_COLUMNS_EXCEL:,}).")

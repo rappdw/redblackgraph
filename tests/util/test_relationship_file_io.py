@@ -9,28 +9,6 @@ from redblackgraph.sparse.csgraph import transitive_closure
 from redblackgraph.reference.ordering import avos_canonical_ordering
 
 
-def test_rel_db():
-    test_db_file = os.path.join(os.path.dirname(__file__), "resources/test.db")
-    reader = rb.RelationshipDbReader(test_db_file, 4)
-    graph = reader.read(1)
-
-    # expected graph
-    r = -1
-    vals = [r, 2, 3, r, 3, 2, 1, 3, 2, r, 2, 3, r, 3, 2, 1, 1, r, 3, 2, 1, r, 2, 3, 1, 1, r, r, 1]
-    rows = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7, 7, 7, 8, 9, 9, 9,10,11,12,13,14]
-    cols = [0, 4, 5, 1, 2, 4, 2, 8, 9, 3, 9,10, 4, 6, 7, 5, 6, 7,11,12, 8, 9,13,14,10,11,12,13,14]
-    expected = rb.rb_matrix(coo_matrix((vals, (rows, cols))))
-    for i, j in zip(*graph.nonzero()):
-        assert_equal(graph[i, j], expected[i, j])
-    for i, j in zip(*expected.nonzero()):
-        assert_equal(graph[i, j], expected[i, j])
-
-    closure_fw = graph.transitive_closure(method="FW")
-    closure_d = graph.transitive_closure(method="D")
-
-    assert closure_fw == closure_d
-
-
 def test_rel_file():
     test_persons_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.vertices.csv")
     test_relationships_file = os.path.join(os.path.dirname(__file__), "resources/sample-tree.edges.csv")

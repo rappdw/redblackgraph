@@ -5,16 +5,17 @@ into a RB Graph.
 It takes 2 input files. One that defines the vertices with 3 columns: external_id, gender, name.
 One that defines the edges with 2 columns: source_external_id, destination_external_id
 """
-from abc import ABC, abstractmethod
 from collections import defaultdict
 import csv
 import itertools
 import logging
-from typing import Optional, Dict, Tuple, List
+from typing import Optional, Dict, List
 
 import numpy as np
 import redblackgraph as rb
 import xlsxwriter
+
+from fscrawler import VertexInfo
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class PersonIdentifier:
     def __init__(self):
         self.next_id = 0
         self.person_dictionary = {}
+        self.order = None
 
     def set_order(self, order):
         self.order = order
@@ -39,7 +41,7 @@ class PersonIdentifier:
         :param name: tuple[ given name, surname ]
         """
         if external_id:
-            if not external_id in self.person_dictionary:
+            if external_id not in self.person_dictionary:
                 internal_id = self.next_id
                 self.person_dictionary[external_id] = (internal_id, name)
                 self.next_id += 1
@@ -70,7 +72,7 @@ class PersonIdentifier:
 
 class GraphBuilder:
     def __init__(self):
-        self.count = 0 # count of how many data cells there should be (one for each edge)
+        self.count = 0  # count of how many data cells there should be (one for each edge)
         self.rbg_dictionary = {}
         self.vertex_color = None
 
@@ -83,7 +85,7 @@ class GraphBuilder:
             else:
                 raise ValueError(f"Unexpected condition. Setting max vertices, {count}, greater than initial estimate, {len(self.vertex_color)}.")
 
-    def add_vertex(self, vertex_id:int, color:int, red_vertex_id:int=None, black_vertex_id:int=None):
+    def add_vertex(self, vertex_id: int, color: int, red_vertex_id: int = None, black_vertex_id: int = None):
         """
         Add a vertex to the graph (optionally include immediate ancestry vertices
         :param vertex_id: id of the vertex to add 
@@ -145,11 +147,10 @@ class GraphBuilder:
                 self._topological_visit(v, color, order)
         return order[::-1]
 
-
     def _gen_graph_ordering(self):
         """
-        Topologically order the graph. This ordering will then apply to both thee vertices of the
-        graph as well as to the vertex keys
+        Topologically order the graph. This ordering will then apply to both the vertices of the
+        graph and the vertex keys
         :return: None
         """
 
@@ -161,7 +162,6 @@ class GraphBuilder:
         # e.g. [1, 2, 0] indicates that id 0 is in the 2nd position, id 1 is in the last position and id 3 is in
         # the first position
         self.order_lookup = [intermediate[idx] for idx in range(len(self.order))]
-
 
     def generate_graph(self):
         self._gen_graph_ordering()
@@ -193,19 +193,9 @@ class GraphBuilder:
         return rb.sparse.rb_matrix((data, indices, indptr))
 
 
-class VertexInfo(ABC):
-    @abstractmethod
-    def get_vertex_key(self) -> Dict[int,Tuple[str,str]]:
-        """
-        Get the "vertex key", a dictionary keyed by the vertex id (int) with values
-        that are tuples of (external id, string designation)
-        """
-        pass
-
-
 class RelationshipFileReader(VertexInfo):
-    def __init__(self, persons_file, relationships_file, hop:int, filter:List[str], invalid_edges_file=None,
-                 invalid_filter:List[str]=None, ignore_file=None):
+    def __init__(self, persons_file, relationships_file, hop: int, filter: List[str], invalid_edges_file=None,
+                 invalid_filter: List[str] = None, ignore_file=None):
         self.persons_file = persons_file
         self.relationships_file = relationships_file
         self.person_identifier = PersonIdentifier()
@@ -218,7 +208,7 @@ class RelationshipFileReader(VertexInfo):
 
     def read(self):
         vertex_exclusions = set()
-        vertex_count = 0 # from this first loop, the count is an estimate as we could have some "island" vertices still
+        vertex_count = 0  # from this first loop, the count is an estimate as we could have some "island" vertices still
         hop_limit_count = 0
         no_color_count = 0
         no_edges_count = 0
@@ -271,9 +261,9 @@ class RelationshipFileReader(VertexInfo):
                             linked.add(row[1])
 
         # read through the vertex file and for any vertices that are
-        # linked and inside of the hop frontier, get a unique monotonically increasing
+        # linked and inside the hop frontier, get a unique monotonically increasing
         # vertex id and add it as a vertex to the graph
-        vertex_count = 0 # reset vertex count
+        vertex_count = 0  # reset vertex count
         with open(self.persons_file, "r") as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -296,7 +286,7 @@ class RelationshipFileReader(VertexInfo):
 
         # if ignore file exists, read it and build dictionary of src -> dest edges that should
         # be ignored
-        ignore:Dict[str, set] = defaultdict(lambda : set())
+        ignore: Dict[str, set] = defaultdict(lambda: set())
         if self.ignore_file:
             with open(self.ignore_file, "r") as csvfile:
                 reader = csv.reader(csvfile)
@@ -315,7 +305,7 @@ class RelationshipFileReader(VertexInfo):
                 if row[2] in self.filter:
                     source_vertex = self.person_identifier.get_person_id(row[0])
                     destination_vertex = self.person_identifier.get_person_id(row[1])
-                    if not source_vertex is None and not destination_vertex is None:
+                    if source_vertex is not None and destination_vertex is not None:
                         if row[0] in ignore and row[1] in ignore[row[0]]:
                             continue
                         self.graph_builder.add_edge(source_vertex, destination_vertex)
@@ -330,7 +320,7 @@ class RelationshipFileReader(VertexInfo):
                     if row[2] in self.filter and row[3] != 'frontier':
                         source_vertex = self.person_identifier.get_person_id(row[0])
                         destination_vertex = self.person_identifier.get_person_id(row[1])
-                        if not source_vertex is None and not destination_vertex is None:
+                        if source_vertex is not None and destination_vertex is not None:
                             if row[0] in ignore and row[1] in ignore[row[0]]:
                                 continue
                             duplicate_edge_count += 1
@@ -352,7 +342,6 @@ class RelationshipFileReader(VertexInfo):
 
 class RedBlackGraphWriter:
     def __init__(self, vertex_info: VertexInfo = None):
-        ''':parameter vertex_info - class providing information on the vertices'''
         self.vertex_key = vertex_info.get_vertex_key() if vertex_info else None
 
     @staticmethod
@@ -361,7 +350,7 @@ class RedBlackGraphWriter:
         formats = {
             ROTATE_90: workbook.add_format({'rotation': 90})
         }
-        return (workbook, formats)
+        return workbook, formats
 
     @staticmethod
     def _calc_width(len_of_max_string):
@@ -406,7 +395,8 @@ class RedBlackGraphWriter:
         worksheet.set_column(n + 1, MAX_COLUMNS_EXCEL - 1, None, None, {'hidden': True})
         workbook.close()
 
-    def write_cell_data(self, cell_data, i, j, max_np, worksheet, font_red):
+    @staticmethod
+    def write_cell_data(cell_data, i, j, max_np, worksheet, font_red):
         if cell_data != 0:
             max_np = max(max_np, cell_data)
             if cell_data == -1:

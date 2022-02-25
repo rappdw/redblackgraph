@@ -130,6 +130,7 @@ if __name__ == "__main__":
             'numpy>=0.14.0',
             'scipy',
             'XlsxWriter',
+            'fs-crawler>=0.3.2'
         ],
         extras_require={
             'dev': [
