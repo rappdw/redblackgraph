@@ -36,13 +36,13 @@ class RbgGraphBuilder(AbstractGraphBuilder):
             self.graph = rb.matrix(np.zeros((nv, ne), dtype=np.int64))
 
     def get_ordering(self) -> Sequence[int]:
-        if not self.graph:
+        if self.graph is None:
             self.graph = rb.rb_matrix(coo_matrix((self.val, (self.row, self.col))))
         ordering = avos_canonical_ordering(self.graph.transitive_closure().W)
         return ordering.label_permutation
 
     def add_vertex(self, vertex_id: int, color: int):
-        if self.graph:
+        if self.graph is not None:
             self.graph[vertex_id, vertex_id] = color
         else:
             self.val[self.idx] = color
@@ -51,7 +51,7 @@ class RbgGraphBuilder(AbstractGraphBuilder):
             self.idx -= 1
 
     def add_edge(self, source_id: int, dest_id: int):
-        if self.graph:
+        if self.graph is not None:
             self.graph[source_id, dest_id] = 3 if self.graph[dest_id, dest_id] == 1 else 2
         else:
             self.val[self.idx] = 3 if self.genders[dest_id] == 1 else 2
@@ -60,11 +60,11 @@ class RbgGraphBuilder(AbstractGraphBuilder):
             self.idx -= 1
 
     def add_gender(self, vertex_id: int, color: int):
-        if not self.graph:
+        if self.graph is None:
             self.genders[vertex_id] = color
 
     def build(self):
-        if self.graph:
+        if self.graph is not None:
             rtn_graph = self.graph
         else:
             rtn_graph = rb.rb_matrix(coo_matrix((self.val, (self.row, self.col))))
