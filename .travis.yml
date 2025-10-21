@@ -1,13 +1,13 @@
 language: python
 sudo: true
-dist: xenial
+dist: jammy
 python:
-  - "3.8"
-  - "3.7"
-  - "3.6"
+  - "3.12"
+  - "3.11"
+  - "3.10"
 install:
   - pip install codecov
-  - pip install cython
+  - pip install "cython>=3.0"
   - pip install -e ".[test]"
 script:
   - bin/test -u

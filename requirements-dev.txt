@@ -1,6 +1,7 @@
 -r requirements.txt
-setuptools
+setuptools<60.0
 wheel
+cython>=3.0
 pytest
 pytest-cov
 pylint

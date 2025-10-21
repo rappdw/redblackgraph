@@ -116,19 +116,15 @@ if __name__ == "__main__":
             'Topic :: Software Development :: Version Control :: Git',
             'Topic :: Software Development :: Libraries :: Python Modules',
             'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+            'Programming Language :: Python :: 3.12',
         ],
         platforms = ["Windows", "Linux", "Mac OS-X"],
         configuration=configuration,
         install_requires=[
-            'dataclasses;python_version<"3.7"',
-            'numpy>=0.14.0',
-            'scipy',
+            'numpy>=1.26.0,<2.0',
+            'scipy>=1.11.0',
             'XlsxWriter',
             'fs-crawler>=0.3.2'
         ],
@@ -143,10 +139,11 @@ if __name__ == "__main__":
             ],
         },
         setup_requires=[
-            'numpy>=0.18.1',
-            'cython'
+            'setuptools<60.0',
+            'numpy>=1.26.0,<2.0',
+            'cython>=3.0'
         ],
-        python_requires='>=3.6',
+        python_requires='>=3.10',
         scripts=[
             'scripts/rbg',
         ]
