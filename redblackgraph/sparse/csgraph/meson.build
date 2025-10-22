@@ -1,9 +1,11 @@
-# Csgraph subpackage - C extensions
-# TODO: Sprint 3 - Add C extension building
+# Csgraph subpackage - Cython extensions
 
-# For now, just install Python sources
+# Install Python sources
 python_sources = [
   '__init__.py',
+  '_validation.py',
+  'cycleerror.py',
+  'transitive_closure.py',
 ]
 
 py.install_sources(
@@ -11,7 +13,28 @@ py.install_sources(
   subdir: 'redblackgraph/sparse/csgraph'
 )
 
-# C extensions will be added in Sprint 3:
-# - _traversal extension
-# - _flow extension
-# - _matching extension
+# Cython extensions (using pre-generated .c files)
+# Each extension is built from .pyx → .c (already generated)
+
+cython_extensions = [
+  '_shortest_path',
+  '_rbg_math',
+  '_components',
+  '_permutation',
+  '_ordering',
+  '_relational_composition',
+  '_tools',
+]
+
+foreach ext_name : cython_extensions
+  py.extension_module(
+    ext_name,
+    ext_name + '.c',
+    dependencies: [py_dep],
+    c_args: [
+      '-I' + incdir_numpy,
+    ],
+    install: true,
+    subdir: 'redblackgraph/sparse/csgraph',
+  )
+endforeach
