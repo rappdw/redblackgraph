@@ -1,0 +1,94 @@
+#include <Python.h>
+#include <stdlib.h>
+
+#define NPY_NO_DEPRECATED_API NPY_API_VERSION
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
+
+#include <numpy/ndarraytypes.h>
+#include <numpy/arrayscalars.h>
+
+#include "rbg_math.h"
+
+{{py:
+# Type definitions for AVOS operations
+# Each tuple is (name, type, utype)
+type_defs = [
+    ('byte', 'npy_byte', 'npy_ubyte'),
+    ('ubyte', 'npy_ubyte', 'npy_ubyte'),
+    ('short', 'npy_short', 'npy_ushort'),
+    ('ushort', 'npy_ushort', 'npy_ushort'),
+    ('int', 'npy_int', 'npy_uint'),
+    ('uint', 'npy_uint', 'npy_uint'),
+    ('long', 'npy_long', 'npy_ulong'),
+    ('ulong', 'npy_ulong', 'npy_ulong'),
+    ('longlong', 'npy_longlong', 'npy_ulonglong'),
+    ('ulonglong', 'npy_ulonglong', 'npy_ulonglong'),
+]
+}}
+
+{{for name, type, utype in type_defs}}
+{{type}} {{name}}_avos_sum({{type}} a, {{type}} b)
+{
+    if (a == 0 || ({{utype}})(~b) == 0) return b;
+    if (b == 0 || ({{utype}})(~a) == 0) return a;
+    if ((({{utype}})a) < (({{utype}})b)) return a;
+    return b;
+}
+
+short {{name}}_MSB({{type}} x)
+{
+    if (({{utype}})~x == 0) return 0;
+    short targetlevel = 0;
+    while (x >>= 1) {
+        targetlevel += 1;
+    }
+    return targetlevel;
+}
+
+{{utype}} {{name}}_avos_product({{type}} lhs, {{type}} rhs)
+{
+    {{utype}} x = ({{utype}})lhs;
+    {{utype}} y = ({{utype}})rhs;
+
+    // The zero property of the avos product
+    if (x == 0 || y == 0) {
+        return 0;
+    }
+    // Special case -1 * 1 or -1 * -1
+    // There is an oddity in bitwise NOT of an unsigned char, ~<unsigned char> temporary is an <int> rather
+    // than an <unsigned char>. Because of this, cast ~x and ~y to the appropriate type
+    if (({{utype}})~x == 0) {
+        if (y == 1) {
+            return x;
+        }
+        x = 1;
+    }
+    if (({{utype}})~y == 0) {
+        if (x == 1) {
+            return y;
+        }
+        y = 1;
+    }
+
+    short bit_position = {{name}}_MSB(y);
+    short result_size = {{name}}_MSB(x) + bit_position;
+    if (result_size >= (short)(sizeof(x) * 8)) {
+        // Overflow Error
+        PyErr_Format(PyExc_OverflowError,
+                         "Avos product of %lu and %lu, results in an overflow. (Result size would require %u bits; Type provides %u bits)", \
+                         lhs, rhs, result_size + 1, (short)(sizeof(x) * 8)
+                         );
+    }
+    {{utype}} result = ((y & ((({{utype}})1 << bit_position) - 1)) | (x << bit_position));
+    if (result == ({{utype}})-1) {
+        // Overflow Error
+        PyErr_Format(PyExc_OverflowError,
+        "Avos product of %lu and %lu, results in an overflow. Result of avos product collides with 'red' 1 (-1).", \
+                                 lhs, rhs
+        );
+    }
+    return result;
+}
+
+{{endfor}}

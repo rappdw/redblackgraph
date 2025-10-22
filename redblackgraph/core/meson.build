@@ -19,19 +19,31 @@ src_dir = 'src/redblackgraph'
 # Tempita processor for template files
 tempita_processor = find_program('../../tools/tempita_processor.py')
 
-# Generate rbg_math.h from Tempita template
+# Generate files from Tempita templates
 rbg_math_h = custom_target('rbg_math_h',
   input: src_dir / 'rbg_math.h.in',
   output: 'rbg_math.h',
   command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
 )
 
+rbg_math_c = custom_target('rbg_math_c',
+  input: src_dir / 'rbg_math.c.in',
+  output: 'rbg_math.c',
+  command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
+)
+
+warshall_c = custom_target('warshall_c',
+  input: src_dir / 'warshall.c.in',
+  output: 'warshall.c',
+  command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
+)
+
 _redblackgraph_sources = [
   src_dir / 'redblackgraphmodule.c',
-  src_dir / 'rbg_math.c',           # TODO: Convert from .c.src to .c.in (Phase 2)
+  rbg_math_c,                        # Generated from rbg_math.c.in (Phase 2 ✅)
   src_dir / 'redblack.c',           # TODO: Convert from .c.src to .c.in (Phase 4)
   src_dir / 'relational_composition.c',  # TODO: Convert from .c.src to .c.in (Phase 3)
-  src_dir / 'warshall.c',           # TODO: Convert from .c.src to .c.in (Phase 2)
+  warshall_c,                        # Generated from warshall.c.in (Phase 2 ✅)
   rbg_math_h,                        # Generated header - forces generation before compilation
 ]
 
