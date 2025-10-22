@@ -2896,6 +2896,7 @@ finish:
     return ret;
 
 fail:
+    NpyIter_Deallocate(iter);  // Fixed: NumPy issue - was missing, caused memory leak
     for (iop = 0; iop < nop; ++iop) {
         Py_XDECREF(op[iop]);
     }
