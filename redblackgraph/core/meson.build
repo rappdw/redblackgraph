@@ -16,9 +16,10 @@ py.install_sources(
 # This extension provides optimized AVOS linear algebra operations
 src_dir = 'src/redblackgraph'
 
-# Template processors
-tempita_processor = find_program('../../tools/tempita_processor.py')
-src_template_processor = find_program('../../tools/process_src_template.py')
+# Template processors - use files() instead of find_program() to avoid 
+# double python.exe invocation on Windows
+tempita_processor = files('../../tools/tempita_processor.py')
+src_template_processor = files('../../tools/process_src_template.py')
 
 # Generate files from Tempita templates (.c.in, .h.in)
 rbg_math_h = custom_target('rbg_math_h',
