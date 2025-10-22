@@ -2,6 +2,7 @@
 [![Coverage](https://codecov.io/gh/rappdw/redblackgraph/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/redblackgraph)
 [![PyPi](https://img.shields.io/pypi/v/redblackgraph.svg)](https://pypi.org/project/redblackgraph/) 
 [![PyPi](https://img.shields.io/pypi/wheel/redblackgraph.svg)](https://pypi.org/project/redblackgraph/) 
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/) 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/) 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/) 
 
@@ -50,6 +51,32 @@ rbgcf -f <directory and base name of vertices and edges file> -o <output-directo
 # Use excel to view output
  
 ```
+
+# Building from Source
+
+RedBlackGraph uses the Meson build system (as of version 0.5.0, migrated from numpy.distutils).
+
+## Requirements
+- Python 3.10, 3.11, or 3.12
+- Meson >= 1.2.0
+- Ninja build tool
+- Cython >= 3.0
+- NumPy >= 1.26
+
+## Build and Install
+```bash
+# Install build dependencies
+pip install meson-python meson ninja cython numpy
+
+# Build and install in development mode
+pip install -e .
+
+# Or build wheel
+pip install build
+python -m build
+```
+
+The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 
 # A Note on Implementations
 
