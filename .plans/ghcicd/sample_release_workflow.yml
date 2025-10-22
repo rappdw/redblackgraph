@@ -1,0 +1,189 @@
+# Sample GitHub Actions Release Workflow
+# This file should be placed at: .github/workflows/release.yml
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.5.1)'
+        required: true
+
+jobs:
+  build-sdist:
+    name: Build Source Distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+          pip install meson-python>=0.15.0
+          pip install meson>=1.2.0
+          pip install ninja
+          pip install cython>=3.0
+      
+      - name: Build source distribution
+        run: python -m build --sdist
+      
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  build-wheels:
+    name: Build Wheels (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+          pip install meson-python>=0.15.0
+          pip install meson>=1.2.0
+          pip install ninja
+          pip install cython>=3.0
+      
+      - name: Build wheel
+        run: python -m build --wheel
+      
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: dist/*.whl
+
+  # Alternative: Use cibuildwheel for multi-platform binary wheels
+  build-wheels-cibuildwheel:
+    name: Build Wheels (cibuildwheel on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    if: false  # Enable this by changing to 'true' when ready
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_BUILD: cp310-* cp311-* cp312-*
+          CIBW_SKIP: pp* *-musllinux_*
+          CIBW_BEFORE_BUILD: pip install meson-python>=0.15.0 meson>=1.2.0 ninja cython>=3.0
+      
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels-cibuildwheel-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+  test-wheels:
+    name: Test Wheels
+    needs: [build-wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Download all wheels
+        uses: actions/download-artifact@v3
+        with:
+          path: dist/
+      
+      - name: Install wheel and test
+        run: |
+          # Find and install a wheel
+          wheel=$(find dist/ -name "*.whl" -type f | head -n 1)
+          if [ -n "$wheel" ]; then
+            pip install "$wheel[test]"
+            pytest tests/ -v
+          else
+            echo "No wheel found to test"
+            exit 1
+          fi
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-sdist, build-wheels, test-wheels]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist/
+      
+      - name: Flatten artifacts directory
+        run: |
+          mkdir -p release_files
+          find dist/ -type f \( -name "*.whl" -o -name "*.tar.gz" \) -exec mv {} release_files/ \;
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_files/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [create-release]
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write  # Required for trusted publishing
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist/
+      
+      - name: Flatten artifacts directory
+        run: |
+          mkdir -p pypi_upload
+          find dist/ -type f \( -name "*.whl" -o -name "*.tar.gz" \) -exec mv {} pypi_upload/ \;
+      
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pypi_upload/
+          # Alternative: Use API token if not using trusted publishing
+          # password: ${{ secrets.PYPI_API_TOKEN }}
