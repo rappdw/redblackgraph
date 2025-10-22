@@ -2,9 +2,9 @@ language: python
 sudo: true
 dist: jammy
 python:
-  - "3.12"
   - "3.11"
   - "3.10"
+  # Python 3.12 blocked until Phase 2 Meson migration (distutils removed from stdlib)
 install:
   - pip install codecov
   - pip install "cython>=3.0"
