@@ -138,7 +138,7 @@ static void
 }
 
 static void
-{{name}}_gufunc_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{{name}}_gufunc_edge_relational_composition(char **args, const npy_intp *dimensions, const npy_intp *steps, void *NPY_UNUSED(func))
 {
     /* outer dimensions counter */
     npy_intp N_;
@@ -163,7 +163,7 @@ static void
 }
 
 static void
-{{name}}_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
+{{name}}_vertex_relational_composition(char **args, const npy_intp *dimensions, const npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
     char *ipu = args[0];
