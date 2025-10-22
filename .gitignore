@@ -1,7 +1,7 @@
 activate
 .idea
 .vscode
-.venv
+.venv*
 dist/
 build/
 .cache/
@@ -44,6 +44,7 @@ _sparsetools.*.so
 cythonize.dat
 
 # Meson build artifacts
-builddir/
+build/
+builddir*
 .mesonpy-*
 *.dist-info/
