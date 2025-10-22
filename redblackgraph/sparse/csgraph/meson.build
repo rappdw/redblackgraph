@@ -13,9 +13,7 @@ py.install_sources(
   subdir: 'redblackgraph/sparse/csgraph'
 )
 
-# Cython extensions (using pre-generated .c files)
-# Each extension is built from .pyx → .c (already generated)
-
+# Cython extensions - generate .c from .pyx during build
 cython_extensions = [
   '_shortest_path',
   '_rbg_math',
@@ -29,7 +27,7 @@ cython_extensions = [
 foreach ext_name : cython_extensions
   py.extension_module(
     ext_name,
-    ext_name + '.c',
+    ext_name + '.pyx',  # Use .pyx source, Cython will generate .c
     dependencies: [py_dep],
     c_args: [
       '-I' + incdir_numpy,

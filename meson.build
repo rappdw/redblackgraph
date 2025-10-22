@@ -1,6 +1,6 @@
 project(
   'redblackgraph',
-  'c', 'cpp',
+  'c', 'cpp', 'cython',
   version: '0.5.0',
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
