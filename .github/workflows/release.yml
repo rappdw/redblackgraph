@@ -33,6 +33,7 @@ jobs:
           pip install meson>=1.2.0
           pip install ninja
           pip install cython>=3.0
+          pip install tempita>=0.5.2  # Required for template processing
       
       - name: Build source distribution
         run: python -m build --sdist
@@ -71,6 +72,7 @@ jobs:
           pip install meson>=1.2.0
           pip install ninja
           pip install cython>=3.0
+          pip install tempita>=0.5.2  # Required for template processing
       
       - name: Build wheel
         run: python -m build --wheel
