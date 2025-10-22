@@ -16,10 +16,11 @@ py.install_sources(
 # This extension provides optimized AVOS linear algebra operations
 src_dir = 'src/redblackgraph'
 
-# Tempita processor for template files
+# Template processors
 tempita_processor = find_program('../../tools/tempita_processor.py')
+src_template_processor = find_program('../../tools/process_src_template.py')
 
-# Generate files from Tempita templates
+# Generate files from Tempita templates (.c.in, .h.in)
 rbg_math_h = custom_target('rbg_math_h',
   input: src_dir / 'rbg_math.h.in',
   output: 'rbg_math.h',
@@ -44,12 +45,19 @@ relational_composition_c = custom_target('relational_composition_c',
   command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
 )
 
+# Generate from NumPy-style .c.src template (follows NumPy 2.x approach)
+redblack_c = custom_target('redblack_c',
+  input: src_dir / 'redblack.c.src',
+  output: 'redblack.c',
+  command: [py, src_template_processor, '@INPUT@', '-o', '@OUTPUT@']
+)
+
 _redblackgraph_sources = [
   src_dir / 'redblackgraphmodule.c',
-  rbg_math_c,                        # Generated from rbg_math.c.in (Phase 2 ✅)
-  src_dir / 'redblack.c',           # TODO: Convert from .c.src to .c.in (Phase 4)
-  relational_composition_c,          # Generated from relational_composition.c.in (Phase 3 ✅)
-  warshall_c,                        # Generated from warshall.c.in (Phase 2 ✅)
+  rbg_math_c,                        # Generated from rbg_math.c.in (Tempita, Phase 2 ✅)
+  redblack_c,                        # Generated from redblack.c.src (NumPy style, Phase 4 ✅)
+  relational_composition_c,          # Generated from relational_composition.c.in (Tempita, Phase 3 ✅)
+  warshall_c,                        # Generated from warshall.c.in (Tempita, Phase 2 ✅)
   rbg_math_h,                        # Generated header - forces generation before compilation
 ]
 
