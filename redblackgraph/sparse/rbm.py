@@ -4,6 +4,7 @@ import numpy as np
 from redblackgraph.sparse._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
 from scipy.sparse.csr import csr_matrix
 from scipy.sparse import get_index_dtype
+from scipy.sparse._sputils import upcast
 
 
 class rb_matrix(csr_matrix):
@@ -50,7 +51,7 @@ class rb_matrix(csr_matrix):
                                     maxval=nnz)
         indptr = np.asarray(indptr, dtype=idx_dtype)
         indices = np.empty(nnz, dtype=idx_dtype)
-        data = np.empty(nnz, dtype=np.result_type(self.dtype, other.dtype))
+        data = np.empty(nnz, dtype=upcast(self.dtype, other.dtype))
 
         rbm_matmat_pass2(M, N, np.asarray(self.indptr, dtype=idx_dtype),
                          np.asarray(self.indices, dtype=idx_dtype),
