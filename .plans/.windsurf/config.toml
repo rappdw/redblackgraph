@@ -1,0 +1,4 @@
+[environment]
+# I've found the following the best mechanism to have Windsurf consistently use my virtual environment
+# to setup the virtual env, I us `uv venv`
+python = ".venv/bin/python"

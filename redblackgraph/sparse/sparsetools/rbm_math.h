@@ -59,7 +59,7 @@ const U avos_product(const T& lhs, const T& rhs)
                          lhs, rhs, result_size + 1, (short)(sizeof(x) * 8)
                          );
     }
-    U result = ((y & ((U)pow(2, bit_position) - 1)) | (x << bit_position));
+    U result = ((y & (((U)1 << bit_position) - 1)) | (x << bit_position));
     if (result == (U)-1) {
         // Overflow Error
         PyErr_Format(PyExc_OverflowError,
@@ -156,7 +156,7 @@ void rbm_matmat_pass2(const I n_row,
 
         for(I jj = Ap[i]; jj < Ap[i+1]; jj++){
             I j = Aj[jj];
-            U v = (U)Ax[jj];
+            T v = Ax[jj];
 
             for(I kk = Bp[j]; kk < Bp[j+1]; kk++){
                 I k = Bj[kk];
