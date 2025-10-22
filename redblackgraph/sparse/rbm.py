@@ -2,8 +2,7 @@
 
 import numpy as np
 from redblackgraph.sparse._sparsetools import rbm_matmat_pass1, rbm_matmat_pass2
-from scipy.sparse.csr import csr_matrix
-from scipy.sparse import get_index_dtype
+from scipy.sparse import csr_matrix, get_index_dtype
 from scipy.sparse._sputils import upcast
 
 
@@ -17,6 +16,20 @@ class rb_matrix(csr_matrix):
 
     def __rmatmul__(self, other):
         # convert to this format
+        return self.__class__(other)._mul_sparse_matrix(self)
+
+    def __mul__(self, other):
+        # Override * operator to use AVOS multiplication for sparse matrices
+        # But allow scalar multiplication to use parent implementation
+        if np.isscalar(other):
+            return super().__mul__(other)
+        return self._mul_sparse_matrix(other)
+
+    def __rmul__(self, other):
+        # Handle scalar multiplication
+        if np.isscalar(other):
+            return super().__rmul__(other)
+        # convert to this format for matrix multiplication
         return self.__class__(other)._mul_sparse_matrix(self)
 
     def transitive_closure(self, method="D"):
