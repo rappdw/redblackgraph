@@ -47,7 +47,7 @@ jobs:
       
       - name: Install project with test dependencies
         run: |
-          pip install -e ".[test]"
+          pip install -e ".[test]" --no-build-isolation
       
       - name: Create output directory
         run: mkdir -p _testing_output
