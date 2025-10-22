@@ -1,0 +1,81 @@
+[build-system]
+# Minimum requirements for building with meson-python
+requires = [
+    "meson-python>=0.15.0",
+    "meson>=1.2.0",
+    "ninja",
+    "Cython>=3.0.0",
+    # NumPy is needed at build time for C API headers
+    "numpy>=1.26.0,<2.0",
+]
+build-backend = "mesonpy"
+
+[project]
+name = "redblackgraph"
+version = "0.5.0"  # Phase 2 version
+description = "Red Black Graph - AVOS algebra for graph computation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "AGPLv3+"}
+authors = [
+    {name = "Daniel Rapp", email = "rappdw@gmail.com"},
+]
+maintainers = [
+    {name = "Daniel Rapp", email = "rappdw@gmail.com"},
+]
+keywords = ["graph", "algebra", "AVOS", "sparse", "matrix"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Programming Language :: Cython",
+]
+
+# Runtime dependencies
+dependencies = [
+    "numpy>=1.26.0,<2.0",
+    "scipy>=1.11.0",
+    "XlsxWriter",
+    "fs-crawler>=0.3.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "wheel>=0.29",
+]
+test = [
+    "pytest>=3.0",
+    "pytest-cov>=2.4",
+    "pylint>=1.8.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/rappdw/redblackgraph"
+Repository = "https://github.com/rappdw/redblackgraph"
+Download = "https://github.com/rappdw/redblackgraph"
+
+[project.scripts]
+rbg = "redblackgraph.__main__:main"
+
+[tool.meson-python.args]
+# Pass additional arguments to meson if needed
+# setup = ["-Doption=value"]
+
+[tool.cibuildwheel]
+# Configuration for building wheels if needed later
+skip = "pp* *-musllinux_*"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
