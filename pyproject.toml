@@ -82,11 +82,8 @@ skip = "pp* *-musllinux_*"
 # Test the wheel imports after building
 test-command = "python -c \"import redblackgraph; print('RedBlackGraph version:', redblackgraph.__version__)\""
 
-# Install test dependencies for wheel testing
-test-requires = ["pytest", "numpy"]
-
-# Additional test to ensure the package works
-test-extras = ["test"]
+# Install numpy as test dependency (required by redblackgraph)
+test-requires = ["numpy"]
 
 # Build configuration
 [tool.cibuildwheel.linux]
