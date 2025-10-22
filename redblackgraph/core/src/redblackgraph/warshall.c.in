@@ -48,7 +48,7 @@ type_defs = [
 
 {{for name, type, utype, format, type_num in type_defs}}
 static void
-{{name}}_warshall(char **args, npy_intp *dimensions, npy_intp *steps)
+{{name}}_warshall(char **args, const npy_intp *dimensions, const npy_intp *steps)
 {
     /* pointers to data for input and output arrays */
     char *ipR1 = args[1]; // first pointer to R
@@ -107,7 +107,7 @@ static void
 }
 
 static void
-{{name}}_gufunc_warshall(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{{name}}_gufunc_warshall(char **args, const npy_intp *dimensions, const npy_intp *steps, void *NPY_UNUSED(func))
 {
     /* outer dimensions counter */
     npy_intp N_;
