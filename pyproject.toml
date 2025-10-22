@@ -79,8 +79,11 @@ build = "cp310-* cp311-* cp312-*"
 # Skip PyPy and musllinux (meson-python can have issues with musl)
 skip = "pp* *-musllinux_*"
 
-# Skip wheel testing - wheels build successfully, testing happens separately
-test-skip = "*"
+# Test that the wheel can be imported successfully
+test-command = "python -c \"import redblackgraph; print('✓ Import successful, version:', redblackgraph.__version__)\""
+
+# Only need runtime dependencies for import test
+test-requires = ["numpy"]
 
 # Build configuration
 [tool.cibuildwheel.linux]

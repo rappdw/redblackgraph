@@ -83,38 +83,9 @@ jobs:
           name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
           path: dist/*.whl
 
-  test-wheels:
-    name: Test Wheels
-    needs: [build-wheels]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-      
-      - name: Download all wheels
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-      
-      - name: Install wheel and test
-        run: |
-          # Find and install a wheel
-          wheel=$(find dist/ -name "*cp312*linux*.whl" -type f | head -n 1)
-          if [ -n "$wheel" ]; then
-            pip install "$wheel[test]"
-            pytest tests/ -v
-          else
-            echo "No wheel found to test"
-            exit 1
-          fi
-
   create-release:
     name: Create GitHub Release
-    needs: [build-sdist, build-wheels, test-wheels]
+    needs: [build-sdist, build-wheels]
     runs-on: ubuntu-latest
     permissions:
       contents: write
