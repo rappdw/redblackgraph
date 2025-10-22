@@ -79,8 +79,8 @@ build = "cp310-* cp311-* cp312-*"
 # Skip PyPy and musllinux (meson-python can have issues with musl)
 skip = "pp* *-musllinux_*"
 
-# Test the wheel imports after building
-test-command = "python -c \"import redblackgraph; print('RedBlackGraph version:', redblackgraph.__version__)\""
+# Test the wheel imports after building (run from temp dir to avoid importing from source)
+test-command = "python -c \"import os; os.chdir(os.path.expanduser('~')); import redblackgraph; print('RedBlackGraph version:', redblackgraph.__version__)\""
 
 # Install numpy as test dependency (required by redblackgraph)
 test-requires = ["numpy"]
