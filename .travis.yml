@@ -2,11 +2,14 @@ language: python
 sudo: true
 dist: jammy
 python:
+  - "3.12"  # Now supported with Meson build system
   - "3.11"
   - "3.10"
-  # Python 3.12 blocked until Phase 2 Meson migration (distutils removed from stdlib)
 install:
   - pip install codecov
+  - pip install "meson-python>=0.15.0"
+  - pip install "meson>=1.2.0"
+  - pip install "ninja"
   - pip install "cython>=3.0"
   - pip install -e ".[test]"
 script:

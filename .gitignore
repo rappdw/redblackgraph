@@ -42,3 +42,8 @@ notebooks/.diff
 _redblackgraph.*.so
 _sparsetools.*.so
 cythonize.dat
+
+# Meson build artifacts
+builddir/
+.mesonpy-*
+*.dist-info/

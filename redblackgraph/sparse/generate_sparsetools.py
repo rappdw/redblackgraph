@@ -21,7 +21,14 @@ See sparsetools.cxx for more details.
 """
 import optparse
 import os
-from distutils.dep_util import newer
+
+def newer(source, target):
+    """Check if source file is newer than target file"""
+    if not os.path.exists(target):
+        return True
+    if not os.path.exists(source):
+        return False
+    return os.path.getmtime(source) > os.path.getmtime(target)
 
 #
 # List of all routines and their argument types.
