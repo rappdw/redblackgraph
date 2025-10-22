@@ -29,8 +29,10 @@
 ## 🔄 IN PROGRESS
 
 ### GitHub Actions CI Execution
-- **Status**: Workflow triggered (commit 74c5c0e)
-- **Expected**: Should pass now with tempita dependency added
+- **Status**: Fixed and re-triggered (commit 3752d0b)
+- **Issue Found**: Cython .c files weren't in git, meson.build needed to generate them
+- **Fix Applied**: Added 'cython' language, changed to use .pyx sources
+- **Expected**: Should pass now with Cython generation + tempita
 - **Monitoring**: Check https://github.com/rappdw/redblackgraph/actions
 
 ## 📋 NEXT STEPS
