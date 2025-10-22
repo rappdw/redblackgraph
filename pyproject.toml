@@ -5,6 +5,7 @@ requires = [
     "meson>=1.2.0",
     "ninja",
     "Cython>=3.0.0",
+    "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
     "numpy>=1.26.0,<2.0",
 ]

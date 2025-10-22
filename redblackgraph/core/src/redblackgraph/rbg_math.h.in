@@ -1,0 +1,30 @@
+#if defined __cplusplus
+extern "C" {
+#endif
+
+{{py:
+# Type definitions for AVOS operations
+# Each tuple is (name, type, utype)
+type_defs = [
+    ('byte', 'npy_byte', 'npy_ubyte'),
+    ('ubyte', 'npy_ubyte', 'npy_ubyte'),
+    ('short', 'npy_short', 'npy_ushort'),
+    ('ushort', 'npy_ushort', 'npy_ushort'),
+    ('int', 'npy_int', 'npy_uint'),
+    ('uint', 'npy_uint', 'npy_uint'),
+    ('long', 'npy_long', 'npy_ulong'),
+    ('ulong', 'npy_ulong', 'npy_ulong'),
+    ('longlong', 'npy_longlong', 'npy_ulonglong'),
+    ('ulonglong', 'npy_ulonglong', 'npy_ulonglong'),
+]
+}}
+
+{{for name, type, utype in type_defs}}
+{{type}} {{name}}_avos_sum({{type}} a, {{type}} b);
+short {{name}}_MSB({{type}} x);
+{{utype}} {{name}}_avos_product({{type}} x, {{type}} y);
+
+{{endfor}}
+#if defined __cplusplus
+};
+#endif
