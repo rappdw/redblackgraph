@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ master, main, develop, feature/github-actions-ci ]
+    branches: [ master, main, develop ]
   pull_request:
     branches: [ master, main ]
   workflow_dispatch:
