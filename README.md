@@ -78,6 +78,34 @@ python -m build
 
 The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 
+# Building and Publishing Wheels
+
+RedBlackGraph uses `cibuildwheel` to build wheels for multiple platforms and Python versions.
+
+## Quick Start
+
+```bash
+# Build wheels for current platform
+./bin/build-wheels-cibuildwheel.sh
+
+# Or use cibuildwheel directly
+pip install cibuildwheel
+cibuildwheel --platform auto --output-dir wheelhouse
+```
+
+## Automated Release
+
+Wheels are automatically built and published to PyPI when a version tag is pushed:
+
+```bash
+git tag -a v0.5.1 -m "Release version 0.5.1"
+git push origin v0.5.1
+```
+
+For detailed instructions, see:
+- **[PyPI Publishing Guide](docs/PYPI_PUBLISHING.md)** - Complete guide for building and publishing
+- **[Release Checklist](RELEASE_CHECKLIST.md)** - Quick reference for releases
+
 # A Note on Implementations
 
 * `redblackgraph.reference` - a pure python implementation. This simple implementation is intended primarily for illustrative purposes.

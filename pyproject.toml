@@ -8,12 +8,13 @@ requires = [
     "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
     "numpy>=1.26.0,<2.0",
+    "setuptools_scm>=8.0",  # For dynamic versioning from git tags
 ]
 build-backend = "mesonpy"
 
 [project]
 name = "redblackgraph"
-version = "0.5.0"  # Phase 2 version
+dynamic = ["version"]  # Version determined by setuptools_scm from git tags
 description = "Red Black Graph - AVOS algebra for graph computation"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -72,8 +73,50 @@ rbg = "redblackgraph.__main__:main"
 # setup = ["-Doption=value"]
 
 [tool.cibuildwheel]
-# Configuration for building wheels if needed later
+# Build wheels for CPython 3.10, 3.11, 3.12 on all platforms
+build = "cp310-* cp311-* cp312-*"
+
+# Skip PyPy and musllinux (meson-python can have issues with musl)
 skip = "pp* *-musllinux_*"
+
+# Test the wheel imports after building
+test-command = "python -c \"import redblackgraph; print('RedBlackGraph version:', redblackgraph.__version__)\""
+
+# Install test dependencies for wheel testing
+test-requires = ["pytest", "numpy"]
+
+# Additional test to ensure the package works
+test-extras = ["test"]
+
+# Build configuration
+[tool.cibuildwheel.linux]
+# Use manylinux2014 for broader compatibility
+manylinux-x86_64-image = "manylinux2014"
+manylinux-aarch64-image = "manylinux2014"
+
+# Ninja is installed via pip in the build environment
+# No system packages needed
+
+[tool.cibuildwheel.macos]
+# Build for both x86_64 and arm64 on macOS
+archs = ["x86_64", "arm64"]
+
+# Install dependencies via brew if needed
+before-all = [
+    "brew install ninja || true"
+]
+
+[tool.cibuildwheel.windows]
+# Windows-specific configuration
+before-build = [
+    "pip install ninja"
+]
+
+[tool.setuptools_scm]
+# Get version from git tags
+write_to = "redblackgraph/_version.py"
+version_scheme = "post-release"
+local_scheme = "no-local-version"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

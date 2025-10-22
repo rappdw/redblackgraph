@@ -1,7 +1,9 @@
 # from .rbm import rb_matrix, Color
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+try:
+    from ._version import __version__
+except ImportError:
+    # Version file not yet generated (e.g., in development without build)
+    __version__ = "0.0.0.dev0"
 
 from .core import *
 from .sparse import *

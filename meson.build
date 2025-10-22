@@ -1,6 +1,8 @@
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
+  # Version is determined by setuptools_scm from git tags
+  # This is a fallback for meson's internal use
   version: '0.5.0',
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
@@ -16,6 +18,9 @@ project(
 py_mod = import('python')
 py = py_mod.find_installation(pure: false)
 py_dep = py.dependency()
+
+# Filesystem module for file checks
+fs = import('fs')
 
 message('Python path:', py.full_path())
 message('Python version:', py.language_version())
