@@ -12,7 +12,6 @@
 
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
-#define NPY_NO_DEPRECATED_API NPY_API_VERSION
 #include <numpy/npy_3kcompat.h>
 #include <numpy/noprefix.h>
 #include <numpy/ndarrayobject.h>

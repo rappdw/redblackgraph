@@ -1,7 +1,6 @@
 #include <Python.h>
 #include <stdlib.h>
 
-#define NPY_NO_DEPRECATED_API NPY_API_VERSION
 #define NO_IMPORT_ARRAY
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
