@@ -38,11 +38,17 @@ warshall_c = custom_target('warshall_c',
   command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
 )
 
+relational_composition_c = custom_target('relational_composition_c',
+  input: src_dir / 'relational_composition.c.in',
+  output: 'relational_composition.c',
+  command: [py, tempita_processor, '@INPUT@', '-o', '@OUTPUT@']
+)
+
 _redblackgraph_sources = [
   src_dir / 'redblackgraphmodule.c',
   rbg_math_c,                        # Generated from rbg_math.c.in (Phase 2 ✅)
   src_dir / 'redblack.c',           # TODO: Convert from .c.src to .c.in (Phase 4)
-  src_dir / 'relational_composition.c',  # TODO: Convert from .c.src to .c.in (Phase 3)
+  relational_composition_c,          # Generated from relational_composition.c.in (Phase 3 ✅)
   warshall_c,                        # Generated from warshall.c.in (Phase 2 ✅)
   rbg_math_h,                        # Generated header - forces generation before compilation
 ]

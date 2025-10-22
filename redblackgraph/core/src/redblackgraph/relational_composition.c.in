@@ -1,0 +1,332 @@
+/* -*- c -*- */
+
+/*
+ *****************************************************************************
+ **                            INCLUDES                                     **
+ *****************************************************************************
+ */
+#include <Python.h>
+#include <math.h>
+
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
+
+#define NPY_NO_DEPRECATED_API NPY_API_VERSION
+#include <numpy/noprefix.h>
+#include <numpy/ndarraytypes.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/arrayscalars.h>
+#include <numpy/ufuncobject.h>
+
+#include "redblack.h"
+#include "rbg_math.h"
+
+/*
+ *****************************************************************************
+ **                             UFUNC LOOPS                                 **
+ *****************************************************************************
+ */
+
+char *vertex_relational_composition_signature = "(n),(n,n),(n),()->(m,m)";
+char *edge_relational_composition_signature = "(n,n),(),(),()->(n,n)";
+//char *edge_relational_composition2_signature = "(),(n,n),(),()->(n,n)"; // for symmetry
+
+{{py:
+# Type definitions for relational composition
+# Each tuple is (name, type, utype, type_num, stype_num)
+type_defs = [
+    ('byte', 'npy_byte', 'npy_ubyte', 'NPY_BYTE', 'NPY_BYTE'),
+    ('ubyte', 'npy_ubyte', 'npy_ubyte', 'NPY_UBYTE', 'NPY_BYTE'),
+    ('short', 'npy_short', 'npy_ushort', 'NPY_SHORT', 'NPY_SHORT'),
+    ('ushort', 'npy_ushort', 'npy_ushort', 'NPY_USHORT', 'NPY_SHORT'),
+    ('int', 'npy_int', 'npy_uint', 'NPY_INT', 'NPY_INT'),
+    ('uint', 'npy_uint', 'npy_uint', 'NPY_UINT', 'NPY_INT'),
+    ('long', 'npy_long', 'npy_ulong', 'NPY_LONG', 'NPY_LONG'),
+    ('ulong', 'npy_ulong', 'npy_ulong', 'NPY_ULONG', 'NPY_LONG'),
+    ('longlong', 'npy_longlong', 'npy_ulonglong', 'NPY_LONGLONG', 'NPY_LONGLONG'),
+    ('ulonglong', 'npy_ulonglong', 'npy_ulonglong', 'NPY_ULONGLONG', 'NPY_LONGLONG'),
+]
+}}
+
+{{for name, type, utype, type_num, stype_num in type_defs}}
+static void
+{{name}}_vector_avos(void* ip0_, npy_intp is0, void* ip1_, npy_intp is1, void* op, npy_intp n, {{type}} beta, {{type}} np)
+{
+    {{type}} r = 0;
+    const char *ip0 = (char*)ip0_, *ip1 = (char*)ip1_;
+    npy_uint i;
+    for (i = 0; i < n; i++) {
+        {{type}} lhs = *({{type}} *)ip0;
+        // if np is non-zero, then replace it as the LHS for column beta, otherwise this is a
+        // straight avos product
+        if (np != 0 && ({{type}})i == beta) {
+            lhs = np;
+        }
+        r = {{name}}_avos_sum(r, {{name}}_avos_product(lhs, *({{type}} *)ip1));
+        ip0 += is0;
+        ip1 += is1;
+    }
+    *({{type}} *)op = r;
+}
+
+static void
+{{name}}_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
+{
+    /* pointers to data for input and output arrays */
+    char *ipR1 = args[0]; // first pointer to R
+    char *ipR2 = args[0]; // second pointer to R
+    {{type}} alpha = *({{type}} *)args[1];
+    {{type}} beta = *({{type}} *)args[2];
+    {{type}} np = *({{type}} *)args[3];
+    char *op = args[4];
+
+    /* lengths of core dimensions */
+    npy_intp dn = dimensions[0];
+
+    /* striding over core dimensions */
+    npy_intp isR_i = steps[0];
+    npy_intp isR_j = steps[1];
+    npy_intp os_i = steps[2];
+    npy_intp os_j = steps[3];
+
+    /* core dimensions counters */
+    npy_intp m, p;
+
+    /* Step 1, set output row_alpha with (input row_alpha +_beta np) avos R */
+    ipR1 += isR_i * alpha;
+    op += os_i * alpha;
+    for (p = 0; p < dn; p++) {
+        {{name}}_vector_avos(ipR1, isR_j, ipR2, isR_i, op, dn, beta, np);
+        /* advance to next column of 2nd input array and output array */
+        ipR2 += isR_j;
+        op += os_j;
+    }
+
+    /* reset ipR1, ipR2, op */
+    ipR1 = args[4];
+    ipR1 += os_i * alpha;
+    op = args[4];
+    ipR2 = args[0];
+
+    /* Step 2, copy input to output, transitively closing any new columns as necessary */
+    for (m = 0; m < dn; m++) {
+        {{type}} lhs = *({{type}} *)(ipR2 + isR_j * alpha);
+        if (({{type}})m != alpha) {
+            for (p = 0; p < dn; p++) {
+                if (*({{type}} *)ipR1 != 0) {
+                    *({{type}} *)op = {{name}}_avos_sum(*({{type}} *)ipR2, {{name}}_avos_product(lhs, *({{type}} *)ipR1));
+                }
+                else {
+                    *({{type}} *)op = *({{type}} *)ipR2;
+                }
+
+                /* advance to next column of the alpha row, 2nd input array and output array */
+                ipR1 += isR_j;
+                ipR2 += isR_j;
+                op  +=  os_j;
+            }
+
+            /* reset to first column of the alpha row, 2nd input array and output array */
+            ipR1 -= isR_j * p;
+            ipR2 -= isR_j * p;
+            op -= os_j * p;
+
+        }
+        /* advance to next row of 1st input array and output array */
+        ipR2 += isR_i;
+        op += os_i;
+    }
+}
+
+static void
+{{name}}_gufunc_edge_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    /* outer dimensions counter */
+    npy_intp N_;
+
+    /* length of flattened outer dimensions */
+    npy_intp dN = dimensions[0];
+
+    /* striding over flattened outer dimensions for input and output arrays */
+    npy_intp s0 = steps[0];
+    // npy_intp s1 = steps[1];
+    // npy_intp s2 = steps[2];
+    // npy_intp s3 = steps[3];
+    npy_intp s4 = steps[4];
+
+    /*
+     * loop through outer dimensions, performing matrix multiply on
+     * core dimensions for each loop
+     */
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[4] += s4) {
+        {{name}}_edge_relational_composition(args, dimensions+1, steps+5);
+    }
+}
+
+static void
+{{name}}_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps)
+{
+    /* pointers to data for input and output arrays */
+    char *ipu = args[0];
+    char *ipR = args[1];
+    char *ipv = args[2];
+    {{type}} self = *({{type}} *)args[3];
+    char *op = args[4];
+
+    /* lengths of core dimensions */
+    npy_intp dn = dimensions[0];
+    // npy_intp dm = dimensions[1];
+
+    /* striding over core dimensions */
+    npy_intp isu_n = steps[0]; // stride over u elements
+    npy_intp isR_i = steps[1]; // stride over R rows
+    npy_intp isR_j = steps[2]; // stride over R columns
+    npy_intp isv_n = steps[3]; // stride over v elements
+    npy_intp os_i = steps[4]; // stride over Output rows
+    npy_intp os_j = steps[5]; // stride over Output columns
+
+    /* core dimensions counters */
+    npy_intp n;
+
+    /* Step 1, set output R_\lambda[n+1] = u avos R (add the new row for vertex_\lambda) */
+    op += os_i * dn;
+    for (n = 0; n < dn; n++) {
+        {{name}}_vector_avos(ipu, isu_n, ipR, isR_i, op, dn, 0, 0);
+        /* advance to next column of R and R_lambda (output) */
+        ipR += isR_j;
+        op += os_j;
+    }
+
+    /* Set the self element in the added row */
+    *({{type}} *)op = self;
+
+    /* reset op */
+    ipR = args[1];
+    op = args[4];
+
+    /* Step 2, set output R_\lambda[:][n+1] = R avos v (add the new column for vertex_\lambda) */
+    op += os_j * dn;
+    for (n = 0; n < dn; n++) {
+        {{name}}_vector_avos(ipR, isR_j, ipv, isv_n, op, dn, 0, 0);
+        /* advance to next row of R and R_lambda*/
+        ipR += isR_i;
+        op += os_i;
+    }
+
+    /* reset op */
+    ipR = args[1];
+    op = args[4];
+
+    // ipv and ipu need to be set to the row/column we added above
+    ipu = args[4] + os_i * dn;
+    ipv = args[4] + os_j * dn;
+
+    /* Step 3, check for cycle constraint violation */
+    for (n = 0; n < dn; n++) {
+        if ((*({{type}} *)ipv != 0) && (*({{type}} *)ipu != 0)) {
+            // This condition indicates a violation of the cycle constraint
+            // raise an exception
+            PyErr_Format(PyExc_ValueError,
+                             "Relational composition would result in a cycle. Idx: %li, u_i: %li, v_i: %li", \
+                             n, *({{type}} *)ipu, *({{type}} *)ipv
+                             );
+            return;
+        }
+        ipu += os_j;
+        ipv += os_i;
+    }
+
+    /* Step 4, transitively close R_\lambda */
+
+    // output dimension counters
+    npy_intp m, p;
+
+    // ipv and ipu need to be set to the row/column we added above
+    ipu = args[4] + os_i * dn;
+    ipv = args[4] + os_j * dn;
+
+    for (m = 0; m < dn; m++) {
+        for (p = 0; p < dn; p++) {
+            *({{type}} *)op = {{name}}_avos_sum(*({{type}} *)ipR, {{name}}_avos_product(*({{type}} *)ipv, *({{type}} *)ipu));
+
+            // advance to next column of u, R and output
+            ipR += isR_j;
+            ipu += os_j;
+            op += os_j;
+        }
+
+        // reset to first column of u, R and output
+        ipR -= isR_j * p;
+        ipu -= os_j * p;
+        op -= os_j * p;
+
+        // advance to the next row of R, v and output
+        ipR += isR_i;
+        ipv += os_i;
+        op += os_i;
+    }
+}
+
+static void
+{{name}}_gufunc_vertex_relational_composition(char **args, npy_intp *dimensions, npy_intp *steps, void *NPY_UNUSED(func))
+{
+    /* outer dimensions counter */
+    npy_intp N_;
+
+    /* length of flattened outer dimensions */
+    npy_intp dN = dimensions[0];
+
+    /* striding over flattened outer dimensions for input and output arrays */
+    // (n),(n,n),(n),()->(n+1,n+1)
+    npy_intp s0 = steps[0];
+    // npy_intp s1 = steps[1];
+    // npy_intp s2 = steps[2];
+    // npy_intp s3 = steps[3];
+    npy_intp s4 = steps[4];
+
+    /*
+     * loop through outer dimensions, performing matrix multiply on
+     * core dimensions for each loop
+     */
+    for (N_ = 0; N_ < dN; N_++, args[0] += s0, args[4] += s4) {
+        {{name}}_vertex_relational_composition(args, dimensions+1, steps+5);
+    }
+}
+
+
+{{endfor}}
+
+PyUFuncGenericFunction vertex_relational_composition_functions[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    &{{name}}_gufunc_vertex_relational_composition,
+{{endfor}}
+};
+void *vertex_relational_composition_data[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    (void *)NULL,
+{{endfor}}
+};
+
+char vertex_relational_composition_signatures[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    {{type_num}}, {{type_num}}, {{type_num}}, {{stype_num}}, {{type_num}},
+{{endfor}}
+};
+
+PyUFuncGenericFunction edge_relational_composition_functions[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    &{{name}}_gufunc_edge_relational_composition,
+{{endfor}}
+};
+void *edge_relational_composition_data[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    (void *)NULL,
+{{endfor}}
+};
+
+char edge_relational_composition_signatures[] = {
+{{for name, type, utype, type_num, stype_num in type_defs}}
+    {{type_num}}, {{type_num}}, {{type_num}}, {{type_num}}, {{type_num}},
+{{endfor}}
+};
+
