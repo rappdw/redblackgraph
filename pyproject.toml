@@ -76,8 +76,8 @@ rbg = "redblackgraph.__main__:main"
 # Build wheels for CPython 3.10, 3.11, 3.12 on all platforms
 build = "cp310-* cp311-* cp312-*"
 
-# Skip PyPy and musllinux (meson-python can have issues with musl)
-skip = "pp* *-musllinux_*"
+# Skip PyPy, musllinux, and 32-bit builds
+skip = "pp* *-musllinux_* *-win32 *-manylinux_i686"
 
 # Generate __config__.py before building
 before-build = "python {project}/generate_config.py"
