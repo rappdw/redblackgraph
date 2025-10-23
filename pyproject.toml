@@ -109,8 +109,10 @@ before-all = [
 
 [tool.cibuildwheel.windows]
 # Windows-specific configuration
+# Ensure MSVC is used instead of MinGW for proper DLL compatibility
+environment = { CC="cl.exe", CXX="cl.exe" }
 before-build = [
-    "pip install ninja"
+    "pip install ninja",
 ]
 
 [tool.setuptools_scm]
