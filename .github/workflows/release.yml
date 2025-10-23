@@ -59,6 +59,10 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for setuptools_scm to detect version from tags
       
+      - name: Set up MSVC (Windows only)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
         env:

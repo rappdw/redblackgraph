@@ -109,11 +109,13 @@ before-all = [
 
 [tool.cibuildwheel.windows]
 # Windows-specific configuration
-# Ensure MSVC is used instead of MinGW for proper DLL compatibility
-environment = { CC="cl.exe", CXX="cl.exe" }
 before-build = [
+    "pip install delvewheel",  # For bundling DLLs into wheels
     "pip install ninja",
+    "python generate_config.py",
 ]
+# Use delvewheel to repair wheels and bundle necessary DLLs
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 
 [tool.setuptools_scm]
 # Get version from git tags
