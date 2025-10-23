@@ -88,22 +88,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: cibw-*
-          path: dist/
-          merge-multiple: true
+          path: artifacts/
       
       - name: Download sdist
         uses: actions/download-artifact@v4
         with:
           name: sdist
-          path: dist/
-      
-      - name: List all files
-        run: ls -lh dist/
+          path: artifacts/sdist/
       
       - name: Prepare release files
         run: |
           mkdir -p release_files
-          cp dist/*.whl dist/*.tar.gz release_files/ 2>/dev/null || true
+          # Copy wheels from all artifact directories
+          find artifacts/ -name '*.whl' -exec cp {} release_files/ \;
+          # Copy sdist
+          find artifacts/ -name '*.tar.gz' -exec cp {} release_files/ \;
+          echo "=== Release files ==="
+          ls -lh release_files/
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -124,21 +125,42 @@ jobs:
       id-token: write
     
     steps:
-      - name: Download wheel artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: cibw-*
-          path: dist/
-          merge-multiple: true
+          path: artifacts/
       
       - name: Download sdist
         uses: actions/download-artifact@v4
         with:
           name: sdist
-          path: dist/
+          path: artifacts/sdist/
+      
+      - name: Prepare distribution directory
+        run: |
+          mkdir -p dist/
+          # Copy wheels from all artifact directories
+          find artifacts/ -name '*.whl' -exec cp {} dist/ \;
+          # Copy sdist
+          find artifacts/ -name '*.tar.gz' -exec cp {} dist/ \;
       
       - name: List all files
-        run: ls -lh dist/
+        run: |
+          echo "=== Distribution files ==="
+          ls -lh dist/
+          echo "=== File count ==="
+          echo "Wheels: $(ls dist/*.whl 2>/dev/null | wc -l)"
+          echo "Sdist: $(ls dist/*.tar.gz 2>/dev/null | wc -l)"
+      
+      - name: Verify wheels are valid
+        run: |
+          pip install check-wheel-contents
+          for wheel in dist/*.whl; do
+            echo "Checking $wheel"
+            python -m zipfile -t "$wheel" || echo "WARNING: $wheel may be corrupted"
+            check-wheel-contents "$wheel" || echo "WARNING: $wheel failed check"
+          done
       
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
