@@ -7,10 +7,19 @@ except ImportError:
 
 from .core import *
 from .sparse import *
-from .util import RelationshipFileReader, RedBlackGraphWriter, RbgGraphBuilder
 from redblackgraph.types.color import Color
+
+# Optional file I/O utilities (require fs-crawler and XlsxWriter)
+# Install with: pip install redblackgraph[io]
+try:
+    from .util import RelationshipFileReader, RedBlackGraphWriter, RbgGraphBuilder
+    _io_available = True
+except ImportError:
+    _io_available = False
 
 __all__ = ['__version__']
 __all__.extend(core.__all__)
 __all__.extend(sparse.__all__)
-__all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter', 'Color'])
+__all__.extend(['Color'])
+if _io_available:
+    __all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter', 'RbgGraphBuilder'])

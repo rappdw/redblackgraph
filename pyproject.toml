@@ -46,11 +46,14 @@ classifiers = [
 dependencies = [
     "numpy>=1.26.0,<2.0",
     "scipy>=1.11.0",
-    "XlsxWriter",
-    "fs-crawler>=0.3.2",
 ]
 
 [project.optional-dependencies]
+# File I/O utilities (CSV/Excel graph readers/writers)
+io = [
+    "fs-crawler>=0.3.2",
+    "XlsxWriter",
+]
 dev = [
     "wheel>=0.29",
 ]
@@ -58,6 +61,8 @@ test = [
     "pytest>=3.0",
     "pytest-cov>=2.4",
     "pylint>=1.8.1",
+    "fs-crawler>=0.3.2",  # Tests use RelationshipFileReader
+    "XlsxWriter",  # Tests use RedBlackGraphWriter
 ]
 
 [project.urls]
