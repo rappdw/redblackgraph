@@ -82,11 +82,7 @@ jobs:
       
     environment:
       name: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_to || 'pypi' }}
-      url: ${{ 
-        github.event_name == 'workflow_dispatch' && inputs.publish_to == 'testpypi' 
-        && 'https://test.pypi.org/p/redblackgraph' 
-        || 'https://pypi.org/p/redblackgraph' 
-      }}
+      url: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_to == 'testpypi' && 'https://test.pypi.org/p/redblackgraph' || 'https://pypi.org/p/redblackgraph' }}
 
     steps:
       - uses: actions/download-artifact@v4
