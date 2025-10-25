@@ -12,7 +12,7 @@ def MSB(x: int) -> int:
 
 def avos_sum(x: int, y: int) -> int:
     '''
-    The avos sum is the non-zero minumum of x and y
+    The avos sum is the non-zero minimum of x and y
     :param x: operand 1
     :param y: operand 2
     :return: avos sum

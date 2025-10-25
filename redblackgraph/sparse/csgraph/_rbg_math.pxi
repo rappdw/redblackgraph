@@ -17,7 +17,7 @@ cdef inline bint avos_lt(DTYPE_t x, DTYPE_t y):
 
 cdef inline DTYPE_t avos_sum(DTYPE_t x, DTYPE_t y):
     '''
-    The avos sum is the non-zero minumum of x and y
+    The avos sum is the non-zero minimum of x and y
     :param x: operand 1
     :param y: operand 2
     :return: avos sum
