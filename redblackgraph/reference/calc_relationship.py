@@ -25,7 +25,7 @@ def lookup_relationship(da: int, db: int) -> str:
     This is a very rudimentary implementation of a Consanguinity lookup and doesn't handle many
     cases correctly.
     :param da: generational distance from u to common ancestor
-    :param db: generational distance from v to common ancester
+    :param db: generational distance from v to common ancestor
     :return: a string designating relationship
     '''
     removal = abs(da - db)
