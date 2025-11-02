@@ -33,7 +33,7 @@ class RbgGraphBuilder(AbstractGraphBuilder):
             self.row = None
             self.col = None
             self.genders = None
-            self.graph = rb.matrix(np.zeros((nv, ne), dtype=np.int64))
+            self.graph = rb.array(np.zeros((nv, ne), dtype=np.int64))
 
     def get_ordering(self) -> Sequence[int]:
         if not self.graph:

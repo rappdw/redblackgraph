@@ -29,7 +29,7 @@ def test_avos(dtype):
                   [ 2,  4,  5,  0,  1]], dtype=dtype)
     result = A @ A
     assert_equal(result, S)
-    A = rb.matrix([[-1,  2,  3,  0,  0],
+    A = rb.array([[-1,  2,  3,  0,  0],
                    [ 0, -1,  0,  2,  0],
                    [ 0,  0,  1,  0,  0],
                    [ 0,  0,  0,  -1, 0],
@@ -61,7 +61,7 @@ def test_avos(dtype):
     v_lambda = np.array([5, 3, 0, 0, 9]).reshape((5, 1))
     assert_equal(u @ A_star, u_lambda)
     assert_equal(A_star @ v, v_lambda)
-    A_star = rb.matrix([[-1,  2,  3,  4,  0],
+    A_star = rb.array([[-1,  2,  3,  4,  0],
                         [ 0, -1,  0,  2,  0],
                         [ 0,  0,  1,  0,  0],
                         [ 0,  0,  0, -1,  0],
@@ -94,8 +94,8 @@ def test_vector_product():
     v = rb.array([[3], [0], [1], [0], [0]])
     assert_equal(u @ v, 5)
     # test matrix multiplication
-    u = rb.matrix([[2, 0, 0, 0, 1]])
-    v = rb.matrix([[3], [0], [1], [0], [0]])
+    u = rb.array([[2, 0, 0, 0, 1]])
+    v = rb.array([[3], [0], [1], [0], [0]])
     assert_equal(u @ v, 5)
 
 def test_vector_matrix_product():
@@ -115,7 +115,7 @@ def test_vector_matrix_product():
     result = u @ A
     assert_equal(result[0], expected)
 
-    A = rb.matrix([[-1,  2,  3,  4,  0],
+    A = rb.array([[-1,  2,  3,  4,  0],
                    [ 0, -1,  0,  2,  0],
                    [ 0,  0,  1,  0,  0],
                    [ 0,  0,  0, -1,  0],
@@ -161,7 +161,7 @@ def test_vector_matrix_rproduct():
     result = u @ A
     assert_equal(result[0], expected)
 
-    A = rb.matrix([[-1,  2,  3,  4,  0],
+    A = rb.array([[-1,  2,  3,  4,  0],
                    [ 0, -1,  0,  2,  0],
                    [ 0,  0,  1,  0,  0],
                    [ 0,  0,  0, -1,  0],

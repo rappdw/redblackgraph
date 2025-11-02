@@ -6,7 +6,7 @@ from redblackgraph.core._redblackgraph import vertex_relational_composition as _
 from redblackgraph.core._redblackgraph import edge_relational_composition as _edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
-__all__ = ['array', 'matrix', 'transitive_closure', 'vertex_relational_composition', 'edge_relational_composition']
+__all__ = ['array', 'transitive_closure', 'vertex_relational_composition', 'edge_relational_composition']
 
 
 class _Avos(ndarray):
@@ -108,15 +108,6 @@ class array(_Avos, ndarray):
         return super(array, self).__rmatmul__(other).view(array)
 
 
-class matrix(_Avos, np.matrix):
-    def __new__(cls, data, dtype=None, copy=True):
-        return super(matrix, cls).__new__(cls, data, dtype=dtype, copy=copy)
-
-    def __matmul__(self, other):
-        return super(matrix, self).__matmul__(other).view(matrix)
-
-    def __rmatmul__(self, other):
-        return super(matrix, self).__rmatmul__(other).view(matrix)
 
 def transitive_closure(A: array):
     return A.transitive_closure()
