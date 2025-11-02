@@ -28,12 +28,13 @@
 #endif
 
 /* NumPy 2.0 compatibility: NPY_NTYPES constant  
- * In NumPy 1.x: NPY_NTYPES is defined in ndarraytypes.h
- * In NumPy 2.x: NPY_NTYPES removed, must use NPY_NTYPES_LEGACY enum value
- * Define it here for NumPy 2.x to maintain compatibility
+ * In NumPy 1.x: NPY_NTYPES is defined in ndarraytypes.h  
+ * In NumPy 2.x: NPY_NTYPES removed, NPY_NTYPES_LEGACY enum value (24) exists
+ * Note: NPY_NTYPES_LEGACY is an enum, not a macro, so we can't use #if defined()
+ * Solution: If NPY_NTYPES not defined, use the legacy count of 24
  */
-#if !defined(NPY_NTYPES)
-    #define NPY_NTYPES NPY_NTYPES_LEGACY
+#ifndef NPY_NTYPES
+    #define NPY_NTYPES 24  /* NPY_NTYPES_LEGACY value from ndarraytypes.h */
 #endif
 
 /**** this is in numpy src common.h ****/
