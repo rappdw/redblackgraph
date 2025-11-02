@@ -116,7 +116,8 @@ PyArray_ImportNumPyAPI(void)
     #define NPY_MAXARGS 32
 
     /* Aliases of 2.x names to 1.x only equivalent names */
-    #define NPY_NTYPES NPY_NTYPES_LEGACY
+    /* NPY_NTYPES is already defined in NumPy 1.x, no need to redefine */
+    /* #define NPY_NTYPES NPY_NTYPES_LEGACY */
     #define PyArray_DescrProto PyArray_Descr
     #define _PyArray_LegacyDescr PyArray_Descr
     /* NumPy 2 definition always works, but add it for 1.x only */
