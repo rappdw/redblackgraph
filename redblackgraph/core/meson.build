@@ -66,6 +66,7 @@ _redblackgraph_sources = [
 _redblackgraph_inc = [
   include_directories(src_dir),
   include_directories('.'),  # For generated rbg_math.h
+  include_directories('include'),  # For vendored npy_2_compat.h (NumPy 1.x compatibility)
 ]
 
 # Build the extension
