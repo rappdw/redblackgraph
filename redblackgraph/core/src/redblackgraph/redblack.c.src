@@ -16,11 +16,11 @@
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
 #define NPY_NO_DEPRECATED_API NPY_API_VERSION
-#include <numpy/noprefix.h>
 #include <numpy/ndarraytypes.h>
 #include <numpy/ndarrayobject.h>
 #include <numpy/arrayscalars.h>
 #include <numpy/ufuncobject.h>
+#include <numpy/npy_2_compat.h>
 
 /**** this is in numpy src common.h ****/
 #ifdef NPY_ALLOW_THREADS

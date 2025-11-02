@@ -13,8 +13,8 @@
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
 #include <numpy/npy_3kcompat.h>
-#include <numpy/noprefix.h>
 #include <numpy/ndarrayobject.h>
+#include <numpy/npy_2_compat.h>
 #include <numpy/arrayscalars.h>
 #include <numpy/ufuncobject.h>
 
