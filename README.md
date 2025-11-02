@@ -61,7 +61,7 @@ RedBlackGraph uses the Meson build system (as of version 0.5.0, migrated from nu
 - Meson >= 1.2.0
 - Ninja build tool
 - Cython >= 3.0
-- NumPy >= 1.26
+- NumPy 1.26+ (including NumPy 2.x)
 
 ## Build and Install
 ```bash

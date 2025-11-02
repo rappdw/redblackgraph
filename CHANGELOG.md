@@ -8,30 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.0] - TBD
 
 ### Added
-- **NumPy 2.x support** (backwards compatible with NumPy 1.26+)
-- CI testing matrix for both NumPy 1.26 and NumPy 2.1 across Python 3.10, 3.11, 3.12
-- Comprehensive CHANGELOG documentation
-- NumPy 2.0 compatibility macros for C API
+- **NumPy 2.x support** - Full compatibility with NumPy 2.0+
+- CI testing matrix for NumPy 1.26 and 2.1 across Python 3.10, 3.11, 3.12
+- NumPy 2.0 compatibility layer using npy_2_compat.h
 
 ### Removed
-- **BREAKING:** `redblackgraph.matrix` class (deprecated since NumPy 1.19)
-  - **Migration:** Use `redblackgraph.array` instead
-  - Example: Change `rb.matrix([...])` to `rb.array([...])`
+- **BREAKING:** `redblackgraph.matrix` class (use `redblackgraph.array` instead)
+  - `np.matrix` was deprecated in NumPy 1.19 and removed in NumPy 2.0
+  - Migration: Replace `rb.matrix(...)` with `rb.array(...)`
 - `__config__.py` generation (internal build artifact, no user impact)
-- References to deprecated `numpy/noprefix.h` from all C source files
+- Deprecated `numpy/noprefix.h` header from C extensions
 
 ### Changed
-- Updated C API to use `PyArray_FROM_OTF` instead of deprecated `PyArray_FROM_OF`
-- Dependency constraint: `numpy>=1.26.0,<3.0` (supports both NumPy 1.x and 2.x)
-- Replaced `NPY_NTYPES` with `NPY_NTYPES_LEGACY` for NumPy 2.0 compatibility
-- Updated `PyArray_Descr` elsize access to use compatibility macro
-- Updated documentation to reflect NumPy 1.26+ and 2.x support
+- Updated C API to use NumPy 2.0 compatible functions:
+  - `PyArray_FROM_OF` → `PyArray_FROM_OTF`
+  - Direct `descr->elsize` access → `PyDataType_ELSIZE()` macro
+  - `NPY_NTYPES` → `NPY_NTYPES_LEGACY` with compatibility layer
+- Dependency constraint: `numpy>=1.26.0,<3.0` (supports NumPy 1.x and 2.x)
+- All C extensions updated for NumPy 2.0 opaque structures
 
 ### Fixed
-- Compatibility with NumPy 1.26.x validated across Python 3.10, 3.11, 3.12
-- Compatibility with NumPy 2.1.x validated with C API compatibility layer
-- C API deprecation warnings resolved for both NumPy 1.x and 2.x
-- All 117 tests passing on both NumPy 1.26 and 2.1
+- Compatibility with NumPy 2.0+ C API changes
+- All 117 tests passing on NumPy 1.26.x and 2.1.x
 
 ## [0.5.0] - Previous Release
 
