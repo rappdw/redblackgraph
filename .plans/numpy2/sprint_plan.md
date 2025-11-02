@@ -1,21 +1,40 @@
-# NumPy 2.x Upgrade - Sprint Plan
+# NumPy 2.x Upgrade - Sprint Plan (REVISED)
 
 **Target Release**: v0.6.0  
-**Total Estimated Effort**: 8-10 hours  
-**Sprints**: 5  
-**Strategy**: Direct removal (no deprecation cycle)
+**Decision**: **Option A - Full Migration** (approved 2025-11-02)  
+**Total Estimated Effort**: 9-11 hours (revised from 8-10 based on official guide)  
+**Sprints**: 6 (added Sprint 3 for C API headers)  
+**Strategy**: Complete NumPy 2.x support in single release
+
+**Based on**: [Official NumPy 2.0 Migration Guide](https://numpy.org/doc/stable/numpy_2_0_migration_guide.html)  
+**Analysis**: See `numpy2_migration_analysis_updated.md`
 
 ---
 
-## Sprint Overview
+## Decision: Option A - Full Migration
 
-| Sprint | Focus Area | Duration | Priority |
-|--------|-----------|----------|----------|
-| 1 | Remove matrix class | 2 hours | 🔴 Critical |
-| 2 | Remove __config__.py | 1 hour | 🔴 Critical |
-| 3 | Fix C API deprecations | 2 hours | 🟡 High |
-| 4 | Update dependencies & CI | 2 hours | 🟡 High |
-| 5 | Testing & validation | 3 hours | 🟢 Required |
+We are proceeding with **Option A** (Full Migration in v0.6.0) rather than staged migration because:
+- Work is already in progress
+- Total effort is manageable (9-11 hours)
+- Users get NumPy 2.x support sooner in a single release
+- Avoids having two breaking change releases close together
+- NumPy provides good compatibility layer (`npy_2_compat.h`)
+
+---
+
+## Sprint Overview (REVISED)
+
+| Sprint | Focus Area | Duration | Priority | Status |
+|--------|-----------|----------|----------|--------|
+| 1 | Remove matrix class | 2 hours | 🔴 Critical | ✅ Completed |
+| 2 | Remove __config__.py | 1 hour | 🔴 Critical | ✅ Completed |
+| 3 | Fix C API headers (NEW) | 1 hour | 🔴 Critical | ⏳ Ready |
+| 4 | Fix C API structure access (NEW) | 2-3 hours | 🔴 Critical | ⏳ Pending |
+| 5 | Fix C API deprecations | 1 hour | 🟡 High | ⏳ Pending |
+| 6 | Update dependencies & CI | 1 hour | 🟡 High | ⏳ Pending |
+| 7 | Testing & validation | 3-4 hours | 🟢 Required | ⏳ Pending |
+
+**Total**: 11-13 hours (including completed work)
 
 ---
 
@@ -128,14 +147,147 @@
 
 ---
 
-## Sprint 3: Fix C API Deprecations
+## Sprint 3: Fix C API Headers (NEW - CRITICAL)
 
-**Duration**: 2 hours  
-**Blocker**: No (deprecated but still works in NumPy 2.0)
+**Duration**: 1 hour  
+**Blocker**: Yes - `numpy/noprefix.h` removed in NumPy 2.0  
+**Status**: ⏳ Ready to Start
+
+### Background
+
+Per the official NumPy 2.0 migration guide:
+- `numpy/noprefix.h` header was **completely removed** in NumPy 2.0
+- NumPy provides `npy_2_compat.h` for dual 1.x/2.x compatibility
+- Must include `ndarrayobject.h` (not just `ndarraytypes.h`)
 
 ### Tasks
 
-#### 3.1 Replace PyArray_FROM_OF calls
+#### 3.1 Remove numpy/noprefix.h includes
+- **Files to update**:
+  1. `redblackgraph/core/src/redblackgraph/redblackgraphmodule.c`
+  2. `redblackgraph/core/src/redblackgraph/redblack.c.src`
+  3. `redblackgraph/core/src/redblackgraph/warshall.c.src`
+  4. `redblackgraph/core/src/redblackgraph/warshall.c.in`
+  5. `redblackgraph/core/src/redblackgraph/relational_composition.c.src`
+  6. `redblackgraph/core/src/redblackgraph/relational_composition.c.in`
+
+- **Change**:
+  ```c
+  // REMOVE this line:
+  #include <numpy/noprefix.h>
+  ```
+
+#### 3.2 Add npy_2_compat.h include
+- **Add to each file** (after other numpy includes):
+  ```c
+  #include <numpy/ndarrayobject.h>  // Ensure this is present
+  #include <numpy/npy_2_compat.h>   // NumPy 2.0 compatibility
+  ```
+
+#### 3.3 Verify import_array() calls
+- **Check**: All C extension modules properly call `import_array()`
+- **Required for**: `npy_2_compat.h` to work correctly
+- **Files to verify**:
+  - `redblackgraphmodule.c` - should have `import_array()` in module init
+
+### Exit Criteria
+- [ ] All 6 C source files have `numpy/noprefix.h` removed
+- [ ] All files include `npy_2_compat.h`
+- [ ] All files include `ndarrayobject.h`
+- [ ] `import_array()` verified in module initialization
+- [ ] Code compiles with NumPy 1.26.x (test before NumPy 2.x)
+
+---
+
+## Sprint 4: Fix C API Structure Access (NEW - CRITICAL)
+
+**Duration**: 2-3 hours  
+**Blocker**: Yes - `PyArray_Descr` structure made opaque in NumPy 2.0  
+**Status**: ⏳ Pending Sprint 3
+
+### Background
+
+Per the official NumPy 2.0 migration guide:
+- `PyArray_Descr` struct is now opaque
+- Direct access to `descr->elsize` **fails** in NumPy 2.0
+- Must use `PyDataType_ELSIZE(descr)` accessor macro
+- `NPY_NTYPES` constant removed, use `NPY_NTYPES_LEGACY`
+
+### Tasks
+
+#### 4.1 Add compatibility macros
+- **File**: `redblackgraph/core/src/redblackgraph/redblack.c.src`
+- **Location**: After includes, before first function
+- **Add**:
+  ```c
+  /* NumPy 2.0 compatibility: PyArray_Descr structure accessors */
+  #if NPY_ABI_VERSION < 0x02000000
+      #define PyDataType_ELSIZE(descr) ((descr)->elsize)
+  #endif
+  
+  /* NumPy 2.0 compatibility: NPY_NTYPES constant */
+  #if !defined(NPY_NTYPES) && defined(NPY_NTYPES_LEGACY)
+      #define NPY_NTYPES NPY_NTYPES_LEGACY
+  #endif
+  ```
+
+#### 4.2 Replace elsize direct accesses
+- **File**: `redblackgraph/core/src/redblackgraph/redblack.c.src`
+- **Locations** (approximate line numbers, search for pattern):
+  - Line ~2289
+  - Line ~2343
+  - Line ~2400
+  - Line ~2456
+  - Line ~2855
+
+- **Pattern to find**:
+  ```c
+  NpyIter_GetDescrArray(iter)[0]->elsize
+  ```
+
+- **Replace with**:
+  ```c
+  PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0])
+  ```
+
+#### 4.3 Verify NPY_NTYPES usage
+- **File**: `redblackgraph/core/src/redblackgraph/redblack.c.src`
+- **Action**: Verify compatibility macro handles all uses
+- **Locations** (static table declarations):
+  - Line ~1515: `_contig_outstride0_unary_specialization_table[NPY_NTYPES]`
+  - Line ~1546: `_binary_specialization_table[NPY_NTYPES][5]`
+  - Line ~1583: `_outstride0_specialized_table[NPY_NTYPES][4]`
+  - Line ~1619: `_allcontig_specialized_table[NPY_NTYPES][4]`
+  - Line ~1655: `_unspecialized_table[NPY_NTYPES][4]`
+  - Line ~1697: `if (type_num >= NPY_NTYPES)` check
+
+#### 4.4 Test build with NumPy 2.1
+- **Action**: After changes, test build with NumPy 2.1
+  ```bash
+  pip install "numpy>=2.1.0"
+  rm -rf build
+  pip install --no-build-isolation -e .
+  ```
+- **Validation**: Build succeeds without errors
+
+### Exit Criteria
+- [ ] Compatibility macros added to `redblack.c.src`
+- [ ] All 5 `->elsize` accesses replaced with `PyDataType_ELSIZE()`
+- [ ] `NPY_NTYPES` usage verified with compatibility macro
+- [ ] Code builds successfully with NumPy 2.1
+- [ ] Code still builds with NumPy 1.26 (backwards compatibility)
+
+---
+
+## Sprint 5: Fix C API Deprecations
+
+**Duration**: 1 hour  
+**Blocker**: No (deprecated but still works in NumPy 2.0)  
+**Status**: ⏳ Pending Sprint 4
+
+### Tasks
+
+#### 5.1 Replace PyArray_FROM_OF calls
 - **File**: `redblackgraph/core/src/redblackgraph/redblackgraphmodule.c`
 - **Locations**: Lines 71 and 222
 - **Change**:
@@ -187,14 +339,15 @@
 
 ---
 
-## Sprint 4: Update Dependencies & CI
+## Sprint 6: Update Dependencies & CI
 
-**Duration**: 2 hours  
-**Blocker**: No (configuration updates)
+**Duration**: 1 hour  
+**Blocker**: No (configuration updates)  
+**Status**: ⏳ Pending Sprint 5
 
 ### Tasks
 
-#### 4.1 Update pyproject.toml dependencies
+#### 6.1 Update pyproject.toml dependencies
 - **File**: `pyproject.toml`
 - **Section**: `[project.dependencies]`
 - **Change**:
@@ -288,14 +441,15 @@
 
 ---
 
-## Sprint 5: Testing & Validation
+## Sprint 7: Testing & Validation
 
-**Duration**: 3 hours  
-**Blocker**: No (validation phase)
+**Duration**: 3-4 hours  
+**Blocker**: No (validation phase)  
+**Status**: ⏳ Pending Sprint 6
 
 ### Tasks
 
-#### 5.1 Local testing with NumPy 1.26
+#### 7.1 Local testing with NumPy 1.26
 - **Setup**:
   ```bash
   python -m venv venv-np126
