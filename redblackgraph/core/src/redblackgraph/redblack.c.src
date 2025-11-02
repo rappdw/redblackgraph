@@ -28,10 +28,13 @@
 #endif
 
 /* NumPy 2.0 compatibility: NPY_NTYPES constant  
- * In NumPy 1.x: NPY_NTYPES is defined
- * In NumPy 2.x: NPY_NTYPES removed, NPY_NTYPES_LEGACY provided by npy_2_compat.h
- * npy_2_compat.h automatically handles this when NPY_ABI_VERSION >= 0x02000000
+ * In NumPy 1.x: NPY_NTYPES is defined in ndarraytypes.h
+ * In NumPy 2.x: NPY_NTYPES removed, must use NPY_NTYPES_LEGACY enum value
+ * Define it here for NumPy 2.x to maintain compatibility
  */
+#if !defined(NPY_NTYPES)
+    #define NPY_NTYPES NPY_NTYPES_LEGACY
+#endif
 
 /**** this is in numpy src common.h ****/
 #ifdef NPY_ALLOW_THREADS

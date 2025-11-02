@@ -109,6 +109,8 @@ PyArray_ImportNumPyAPI(void)
     #define NPY_DEFAULT_INT NPY_INTP
     #define NPY_RAVEL_AXIS NPY_MIN_INT
     #define NPY_MAXARGS 64
+    /* Define NPY_NTYPES for NumPy 2.x compatibility - maps to enum value */
+    #define NPY_NTYPES NPY_NTYPES_LEGACY
 
 #elif NPY_ABI_VERSION < 0x02000000
     #define NPY_DEFAULT_INT NPY_LONG
