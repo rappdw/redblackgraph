@@ -9,7 +9,7 @@ project(
   default_options: [
     'buildtype=debugoptimized',
     'c_std=c99',
-    'cpp_std=c++11',
+    'cpp_std=c++14',  # c++14 is supported by MSVC, GCC, and Clang
     'warning_level=2',
   ],
 )

@@ -276,7 +276,8 @@ array_einsum2(PyObject *NPY_UNUSED(dummy), PyObject *args, PyObject *kwds)
     PyObject *str_obj = NULL, *str_key_obj = NULL;
     PyObject *arg0;
     int i, nop;
-    PyArrayObject *op[NPY_MAXARGS];
+    /* Use dynamic allocation for MSVC compatibility (no C99 VLA support) */
+    PyArrayObject **op = NULL;
     NPY_ORDER order = NPY_KEEPORDER;
     NPY_CASTING casting = NPY_SAFE_CASTING;
     PyArrayObject *out = NULL;
@@ -290,6 +291,14 @@ array_einsum2(PyObject *NPY_UNUSED(dummy), PyObject *args, PyObject *kwds)
                         "and its corresponding subscripts list");
         return NULL;
     }
+
+    /* Allocate op array dynamically for MSVC compatibility */
+    op = (PyArrayObject **)malloc(NPY_MAXARGS * sizeof(PyArrayObject *));
+    if (!op) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+
     arg0 = PyTuple_GET_ITEM(args, 0);
 
     /* einsum('i,j', a, b), einsum('i,j->ij', a, b) */
@@ -383,6 +392,9 @@ finish:
     Py_XDECREF(str_obj);
     Py_XDECREF(str_key_obj);
     /* out is a borrowed reference */
+
+    /* Free dynamically allocated array */
+    free(op);
 
     return ret;
 }

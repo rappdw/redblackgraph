@@ -24,15 +24,6 @@ _sparsetools_sources = [
 
 _sparsetools_inc = include_directories(sparsetools_dir)
 
-# Compiler-specific C++ flags
-cpp = meson.get_compiler('cpp')
-cpp_std_flag = []
-if cpp.get_id() == 'msvc'
-  cpp_std_flag = ['/std:c++14']  # MSVC syntax
-else
-  cpp_std_flag = ['-std=c++11']  # GCC/Clang syntax
-endif
-
 py.extension_module(
   '_sparsetools',
   _sparsetools_sources,
@@ -42,7 +33,7 @@ py.extension_module(
     '-I' + incdir_numpy,
     '-D__STDC_FORMAT_MACROS=1',
     '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION',
-  ] + cpp_std_flag,
+  ],
   install: true,
   subdir: 'redblackgraph/sparse',
 )

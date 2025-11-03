@@ -2546,26 +2546,41 @@ PyArray_EinsteinSum2(char *subscripts, npy_intp nop,
 {
     int iop /*index of operand*/, label /*index for label iteration*/, min_label = 127, max_label = 0;
     char label_counts[128];
-    char op_labels[NPY_MAXARGS][NPY_MAXDIMS];
+    /* Use dynamic allocation for MSVC compatibility (no C99 VLA support) */
+    char (*op_labels)[NPY_MAXDIMS] = NULL;
     char output_labels[NPY_MAXDIMS], *iter_labels;
     int idim, ndim_output, ndim_broadcast, ndim_iter;
 
-    PyArrayObject *op[NPY_MAXARGS], *ret = NULL;
-    PyArray_Descr *op_dtypes_array[NPY_MAXARGS], **op_dtypes;
+    PyArrayObject **op = NULL, *ret = NULL;
+    PyArray_Descr **op_dtypes_array = NULL, **op_dtypes;
 
-    int op_axes_arrays[NPY_MAXARGS][NPY_MAXDIMS];
-    int *op_axes[NPY_MAXARGS];
-    npy_uint32 iter_flags, op_flags[NPY_MAXARGS];
+    int (*op_axes_arrays)[NPY_MAXDIMS] = NULL;
+    int **op_axes = NULL;
+    npy_uint32 iter_flags, *op_flags = NULL;
 
     NpyIter *iter;
     sum_of_products_fn sop;
-    npy_intp fixed_strides[NPY_MAXARGS];
+    npy_intp *fixed_strides = NULL;
 
     /* nop+1 (+1 is for the output) must fit in NPY_MAXARGS */
     if (nop >= NPY_MAXARGS) {
         PyErr_SetString(PyExc_ValueError,
                     "too many operands provided to einstein sum function");
         return NULL;
+    }
+
+    /* Allocate arrays dynamically for MSVC compatibility */
+    op_labels = (char (*)[NPY_MAXDIMS])malloc(NPY_MAXARGS * NPY_MAXDIMS * sizeof(char));
+    op = (PyArrayObject **)malloc(NPY_MAXARGS * sizeof(PyArrayObject *));
+    op_dtypes_array = (PyArray_Descr **)malloc(NPY_MAXARGS * sizeof(PyArray_Descr *));
+    op_axes_arrays = (int (*)[NPY_MAXDIMS])malloc(NPY_MAXARGS * NPY_MAXDIMS * sizeof(int));
+    op_axes = (int **)malloc(NPY_MAXARGS * sizeof(int *));
+    op_flags = (npy_uint32 *)malloc(NPY_MAXARGS * sizeof(npy_uint32));
+    fixed_strides = (npy_intp *)malloc(NPY_MAXARGS * sizeof(npy_intp));
+
+    if (!op_labels || !op || !op_dtypes_array || !op_axes_arrays || !op_axes || !op_flags || !fixed_strides) {
+        PyErr_NoMemory();
+        goto cleanup_arrays;
     }
     else if (nop < 1) {
         PyErr_SetString(PyExc_ValueError,
@@ -2908,6 +2923,15 @@ finish:
         Py_DECREF(op[iop]);
     }
 
+    /* Free dynamically allocated arrays */
+    free(op_labels);
+    free(op);
+    free(op_dtypes_array);
+    free(op_axes_arrays);
+    free(op_axes);
+    free(op_flags);
+    free(fixed_strides);
+
     return ret;
 
 fail:
@@ -2915,6 +2939,16 @@ fail:
     for (iop = 0; iop < nop; ++iop) {
         Py_XDECREF(op[iop]);
     }
+
+cleanup_arrays:
+    /* Free dynamically allocated arrays */
+    free(op_labels);
+    free(op);
+    free(op_dtypes_array);
+    free(op_axes_arrays);
+    free(op_axes);
+    free(op_flags);
+    free(fixed_strides);
 
     return NULL;
 }
