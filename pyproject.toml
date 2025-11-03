@@ -7,7 +7,7 @@ requires = [
     "Cython>=3.0.0",
     "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
-    "numpy>=1.26.0,<3.0",
+    "numpy>=2.0.0,<3.0",
     "setuptools_scm>=8.0",  # For dynamic versioning from git tags
 ]
 build-backend = "mesonpy"
@@ -44,7 +44,7 @@ classifiers = [
 
 # Runtime dependencies
 dependencies = [
-    "numpy>=1.26.0,<3.0",  # Support both NumPy 1.x and 2.x
+    "numpy>=2.0.0,<3.0",  # NumPy 2.x required (use v0.5.x for NumPy 1.x)
     "scipy>=1.11.0",
 ]
 

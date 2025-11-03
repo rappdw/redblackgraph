@@ -20,27 +20,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prevents impossible relationships like "father's female self" or "mother's male self"
   - Implemented across all backends: Python reference, C core, C++ sparse, Cython
   - See notebook for detailed mathematical justification and examples
-- CI testing matrix for NumPy 1.26 and 2.1 across Python 3.10, 3.11, 3.12
 - NumPy 2.0 compatibility layer using npy_2_compat.h
+- Comprehensive test suite for parity constraints (52 tests)
+- Mathematical analysis documenting algebraic structure as two-sorted/ℤ/2ℤ-graded algebra
+
+### Changed
+- **BREAKING:** Minimum NumPy version raised to 2.0.0
+  - NumPy 1.x is no longer supported
+  - Users requiring NumPy 1.x should use redblackgraph v0.5.x
+  - Reason: NumPy 2.0 has been stable since June 2024 and provides significant improvements
+- Updated C API to use NumPy 2.0 compatible functions:
+  - `PyArray_FROM_OF` → `PyArray_FROM_OTF`
+  - Direct `descr->elsize` access → `PyDataType_ELSIZE()` macro
+  - `NPY_NTYPES` → `NPY_NTYPES_LEGACY` with compatibility layer
+- All C extensions updated for NumPy 2.0 opaque structures
 
 ### Removed
 - **BREAKING:** `redblackgraph.matrix` class (use `redblackgraph.array` instead)
   - `np.matrix` was deprecated in NumPy 1.19 and removed in NumPy 2.0
   - Migration: Replace `rb.matrix(...)` with `rb.array(...)`
 - `__config__.py` generation (internal build artifact, no user impact)
+- NumPy 1.26 testing from CI (simplified to NumPy 2.x only)
 - Deprecated `numpy/noprefix.h` header from C extensions
-
-### Changed
-- Updated C API to use NumPy 2.0 compatible functions:
-  - `PyArray_FROM_OF` → `PyArray_FROM_OTF`
-  - Direct `descr->elsize` access → `PyDataType_ELSIZE()` macro
-  - `NPY_NTYPES` → `NPY_NTYPES_LEGACY` with compatibility layer
-- Dependency constraint: `numpy>=1.26.0,<3.0` (supports NumPy 1.x and 2.x)
-- All C extensions updated for NumPy 2.0 opaque structures
 
 ### Fixed
 - Compatibility with NumPy 2.0+ C API changes
-- All 117 tests passing on NumPy 1.26.x and 2.1.x
+- All 167 tests passing on NumPy 2.x across Python 3.10, 3.11, 3.12
 
 ## [0.5.0] - Previous Release
 
