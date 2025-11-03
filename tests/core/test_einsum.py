@@ -15,16 +15,17 @@ import pytest
 ])
 def test_avos(dtype):
     # test simple avos matmul
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
     A = np.array([[-1,2, 3, 0, 0],
                   [0,-1, 0, 2, 0],
                   [0, 0, 1, 0, 0],
                   [0, 0, 0,-1, 0],
-                  [2, 0, 0, 0, 1]], dtype=dtype)
+                  [2, 0, 0, 0, 1]]).astype(dtype)
     S = np.array([[-1, 2, 3, 4, 0],
                   [0,-1, 0, 2, 0],
                   [0, 0, 1, 0, 0],
                   [0, 0, 0,-1, 0],
-                  [2, 4, 5, 0, 1]], dtype=dtype)
+                  [2, 4, 5, 0, 1]]).astype(dtype)
     assert_equal(einsum('ij, jk', A, A, avos=True), S)
 
     # test vector mat mul
@@ -32,7 +33,7 @@ def test_avos(dtype):
                        [0,-1, 0, 2, 0],
                        [0, 0, 1, 0, 0],
                        [0, 0, 0,-1, 0],
-                       [2, 4, 5, 8, 1]], dtype=dtype)
+                       [2, 4, 5, 8, 1]]).astype(dtype)
     u = np.array([2, 0, 0, 0, 0], dtype=dtype)
     v = np.array([0, 3, 0, 0, 0], dtype=dtype)
     u_lambda = np.array([2, 4, 5, 8, 0])
@@ -53,11 +54,12 @@ def test_avos(dtype):
     np.uint64
 ])
 def test_identity(dtype):
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
     A = np.array([[-1, 2, 3, 0, 0],
                   [ 0,-1, 0, 2, 0],
                   [ 0, 0, 1, 0, 0],
                   [ 0, 0, 0,-1, 0],
-                  [ 2, 0, 0, 0, 1]], dtype=dtype)
+                  [ 2, 0, 0, 0, 1]]).astype(dtype)
     I = np.array([[ 1, 0, 0, 0, 0],
                   [ 0, 1, 0, 0, 0],
                   [ 0, 0, 1, 0, 0],

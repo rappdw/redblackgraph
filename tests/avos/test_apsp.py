@@ -76,16 +76,18 @@ def test_warshall_core_impl(dtype):
         (sparse.transitive_closure_dijkstra),
     ])
 def test_apsp_sparse_impl(dtype, transitive_closure):
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
+    a_data = np.array([-1, -1, 1, -1, 1, -1, 1, 2, 3, 2, 3, 2, 3]).astype(dtype)
     a = rb_matrix(
         coo_matrix(
             (
-                [-1, -1, 1, -1, 1, -1, 1, 2, 3, 2, 3, 2, 3],
+                a_data,
                 (
                     [0, 1, 2, 3, 4, 5, 6, 0, 0, 1, 1, 2, 2],
                     [0, 1, 2, 3, 4, 5, 6, 1, 2, 5, 6, 3, 4]
                 )
-            ),
-        dtype=dtype)
+            )
+        )
     )
 
     expected = rb.array([[-1, 2, 3, 6, 7, 4, 5],

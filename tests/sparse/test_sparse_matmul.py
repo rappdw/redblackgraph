@@ -206,45 +206,49 @@ def test_rb_matrix_square(matrix):
 ])
 def test_avos(dtype):
     # test simple avos matmul
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
+    A_data = np.array([-1, 2, 3, -1, 2, 1, -1, 2, 1]).astype(dtype)
     A = rb_matrix(coo_matrix(
         (
-            [-1, 2, 3, -1, 2, 1, -1, 2, 1],
+            A_data,
             (
                 [0, 0, 0, 1, 1, 2, 3, 4, 4],
                 [0, 1, 2, 1, 3, 2, 3, 0, 4]
             )
-        ), dtype = dtype
+        )
     ))
+    S_data = np.array([-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 1]).astype(dtype)
     S = rb_matrix(coo_matrix(
         (
-            [-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 1],
+            S_data,
             (
                 [0, 0, 0, 0, 1, 1, 2, 3, 4, 4, 4, 4],
                 [0, 1, 2, 3, 1, 3, 2, 3, 0, 1, 2, 4]
             )
-        ), dtype = dtype
+        )
     ))
     result = A @ A
     assert (result != S).nnz == 0
     A = rb_matrix(coo_matrix(
         (
-            [-1, 2, 3, -1, 2, 1, -1, 2, 1],
+            A_data,  # Reuse the same data array
             (
                 [0, 0, 0, 1, 1, 2, 3, 4, 4],
                 [0, 1, 2, 1, 3, 2, 3, 0, 4]
             )
-        ), dtype = dtype
+        )
     ))
     assert ((A @ A) != S).nnz == 0
 
+    A_star_data = np.array([-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 8, 1]).astype(dtype)
     A_star = rb_matrix(coo_matrix(
         (
-            [-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 8, 1],
+            A_star_data,
             (
                 [0, 0, 0, 0, 1, 1, 2, 3, 4, 4, 4, 4, 4],
                 [0, 1, 2, 3, 1, 3, 2, 3, 0, 1, 2, 3, 4]
             )
-        ), dtype = dtype
+        )
     ))
     result = S @ A
     assert (result != A_star).nnz == 0
@@ -300,12 +304,12 @@ def test_avos(dtype):
     assert ((A_star @ v) != v_lambda).nnz == 0
     A_star = rb_matrix(coo_matrix(
         (
-            [-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 8, 1],
+            A_star_data,  # Reuse the same data array from above
             (
                 [0, 0, 0, 0, 1, 1, 2, 3, 4, 4, 4, 4, 4],
                 [0, 1, 2, 3, 1, 3, 2, 3, 0, 1, 2, 3, 4]
             )
-        ), dtype = dtype
+        )
     ))
     bar = u @ A_star
     assert (bar != u_lambda).nnz == 0
