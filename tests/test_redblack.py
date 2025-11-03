@@ -88,16 +88,16 @@ def test_cardinality():
 
 def test_vector_product():
     # test rank-1 mutliplication
-    u = rb.array([2, 0, 0, 0, 1])
-    v = rb.array([3, 0, 1, 0, 0])
+    u = rb.array([2, 0, 0, 0, BLACK_ONE])
+    v = rb.array([3, 0, BLACK_ONE, 0, 0])
     assert_equal(u @ v, 5)
     # test rank-2 multiplication
-    u = rb.array([[2, 0, 0, 0, 1]])
-    v = rb.array([[3], [0], [1], [0], [0]])
+    u = rb.array([[2, 0, 0, 0, BLACK_ONE]])
+    v = rb.array([[3], [0], [BLACK_ONE], [0], [0]])
     assert_equal(u @ v, 5)
     # test matrix multiplication
-    u = rb.array([[2, 0, 0, 0, 1]])
-    v = rb.array([[3], [0], [1], [0], [0]])
+    u = rb.array([[2, 0, 0, 0, BLACK_ONE]])
+    v = rb.array([[3], [0], [BLACK_ONE], [0], [0]])
     assert_equal(u @ v, 5)
 
 def test_vector_matrix_product():

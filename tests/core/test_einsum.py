@@ -61,11 +61,11 @@ def test_identity(dtype):
                   [ 0, 0, BLACK_ONE, 0, 0],
                   [ 0, 0, 0, RED_ONE, 0],
                   [ 2, 0, 0, 0, BLACK_ONE]]).astype(dtype)
-    I = np.array([[ 1, 0, 0, 0, 0],
-                  [ 0, 1, 0, 0, 0],
-                  [ 0, 0, 1, 0, 0],
-                  [ 0, 0, 0, 1, 0],
-                  [ 0, 0, 0, 0, 1]], dtype=dtype)
+    I = np.array([[ BLACK_ONE, 0, 0, 0, 0],
+                  [ 0, BLACK_ONE, 0, 0, 0],
+                  [ 0, 0, BLACK_ONE, 0, 0],
+                  [ 0, 0, 0, BLACK_ONE, 0],
+                  [ 0, 0, 0, 0, BLACK_ONE]], dtype=dtype)
 
     res = einsum('ij,jk', I, A, avos=True)
     assert_equal(A, res)
