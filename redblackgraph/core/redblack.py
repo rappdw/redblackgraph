@@ -99,6 +99,17 @@ class _Avos(ndarray):
 
 class array(_Avos, ndarray):
     def __new__(cls, *args, **kwargs):
+        # NumPy 2.x raises OverflowError for out-of-bound integers with unsigned dtypes
+        # NumPy 1.x allowed overflow with deprecation warning
+        # Maintain NumPy 1.x behavior: create array first, then cast to allow overflow
+        if 'dtype' in kwargs:
+            import numpy as np
+            dt = np.dtype(kwargs['dtype'])
+            if dt.kind == 'u':  # unsigned integer
+                # Create array without dtype first, then cast to allow overflow
+                kwargs_no_dtype = {k: v for k, v in kwargs.items() if k != 'dtype'}
+                arr = asarray(*args, **kwargs_no_dtype).astype(dt)
+                return arr.view(cls)
         return asarray(*args, **kwargs).view(cls)
 
     def __matmul__(self, other):

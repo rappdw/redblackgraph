@@ -161,6 +161,7 @@ def test_vector_matrix_rproduct():
     result = u @ A
     assert_equal(result[0], expected)
 
+    # With rb.array (not matrix), 1D @ 2D returns 1D (standard NumPy behavior)
     A = rb.array([[-1,  2,  3,  4,  0],
                    [ 0, -1,  0,  2,  0],
                    [ 0,  0,  1,  0,  0],
@@ -168,11 +169,11 @@ def test_vector_matrix_rproduct():
                    [ 2,  4,  5,  8,  1]])
     u = np.array([0, 2, 3, 0, 0])
     result = u @ A
-    assert_equal(result, expected.reshape((1,5)))
+    assert_equal(result, expected)  # 1D @ 2D = 1D with standard arrays
 
     u = np.array([[0, 2, 3, 0, 0]])
     result = u @ A
-    assert_equal(result[0], expected.reshape((1,5)))
+    assert_equal(result[0], expected)  # 2D @ 2D = 2D, check first row
 
     A = np.array([[-1,  2,  3,  4,  0],
                   [ 0, -1,  0,  2,  0],
