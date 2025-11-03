@@ -113,7 +113,6 @@ before-all = [
 before-build = [
     "pip install delvewheel",  # For bundling DLLs into wheels
     "pip install ninja",
-    "python generate_config.py",
 ]
 # Use delvewheel to repair wheels and bundle necessary DLLs
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
