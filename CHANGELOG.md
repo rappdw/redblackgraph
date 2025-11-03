@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **NumPy 2.x support** - Full compatibility with NumPy 2.0+
+- **Explicit constants for red-black algebra** - `RED_ONE` and `BLACK_ONE`
+  - `RED_ONE` (-1): Identity for even values, annihilator for odd values
+  - `BLACK_ONE` (1): Identity for odd values, annihilator for even values  
+  - Helper functions: `red_one_for_dtype()`, `black_one_for_dtype()`, `is_red_one()`, `is_black_one()`
+  - Makes parity-based algebraic semantics explicit and self-documenting
+- **Parity identity constraints in AVOS product** - Asymmetric identity behavior
+  - LEFT identity: Acts as starting point marker (no filtering)
+  - RIGHT identity: Acts as gender/parity filter (enforces parity constraints)
+  - Prevents impossible relationships like "father's female self" or "mother's male self"
+  - Implemented across all backends: Python reference, C core, C++ sparse, Cython
+  - See notebook for detailed mathematical justification and examples
 - CI testing matrix for NumPy 1.26 and 2.1 across Python 3.10, 3.11, 3.12
 - NumPy 2.0 compatibility layer using npy_2_compat.h
 

@@ -2,26 +2,67 @@
 Red-Black Algebra Constants
 
 The red-black semiring extends the natural numbers with two distinct multiplicative
-identities based on parity:
+identities based on parity. This algebraic structure emerges naturally from modeling
+binary trees and genealogical relationships.
 
-- **BLACK_ONE (1)**: Identity for odd values in AVOS product
-- **RED_ONE (-1)**: Identity for even values in AVOS product
+Parity-Based Identities:
+------------------------
+- **BLACK_ONE (1)**: Identity for odd values, annihilator for even values
+- **RED_ONE (-1)**: Identity for even values, annihilator for odd values
 
-AVOS Product Rules:
--------------------
-The AVOS (Algebraic Vertex-Ordered Semiring) product (⊗) follows these rules:
+AVOS Product Parity Constraints:
+---------------------------------
+The AVOS (Algebraic Vertex-Ordered Semiring) product (⊗) enforces strict parity rules:
 
-  x ⊗ RED_ONE  = x if x is even, else 0 (undefined)
-  x ⊗ BLACK_ONE = x if x is odd, else 0 (undefined)
+**RED_ONE (-1) Behavior:**
+  - even ⊗ RED_ONE  = even  (acts as identity)
+  - odd  ⊗ RED_ONE  = 0     (acts as annihilator/undefined)
+  
+  Examples:
+    2 ⊗ RED_ONE = 2   (father remains father)
+    4 ⊗ RED_ONE = 4   (paternal grandfather remains same)
+    3 ⊗ RED_ONE = 0   (mother becomes undefined - wrong gender line)
+    5 ⊗ RED_ONE = 0   (maternal grandfather becomes undefined)
 
-In graph theory, these identities represent self-loops with different properties:
-- RED_ONE typically appears on diagonal elements for vertices with even labels
-- BLACK_ONE typically appears on diagonal elements for vertices with odd labels
+**BLACK_ONE (1) Behavior:**
+  - odd  ⊗ BLACK_ONE = odd   (acts as identity)
+  - even ⊗ BLACK_ONE = 0     (acts as annihilator/undefined)
+  
+  Examples:
+    3 ⊗ BLACK_ONE = 3   (mother remains mother)
+    5 ⊗ BLACK_ONE = 5   (maternal grandfather remains same)
+    2 ⊗ BLACK_ONE = 0   (father becomes undefined - wrong gender line)
+    4 ⊗ BLACK_ONE = 0   (paternal grandfather becomes undefined)
+
+**Why This Matters:**
+This constraint prevents mixing incompatible gender lines in genealogical relationships.
+In a red-black graph representing family trees:
+  - Even values represent paternal (male) lineage
+  - Odd values represent maternal (female) lineage
+  - RED_ONE enforces "stay on paternal line or undefined"
+  - BLACK_ONE enforces "stay on maternal line or undefined"
+
+**Asymmetric Semantics:**
+The parity constraints are NOT commutative because identities serve two different roles:
+  - LEFT identity: "which gender am I starting from?" (no filtering, just composition)
+  - RIGHT identity: "does this ancestor have the specified gender?" (parity filter)
+
+For detailed mathematical justification and examples, see:
+notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb
+
+Graph Theory Interpretation:
+----------------------------
+In a red-black adjacency matrix:
+- RED_ONE appears on diagonal for "red" vertices (conventionally male/even)
+- BLACK_ONE appears on diagonal for "black" vertices (conventionally female/odd)
+- This ensures self-loops preserve the gender/parity constraint
 
 NumPy Compatibility:
 -------------------
 For unsigned integer types, RED_ONE is represented as the maximum value (e.g., 255 
-for uint8), which maintains the correct parity (always odd in binary representation).
+for uint8), which maintains the correct parity (maxint is always odd in binary).
+This allows the same bitwise parity checks (x & 1) to work correctly across both
+signed and unsigned integer types.
 """
 
 import numpy as np

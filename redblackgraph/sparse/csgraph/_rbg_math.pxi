@@ -32,27 +32,56 @@ cdef inline DTYPE_t avos_sum(DTYPE_t x, DTYPE_t y):
 
 cdef inline DTYPE_t avos_product(DTYPE_t lhs, DTYPE_t rhs):
     '''
-    The avos product replaces the left most significant bit of operand 2 with operand 1
-    :param x: operand 1
-    :param y: operand 2
+    The avos product with parity identity constraints.
+    
+    Identity semantics (asymmetric):
+    - LEFT identity: starting point marker, no filtering
+    - RIGHT identity: gender/parity filter
+      * RED_ONE (-1) filters for even (odd → 0)
+      * BLACK_ONE (1) filters for odd (even → 0)
+    
+    :param lhs: left operand
+    :param rhs: right operand
     :return: avos product
     '''
-    cdef UDTYPE_t red_one = -1
     cdef UDTYPE_t x = <UDTYPE_t>lhs
     cdef UDTYPE_t y = <UDTYPE_t>rhs
 
     # The zero property of the avos product
     if x == 0 or y == 0:
         return 0
-    # Special case -1 * 1 or -1 * -1
-    if x == red_one:
-        if y == 1:
-            return -1
-        x = 1
-    if y == red_one:
-        if x == 1:
-            return -1
-        y = 1
+    
+    # Identity ⊗ Identity special cases (must come before other checks)
+    # Same-gender self-loops
+    if lhs == -1 and rhs == -1:
+        return -1  # RED_ONE ⊗ RED_ONE = RED_ONE (male self-loop)
+    if lhs == 1 and rhs == 1:
+        return 1   # BLACK_ONE ⊗ BLACK_ONE = BLACK_ONE (female self-loop)
+    
+    # Cross-gender identity cases (RED_ONE is even/male, BLACK_ONE is odd/female)
+    if lhs == -1 and rhs == 1:
+        return 0  # RED_ONE ⊗ BLACK_ONE: male's female self is undefined
+    if lhs == 1 and rhs == -1:
+        return 0  # BLACK_ONE ⊗ RED_ONE: female's male self is undefined
+    
+    # Identity on LEFT: just a starting point marker, treat as 1 for bit-shift
+    if lhs == -1:
+        x = 1  # Treat RED_ONE as 1 for composition
+    
+    # Identity on RIGHT: acts as gender/parity filter
+    # When rhs is RED_ONE (-1): filters for even values only
+    if rhs == -1:
+        if lhs & 1:  # lhs is odd (use original lhs, not converted x)
+            return 0  # Odd values have no male self
+        else:
+            return x  # Even values' male self is themselves
+    
+    # When rhs is BLACK_ONE (1): filters for odd values only
+    if rhs == 1:
+        if lhs & 1:  # lhs is odd
+            return x  # Odd values' female self is themselves
+        else:
+            return 0  # Even values have no female self
 
     cdef unsigned short bit_position = MSB(y)
     return ((y & (2 ** bit_position - 1)) | (x << bit_position))

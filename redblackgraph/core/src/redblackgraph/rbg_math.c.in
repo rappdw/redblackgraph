@@ -54,20 +54,50 @@ short {{name}}_MSB({{type}} x)
     if (x == 0 || y == 0) {
         return 0;
     }
-    // Special case -1 * 1 or -1 * -1
-    // There is an oddity in bitwise NOT of an unsigned char, ~<unsigned char> temporary is an <int> rather
-    // than an <unsigned char>. Because of this, cast ~x and ~y to the appropriate type
-    if (({{utype}})~x == 0) {
-        if (y == 1) {
-            return x;
-        }
-        x = 1;
+    
+    // Identity ⊗ Identity special cases (must come before other checks)
+    // Same-gender self-loops
+    if (lhs == ({{type}})-1 && rhs == ({{type}})-1) {
+        return x;  // RED_ONE ⊗ RED_ONE = RED_ONE (male self-loop)
     }
-    if (({{utype}})~y == 0) {
-        if (x == 1) {
-            return y;
+    if (lhs == 1 && rhs == 1) {
+        return 1;  // BLACK_ONE ⊗ BLACK_ONE = BLACK_ONE (female self-loop)
+    }
+    
+    // Cross-gender identity cases (RED_ONE is even/male, BLACK_ONE is odd/female)
+    if (lhs == ({{type}})-1 && rhs == 1) {
+        return 0;  // RED_ONE ⊗ BLACK_ONE: male's female self is undefined
+    }
+    if (lhs == 1 && rhs == ({{type}})-1) {
+        return 0;  // BLACK_ONE ⊗ RED_ONE: female's male self is undefined
+    }
+    
+    // Identity on LEFT (lhs): Just a starting point marker, treat as 1 for bit-shift
+    // Example: RED_ONE ⊗ 3 = "male-me's mother" = bit_shift(1, 3) = 3
+    if (lhs == ({{type}})-1) {
+        x = 1;  // Treat RED_ONE as 1 for composition
+    }
+    
+    // Identity on RIGHT (rhs): Acts as gender/parity filter
+    // Example: 3 ⊗ RED_ONE = "mother's male self" = 0 (mother is odd/female)
+    //          3 ⊗ BLACK_ONE = "mother's female self" = 3 (mother is odd/female)
+    
+    // When rhs is RED_ONE (-1): Filters for even values only
+    if (rhs == ({{type}})-1) {
+        if (lhs & 1) {  // lhs is odd (use original lhs, not converted x)
+            return 0;  // Odd values have no male self
+        } else {
+            return x;  // Even values' male self is themselves
         }
-        y = 1;
+    }
+    
+    // When rhs is BLACK_ONE (1): Filters for odd values only
+    if (rhs == 1) {
+        if (lhs & 1) {  // lhs is odd
+            return x;  // Odd values' female self is themselves
+        } else {
+            return 0;  // Even values have no female self
+        }
     }
 
     short bit_position = {{name}}_MSB(y);

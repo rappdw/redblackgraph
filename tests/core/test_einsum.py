@@ -56,16 +56,20 @@ def test_avos(dtype):
 ])
 def test_identity(dtype):
     # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
+    # With parity constraints, identity matrix must respect vertex parity:
+    # - RED vertices (even) have RED_ONE on diagonal
+    # - BLACK vertices (odd) have BLACK_ONE on diagonal
     A = np.array([[RED_ONE, 2, 3, 0, 0],
                   [ 0, RED_ONE, 0, 2, 0],
                   [ 0, 0, BLACK_ONE, 0, 0],
                   [ 0, 0, 0, RED_ONE, 0],
-                  [ 2, 0, 0, 0, BLACK_ONE]]).astype(dtype)
-    I = np.array([[ BLACK_ONE, 0, 0, 0, 0],
-                  [ 0, BLACK_ONE, 0, 0, 0],
-                  [ 0, 0, BLACK_ONE, 0, 0],
-                  [ 0, 0, 0, BLACK_ONE, 0],
-                  [ 0, 0, 0, 0, BLACK_ONE]], dtype=dtype)
+                  [ 2, 0, 0, 0, BLACK_ONE]], dtype=np.int64).astype(dtype)  # Use int64 first to handle RED_ONE=-1
+    # Identity matrix matching the parity of A's diagonal
+    I = np.array([[ RED_ONE, 0, 0, 0, 0],        # Row 0: RED (even)
+                  [ 0, RED_ONE, 0, 0, 0],        # Row 1: RED (even)
+                  [ 0, 0, BLACK_ONE, 0, 0],      # Row 2: BLACK (odd)
+                  [ 0, 0, 0, RED_ONE, 0],        # Row 3: RED (even)
+                  [ 0, 0, 0, 0, BLACK_ONE]], dtype=np.int64).astype(dtype)  # Row 4: BLACK (odd)
 
     res = einsum('ij,jk', I, A, avos=True)
     assert_equal(A, res)
@@ -88,9 +92,12 @@ def test_product():
     products = []
     for i in range(-1, 2):
         for j in range(-1, 2):
+            operands.append((i, j))
             products.append(avos_product(i, j))
     errors = ""
-    expected = [-1, 0, -1, 0, 0, 0, -1, 0, 1]
+    # Updated expected results with parity constraints and cross-gender = 0
+    # -1⊗-1=-1, -1⊗0=0, -1⊗1=0, 0⊗-1=0, 0⊗0=0, 0⊗1=0, 1⊗-1=0, 1⊗0=0, 1⊗1=1
+    expected = [-1, 0, 0, 0, 0, 0, 0, 0, 1]
     for i in range(len(products)):
         if products[i] != expected[i]:
             errors += f"{operands[i][0]} * {operands[i][1]} = {products[i]}. Expected: {expected[i]}\n"
