@@ -13,8 +13,8 @@
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
 #include <numpy/npy_3kcompat.h>
-#include <numpy/noprefix.h>
 #include <numpy/ndarrayobject.h>
+#include <numpy/npy_2_compat.h>
 #include <numpy/arrayscalars.h>
 #include <numpy/ufuncobject.h>
 
@@ -68,7 +68,7 @@ einsum_sub_op_from_str(PyObject *args, PyObject **str_obj, char **subscripts,
     for (i = 0; i < nop; ++i) {
         PyObject *obj = PyTuple_GET_ITEM(args, i+1);
 
-        op[i] = (PyArrayObject *)PyArray_FROM_OF(obj, NPY_ARRAY_ENSUREARRAY);
+        op[i] = (PyArrayObject *)PyArray_FROM_OTF(obj, NPY_NOTYPE, NPY_ARRAY_ENSUREARRAY);
         if (op[i] == NULL) {
             goto fail;
         }
@@ -128,8 +128,8 @@ einsum_list_to_subscripts(PyObject *obj, char *subscripts, int subsize)
             ellipsis = 1;
         }
         /* Subscript */
-        else if (PyInt_Check(item) || PyLong_Check(item)) {
-            long s = PyInt_AsLong(item);
+        else if (PyLong_Check(item)) {
+            long s = PyLong_AsLong(item);
             npy_bool bad_input = 0;
 
             if (subindex + 1 >= subsize) {
@@ -219,7 +219,7 @@ einsum_sub_op_from_lists(PyObject *args,
             }
         }
 
-        op[i] = (PyArrayObject *)PyArray_FROM_OF(obj, NPY_ARRAY_ENSUREARRAY);
+        op[i] = (PyArrayObject *)PyArray_FROM_OTF(obj, NPY_NOTYPE, NPY_ARRAY_ENSUREARRAY);
         if (op[i] == NULL) {
             goto fail;
         }
@@ -293,7 +293,7 @@ array_einsum2(PyObject *NPY_UNUSED(dummy), PyObject *args, PyObject *kwds)
     arg0 = PyTuple_GET_ITEM(args, 0);
 
     /* einsum('i,j', a, b), einsum('i,j->ij', a, b) */
-    if (PyString_Check(arg0) || PyUnicode_Check(arg0)) {
+    if (PyUnicode_Check(arg0)) {
         nop = einsum_sub_op_from_str(args, &str_obj, &subscripts, op);
     }
     /* einsum(a, [0], b, [1]), einsum(a, [0], b, [1], [0,1]) */

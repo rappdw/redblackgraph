@@ -1,5 +1,5 @@
 import numpy as np
-from redblackgraph import einsum, avos_sum, avos_product
+from redblackgraph import einsum, avos_sum, avos_product, RED_ONE, BLACK_ONE
 from numpy.testing import (assert_equal)
 import pytest
 
@@ -15,24 +15,26 @@ import pytest
 ])
 def test_avos(dtype):
     # test simple avos matmul
-    A = np.array([[-1,2, 3, 0, 0],
-                  [0,-1, 0, 2, 0],
-                  [0, 0, 1, 0, 0],
-                  [0, 0, 0,-1, 0],
-                  [2, 0, 0, 0, 1]], dtype=dtype)
-    S = np.array([[-1, 2, 3, 4, 0],
-                  [0,-1, 0, 2, 0],
-                  [0, 0, 1, 0, 0],
-                  [0, 0, 0,-1, 0],
-                  [2, 4, 5, 0, 1]], dtype=dtype)
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
+    # Diagonal: RED_ONE (even identity) for vertices 0,1,3; BLACK_ONE (odd identity) for 2,4
+    A = np.array([[RED_ONE, 2, 3, 0, 0],
+                  [0, RED_ONE, 0, 2, 0],
+                  [0, 0, BLACK_ONE, 0, 0],
+                  [0, 0, 0, RED_ONE, 0],
+                  [2, 0, 0, 0, BLACK_ONE]]).astype(dtype)
+    S = np.array([[RED_ONE, 2, 3, 4, 0],
+                  [0, RED_ONE, 0, 2, 0],
+                  [0, 0, BLACK_ONE, 0, 0],
+                  [0, 0, 0, RED_ONE, 0],
+                  [2, 4, 5, 0, BLACK_ONE]]).astype(dtype)
     assert_equal(einsum('ij, jk', A, A, avos=True), S)
 
     # test vector mat mul
-    A_star = np.array([[-1,2, 3, 4, 0],
-                       [0,-1, 0, 2, 0],
-                       [0, 0, 1, 0, 0],
-                       [0, 0, 0,-1, 0],
-                       [2, 4, 5, 8, 1]], dtype=dtype)
+    A_star = np.array([[RED_ONE, 2, 3, 4, 0],
+                       [0, RED_ONE, 0, 2, 0],
+                       [0, 0, BLACK_ONE, 0, 0],
+                       [0, 0, 0, RED_ONE, 0],
+                       [2, 4, 5, 8, BLACK_ONE]]).astype(dtype)
     u = np.array([2, 0, 0, 0, 0], dtype=dtype)
     v = np.array([0, 3, 0, 0, 0], dtype=dtype)
     u_lambda = np.array([2, 4, 5, 8, 0])
@@ -53,16 +55,21 @@ def test_avos(dtype):
     np.uint64
 ])
 def test_identity(dtype):
-    A = np.array([[-1, 2, 3, 0, 0],
-                  [ 0,-1, 0, 2, 0],
-                  [ 0, 0, 1, 0, 0],
-                  [ 0, 0, 0,-1, 0],
-                  [ 2, 0, 0, 0, 1]], dtype=dtype)
-    I = np.array([[ 1, 0, 0, 0, 0],
-                  [ 0, 1, 0, 0, 0],
-                  [ 0, 0, 1, 0, 0],
-                  [ 0, 0, 0, 1, 0],
-                  [ 0, 0, 0, 0, 1]], dtype=dtype)
+    # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
+    # With parity constraints, identity matrix must respect vertex parity:
+    # - RED vertices (even) have RED_ONE on diagonal
+    # - BLACK vertices (odd) have BLACK_ONE on diagonal
+    A = np.array([[RED_ONE, 2, 3, 0, 0],
+                  [ 0, RED_ONE, 0, 2, 0],
+                  [ 0, 0, BLACK_ONE, 0, 0],
+                  [ 0, 0, 0, RED_ONE, 0],
+                  [ 2, 0, 0, 0, BLACK_ONE]], dtype=np.int64).astype(dtype)  # Use int64 first to handle RED_ONE=-1
+    # Identity matrix matching the parity of A's diagonal
+    I = np.array([[ RED_ONE, 0, 0, 0, 0],        # Row 0: RED (even)
+                  [ 0, RED_ONE, 0, 0, 0],        # Row 1: RED (even)
+                  [ 0, 0, BLACK_ONE, 0, 0],      # Row 2: BLACK (odd)
+                  [ 0, 0, 0, RED_ONE, 0],        # Row 3: RED (even)
+                  [ 0, 0, 0, 0, BLACK_ONE]], dtype=np.int64).astype(dtype)  # Row 4: BLACK (odd)
 
     res = einsum('ij,jk', I, A, avos=True)
     assert_equal(A, res)
@@ -85,9 +92,12 @@ def test_product():
     products = []
     for i in range(-1, 2):
         for j in range(-1, 2):
+            operands.append((i, j))
             products.append(avos_product(i, j))
     errors = ""
-    expected = [-1, 0, -1, 0, 0, 0, -1, 0, 1]
+    # Updated expected results with parity constraints and cross-gender = 0
+    # -1⊗-1=-1, -1⊗0=0, -1⊗1=0, 0⊗-1=0, 0⊗0=0, 0⊗1=0, 1⊗-1=0, 1⊗0=0, 1⊗1=1
+    expected = [-1, 0, 0, 0, 0, 0, 0, 0, 1]
     for i in range(len(products)):
         if products[i] != expected[i]:
             errors += f"{operands[i][0]} * {operands[i][1]} = {products[i]}. Expected: {expected[i]}\n"

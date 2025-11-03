@@ -6,7 +6,7 @@ from redblackgraph.core._redblackgraph import vertex_relational_composition as _
 from redblackgraph.core._redblackgraph import edge_relational_composition as _edge_relational_composition
 from redblackgraph.types.transitive_closure import TransitiveClosure
 
-__all__ = ['array', 'matrix', 'transitive_closure', 'vertex_relational_composition', 'edge_relational_composition']
+__all__ = ['array', 'transitive_closure', 'vertex_relational_composition', 'edge_relational_composition']
 
 
 class _Avos(ndarray):
@@ -99,6 +99,17 @@ class _Avos(ndarray):
 
 class array(_Avos, ndarray):
     def __new__(cls, *args, **kwargs):
+        # NumPy 2.x raises OverflowError for out-of-bound integers with unsigned dtypes
+        # NumPy 1.x allowed overflow with deprecation warning
+        # Maintain NumPy 1.x behavior: create array first, then cast to allow overflow
+        if 'dtype' in kwargs:
+            import numpy as np
+            dt = np.dtype(kwargs['dtype'])
+            if dt.kind == 'u':  # unsigned integer
+                # Create array without dtype first, then cast to allow overflow
+                kwargs_no_dtype = {k: v for k, v in kwargs.items() if k != 'dtype'}
+                arr = asarray(*args, **kwargs_no_dtype).astype(dt)
+                return arr.view(cls)
         return asarray(*args, **kwargs).view(cls)
 
     def __matmul__(self, other):
@@ -108,15 +119,6 @@ class array(_Avos, ndarray):
         return super(array, self).__rmatmul__(other).view(array)
 
 
-class matrix(_Avos, np.matrix):
-    def __new__(cls, data, dtype=None, copy=True):
-        return super(matrix, cls).__new__(cls, data, dtype=dtype, copy=copy)
-
-    def __matmul__(self, other):
-        return super(matrix, self).__matmul__(other).view(matrix)
-
-    def __rmatmul__(self, other):
-        return super(matrix, self).__rmatmul__(other).view(matrix)
 
 def transitive_closure(A: array):
     return A.transitive_closure()

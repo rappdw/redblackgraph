@@ -16,11 +16,26 @@
 #define PY_ARRAY_UNIQUE_SYMBOL RBG_ARRAY_API
 
 #define NPY_NO_DEPRECATED_API NPY_API_VERSION
-#include <numpy/noprefix.h>
 #include <numpy/ndarraytypes.h>
 #include <numpy/ndarrayobject.h>
 #include <numpy/arrayscalars.h>
 #include <numpy/ufuncobject.h>
+#include <numpy/npy_2_compat.h>
+
+/* NumPy 2.0 compatibility: PyArray_Descr structure accessors */
+#if NPY_ABI_VERSION < 0x02000000
+    #define PyDataType_ELSIZE(descr) ((descr)->elsize)
+#endif
+
+/* NumPy 2.0 compatibility: NPY_NTYPES constant  
+ * In NumPy 1.x: NPY_NTYPES is defined in ndarraytypes.h  
+ * In NumPy 2.x: NPY_NTYPES removed, NPY_NTYPES_LEGACY enum value (24) exists
+ * Note: NPY_NTYPES_LEGACY is an enum, not a macro, so we can't use #if defined()
+ * Solution: If NPY_NTYPES not defined, use the legacy count of 24
+ */
+#ifndef NPY_NTYPES
+    #define NPY_NTYPES 24  /* NPY_NTYPES_LEGACY value from ndarraytypes.h */
+#endif
 
 /**** this is in numpy src common.h ****/
 #ifdef NPY_ALLOW_THREADS
@@ -2275,7 +2290,7 @@ unbuffered_loop_nop1_ndim2(NpyIter *iter)
 
     sop = get_sum_of_products_function(1,
                     NpyIter_GetDescrArray(iter)[0]->type_num,
-                    NpyIter_GetDescrArray(iter)[0]->elsize,
+                    PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0]),
                     strides[0]);
 
     if (sop == NULL) {
@@ -2329,7 +2344,7 @@ unbuffered_loop_nop1_ndim3(NpyIter *iter)
 
     sop = get_sum_of_products_function(1,
                     NpyIter_GetDescrArray(iter)[0]->type_num,
-                    NpyIter_GetDescrArray(iter)[0]->elsize,
+                    PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0]),
                     strides[0]);
 
     if (sop == NULL) {
@@ -2386,7 +2401,7 @@ unbuffered_loop_nop2_ndim2(NpyIter *iter)
 
     sop = get_sum_of_products_function(2,
                     NpyIter_GetDescrArray(iter)[0]->type_num,
-                    NpyIter_GetDescrArray(iter)[0]->elsize,
+                    PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0]),
                     strides[0]);
 
     if (sop == NULL) {
@@ -2442,7 +2457,7 @@ unbuffered_loop_nop2_ndim3(NpyIter *iter)
 
     sop = get_sum_of_products_function(2,
                     NpyIter_GetDescrArray(iter)[0]->type_num,
-                    NpyIter_GetDescrArray(iter)[0]->elsize,
+                    PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0]),
                     strides[0]);
 
     if (sop == NULL) {
@@ -2841,7 +2856,7 @@ PyArray_EinsteinSum2(char *subscripts, npy_intp nop,
     NpyIter_GetInnerFixedStrideArray(iter, fixed_strides);
     sop = get_sum_of_products_function(nop,
                         NpyIter_GetDescrArray(iter)[0]->type_num,
-                        NpyIter_GetDescrArray(iter)[0]->elsize,
+                        PyDataType_ELSIZE(NpyIter_GetDescrArray(iter)[0]),
                         fixed_strides);
 
 #if NPY_EINSUM_DBG_TRACING

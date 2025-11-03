@@ -5,6 +5,7 @@ python_sources = [
   'capture.py',
   'graph_builder.py',
   'relationship_file_io.py',
+  'test_support.py',
 ]
 
 py.install_sources(
