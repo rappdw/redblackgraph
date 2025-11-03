@@ -1,7 +1,10 @@
 import numpy as np
-import pytest
+from numpy.testing import assert_equal
 from scipy.sparse import coo_matrix
-from redblackgraph import rb_matrix
+import pytest
+
+from redblackgraph import RED_ONE, BLACK_ONE
+from redblackgraph.util.test_support import rb_matrix
 
 MATRICES = [
     # elementary case
@@ -207,7 +210,8 @@ def test_rb_matrix_square(matrix):
 def test_avos(dtype):
     # test simple avos matmul
     # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
-    A_data = np.array([-1, 2, 3, -1, 2, 1, -1, 2, 1]).astype(dtype)
+    # Diagonal elements: RED_ONE for positions (0,0), (1,1), (3,3); BLACK_ONE for (2,2), (4,4)
+    A_data = np.array([RED_ONE, 2, 3, RED_ONE, 2, BLACK_ONE, RED_ONE, 2, BLACK_ONE]).astype(dtype)
     A = rb_matrix(coo_matrix(
         (
             A_data,
@@ -217,7 +221,7 @@ def test_avos(dtype):
             )
         )
     ))
-    S_data = np.array([-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 1]).astype(dtype)
+    S_data = np.array([RED_ONE, 2, 3, 4, RED_ONE, 2, BLACK_ONE, RED_ONE, 2, 4, 5, BLACK_ONE]).astype(dtype)
     S = rb_matrix(coo_matrix(
         (
             S_data,
@@ -240,7 +244,7 @@ def test_avos(dtype):
     ))
     assert ((A @ A) != S).nnz == 0
 
-    A_star_data = np.array([-1, 2, 3, 4, -1, 2, 1, -1, 2, 4, 5, 8, 1]).astype(dtype)
+    A_star_data = np.array([RED_ONE, 2, 3, 4, RED_ONE, 2, BLACK_ONE, RED_ONE, 2, 4, 5, 8, BLACK_ONE]).astype(dtype)
     A_star = rb_matrix(coo_matrix(
         (
             A_star_data,

@@ -1,5 +1,5 @@
 import numpy as np
-from redblackgraph import einsum, avos_sum, avos_product
+from redblackgraph import einsum, avos_sum, avos_product, RED_ONE, BLACK_ONE
 from numpy.testing import (assert_equal)
 import pytest
 
@@ -16,24 +16,25 @@ import pytest
 def test_avos(dtype):
     # test simple avos matmul
     # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
-    A = np.array([[-1,2, 3, 0, 0],
-                  [0,-1, 0, 2, 0],
-                  [0, 0, 1, 0, 0],
-                  [0, 0, 0,-1, 0],
-                  [2, 0, 0, 0, 1]]).astype(dtype)
-    S = np.array([[-1, 2, 3, 4, 0],
-                  [0,-1, 0, 2, 0],
-                  [0, 0, 1, 0, 0],
-                  [0, 0, 0,-1, 0],
-                  [2, 4, 5, 0, 1]]).astype(dtype)
+    # Diagonal: RED_ONE (even identity) for vertices 0,1,3; BLACK_ONE (odd identity) for 2,4
+    A = np.array([[RED_ONE, 2, 3, 0, 0],
+                  [0, RED_ONE, 0, 2, 0],
+                  [0, 0, BLACK_ONE, 0, 0],
+                  [0, 0, 0, RED_ONE, 0],
+                  [2, 0, 0, 0, BLACK_ONE]]).astype(dtype)
+    S = np.array([[RED_ONE, 2, 3, 4, 0],
+                  [0, RED_ONE, 0, 2, 0],
+                  [0, 0, BLACK_ONE, 0, 0],
+                  [0, 0, 0, RED_ONE, 0],
+                  [2, 4, 5, 0, BLACK_ONE]]).astype(dtype)
     assert_equal(einsum('ij, jk', A, A, avos=True), S)
 
     # test vector mat mul
-    A_star = np.array([[-1,2, 3, 4, 0],
-                       [0,-1, 0, 2, 0],
-                       [0, 0, 1, 0, 0],
-                       [0, 0, 0,-1, 0],
-                       [2, 4, 5, 8, 1]]).astype(dtype)
+    A_star = np.array([[RED_ONE, 2, 3, 4, 0],
+                       [0, RED_ONE, 0, 2, 0],
+                       [0, 0, BLACK_ONE, 0, 0],
+                       [0, 0, 0, RED_ONE, 0],
+                       [2, 4, 5, 8, BLACK_ONE]]).astype(dtype)
     u = np.array([2, 0, 0, 0, 0], dtype=dtype)
     v = np.array([0, 3, 0, 0, 0], dtype=dtype)
     u_lambda = np.array([2, 4, 5, 8, 0])
@@ -55,11 +56,11 @@ def test_avos(dtype):
 ])
 def test_identity(dtype):
     # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
-    A = np.array([[-1, 2, 3, 0, 0],
-                  [ 0,-1, 0, 2, 0],
-                  [ 0, 0, 1, 0, 0],
-                  [ 0, 0, 0,-1, 0],
-                  [ 2, 0, 0, 0, 1]]).astype(dtype)
+    A = np.array([[RED_ONE, 2, 3, 0, 0],
+                  [ 0, RED_ONE, 0, 2, 0],
+                  [ 0, 0, BLACK_ONE, 0, 0],
+                  [ 0, 0, 0, RED_ONE, 0],
+                  [ 2, 0, 0, 0, BLACK_ONE]]).astype(dtype)
     I = np.array([[ 1, 0, 0, 0, 0],
                   [ 0, 1, 0, 0, 0],
                   [ 0, 0, 1, 0, 0],

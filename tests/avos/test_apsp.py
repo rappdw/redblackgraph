@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
-import redblackgraph as rb
-import redblackgraph.reference as ref
-import redblackgraph.core as core
-import redblackgraph.sparse as sparse
-from redblackgraph import rb_matrix
-from numpy.testing import assert_equal
 from scipy.sparse import coo_matrix
+from numpy.testing import assert_equal
+
+import redblackgraph as rb
+from redblackgraph import sparse, RED_ONE, BLACK_ONE
+from redblackgraph import reference as ref, core
+from redblackgraph.util.test_support import rb_matrix
 
 def core_transitive_closure(A):
     return core.transitive_closure(rb.array(A))
@@ -77,7 +77,8 @@ def test_warshall_core_impl(dtype):
     ])
 def test_apsp_sparse_impl(dtype, transitive_closure):
     # NumPy 2.x: use astype() for unsigned dtypes to allow overflow wrapping
-    a_data = np.array([-1, -1, 1, -1, 1, -1, 1, 2, 3, 2, 3, 2, 3]).astype(dtype)
+    # Diagonal: RED_ONE for vertices 0,1,3,5; BLACK_ONE for 2,4,6
+    a_data = np.array([RED_ONE, RED_ONE, BLACK_ONE, RED_ONE, BLACK_ONE, RED_ONE, BLACK_ONE, 2, 3, 2, 3, 2, 3]).astype(dtype)
     a = rb_matrix(
         coo_matrix(
             (
@@ -90,13 +91,13 @@ def test_apsp_sparse_impl(dtype, transitive_closure):
         )
     )
 
-    expected = rb.array([[-1, 2, 3, 6, 7, 4, 5],
-                         [ 0,-1, 0, 0, 0, 2, 3],
-                         [ 0, 0, 1, 2, 3, 0, 0],
-                         [ 0, 0, 0,-1, 0, 0, 0],
-                         [ 0, 0, 0, 0, 1, 0, 0],
-                         [ 0, 0, 0, 0, 0,-1, 0],
-                         [ 0, 0, 0, 0, 0, 0, 1]], dtype=np.int32)
+    expected = rb.array([[RED_ONE, 2, 3, 6, 7, 4, 5],
+                         [ 0, RED_ONE, 0, 0, 0, 2, 3],
+                         [ 0, 0, BLACK_ONE, 2, 3, 0, 0],
+                         [ 0, 0, 0, RED_ONE, 0, 0, 0],
+                         [ 0, 0, 0, 0, BLACK_ONE, 0, 0],
+                         [ 0, 0, 0, 0, 0, RED_ONE, 0],
+                         [ 0, 0, 0, 0, 0, 0, BLACK_ONE]], dtype=np.int32)
 
     results = transitive_closure(a)
     # print()

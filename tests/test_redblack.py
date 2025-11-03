@@ -1,5 +1,6 @@
 import numpy as np
 import redblackgraph as rb
+from redblackgraph import RED_ONE, BLACK_ONE
 from redblackgraph.reference import topological_ordering
 from numpy.testing import assert_equal
 import pytest
@@ -17,30 +18,31 @@ import pytest
 ])
 def test_avos(dtype):
     # test simple avos matmul
-    A = rb.array([[-1,  2,  3,  0,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0,  -1, 0],
-                  [ 2,  0,  0,  0,  1]], dtype=dtype)
-    S = rb.array([[-1,  2,  3,  4,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  0],
-                  [ 2,  4,  5,  0,  1]], dtype=dtype)
+    # Diagonal: RED_ONE (even identity) for vertices 0,1,3; BLACK_ONE (odd identity) for 2,4
+    A = rb.array([[RED_ONE,  2,  3,  0,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0,  RED_ONE, 0],
+                  [ 2,  0,  0,  0,  BLACK_ONE]], dtype=dtype)
+    S = rb.array([[RED_ONE,  2,  3,  4,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0, RED_ONE,  0],
+                  [ 2,  4,  5,  0,  BLACK_ONE]], dtype=dtype)
     result = A @ A
     assert_equal(result, S)
-    A = rb.array([[-1,  2,  3,  0,  0],
-                   [ 0, -1,  0,  2,  0],
-                   [ 0,  0,  1,  0,  0],
-                   [ 0,  0,  0,  -1, 0],
-                   [ 2,  0,  0,  0,  1]], dtype=dtype)
+    A = rb.array([[RED_ONE,  2,  3,  0,  0],
+                   [ 0, RED_ONE,  0,  2,  0],
+                   [ 0,  0,  BLACK_ONE,  0,  0],
+                   [ 0,  0,  0,  RED_ONE, 0],
+                   [ 2,  0,  0,  0,  BLACK_ONE]], dtype=dtype)
     assert_equal(A @ A, S)
 
-    A_star = rb.array([[-1,  2,  3,  4,  0],
-                       [ 0, -1,  0,  2,  0],
-                       [ 0,  0,  1,  0,  0],
-                       [ 0,  0,  0, -1,  0],
-                       [ 2,  4,  5,  8,  1]], dtype=dtype)
+    A_star = rb.array([[RED_ONE,  2,  3,  4,  0],
+                       [ 0, RED_ONE,  0,  2,  0],
+                       [ 0,  0,  BLACK_ONE,  0,  0],
+                       [ 0,  0,  0, RED_ONE,  0],
+                       [ 2,  4,  5,  8,  BLACK_ONE]], dtype=dtype)
     result = S @ A
     assert_equal(result, A_star)
     result = A @ (A @ A)
@@ -61,24 +63,24 @@ def test_avos(dtype):
     v_lambda = np.array([5, 3, 0, 0, 9]).reshape((5, 1))
     assert_equal(u @ A_star, u_lambda)
     assert_equal(A_star @ v, v_lambda)
-    A_star = rb.array([[-1,  2,  3,  4,  0],
-                        [ 0, -1,  0,  2,  0],
-                        [ 0,  0,  1,  0,  0],
-                        [ 0,  0,  0, -1,  0],
-                        [ 2,  4,  5,  8,  1]], dtype=dtype)
+    A_star = rb.array([[RED_ONE,  2,  3,  4,  0],
+                        [ 0, RED_ONE,  0,  2,  0],
+                        [ 0,  0,  BLACK_ONE,  0,  0],
+                        [ 0,  0,  0, RED_ONE,  0],
+                        [ 2,  4,  5,  8,  BLACK_ONE]], dtype=dtype)
     bar = u @ A_star
     assert_equal(bar, u_lambda)
     assert_equal(A_star @ v, v_lambda)
     assert_equal(A @ A @ A @ v, v_lambda)
 
 def test_cardinality():
-    A = rb.array([[-1, 2, 3, 4, 0, 0, 5],
-                  [ 0,-1, 0, 2, 0, 0, 3],
-                  [ 0, 0, 1, 0, 0, 0, 0],
-                  [ 0, 0, 0,-1, 0, 0, 0],
-                  [ 2, 4, 5, 8, 1, 0, 9],
-                  [ 2, 4, 5, 8, 0,-1, 9],
-                  [ 0, 0, 0, 0, 0, 0, 1]])
+    A = rb.array([[RED_ONE, 2, 3, 4, 0, 0, 5],
+                  [ 0, RED_ONE, 0, 2, 0, 0, 3],
+                  [ 0, 0, BLACK_ONE, 0, 0, 0, 0],
+                  [ 0, 0, 0, RED_ONE, 0, 0, 0],
+                  [ 2, 4, 5, 8, BLACK_ONE, 0, 9],
+                  [ 2, 4, 5, 8, 0, RED_ONE, 9],
+                  [ 0, 0, 0, 0, 0, 0, BLACK_ONE]])
     cardinality = A.cardinality()
     assert_equal(cardinality['red'], 4)
     assert_equal(cardinality['black'], 3)
@@ -99,11 +101,11 @@ def test_vector_product():
     assert_equal(u @ v, 5)
 
 def test_vector_matrix_product():
-    A = rb.array([[-1,  2,  3,  4,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  0],
-                  [ 2,  4,  5,  8,  1]])
+    A = rb.array([[RED_ONE,  2,  3,  4,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0, RED_ONE,  0],
+                  [ 2,  4,  5,  8,  BLACK_ONE]])
     # test rank-1 mutliplication
     u = rb.array([0, 2, 3, 0, 0])
     result = u @ A
@@ -115,11 +117,11 @@ def test_vector_matrix_product():
     result = u @ A
     assert_equal(result[0], expected)
 
-    A = rb.array([[-1,  2,  3,  4,  0],
-                   [ 0, -1,  0,  2,  0],
-                   [ 0,  0,  1,  0,  0],
-                   [ 0,  0,  0, -1,  0],
-                   [ 2,  4,  5,  8,  1]])
+    A = rb.array([[RED_ONE,  2,  3,  4,  0],
+                   [ 0, RED_ONE,  0,  2,  0],
+                   [ 0,  0,  BLACK_ONE,  0,  0],
+                   [ 0,  0,  0, RED_ONE,  0],
+                   [ 2,  4,  5,  8,  BLACK_ONE]])
     u = rb.array([0, 2, 3, 0, 0])
     result = u @ A
     assert_equal(result, expected)
@@ -128,11 +130,11 @@ def test_vector_matrix_product():
     result = u @ A
     assert_equal(result[0], expected)
 
-    A = rb.array([[-1,  2,  3,  4,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  0],
-                  [ 2,  4,  5,  8,  1]])
+    A = rb.array([[RED_ONE,  2,  3,  4,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0, RED_ONE,  0],
+                  [ 2,  4,  5,  8,  BLACK_ONE]])
     v = rb.array([0, 0, 9, 0, 0])
     # test rank-1 mutliplication
     result = A @ v
@@ -145,11 +147,11 @@ def test_vector_matrix_product():
     assert_equal(result, expected.reshape((5, 1)))
 
 def test_vector_matrix_rproduct():
-    A = rb.array([[-1,  2,  3,  4,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  0],
-                  [ 2,  4,  5,  8,  1]])
+    A = rb.array([[RED_ONE,  2,  3,  4,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0, RED_ONE,  0],
+                  [ 2,  4,  5,  8,  BLACK_ONE]])
     # test rank-1 mutliplication
     u = np.array([0, 2, 3, 0, 0])
     result = u @ A
@@ -162,11 +164,11 @@ def test_vector_matrix_rproduct():
     assert_equal(result[0], expected)
 
     # With rb.array (not matrix), 1D @ 2D returns 1D (standard NumPy behavior)
-    A = rb.array([[-1,  2,  3,  4,  0],
-                   [ 0, -1,  0,  2,  0],
-                   [ 0,  0,  1,  0,  0],
-                   [ 0,  0,  0, -1,  0],
-                   [ 2,  4,  5,  8,  1]])
+    A = rb.array([[RED_ONE,  2,  3,  4,  0],
+                   [ 0, RED_ONE,  0,  2,  0],
+                   [ 0,  0,  BLACK_ONE,  0,  0],
+                   [ 0,  0,  0, RED_ONE,  0],
+                   [ 2,  4,  5,  8,  BLACK_ONE]])
     u = np.array([0, 2, 3, 0, 0])
     result = u @ A
     assert_equal(result, expected)  # 1D @ 2D = 1D with standard arrays
@@ -175,11 +177,11 @@ def test_vector_matrix_rproduct():
     result = u @ A
     assert_equal(result[0], expected)  # 2D @ 2D = 2D, check first row
 
-    A = np.array([[-1,  2,  3,  4,  0],
-                  [ 0, -1,  0,  2,  0],
-                  [ 0,  0,  1,  0,  0],
-                  [ 0,  0,  0, -1,  0],
-                  [ 2,  4,  5,  8,  1]])
+    A = np.array([[RED_ONE,  2,  3,  4,  0],
+                  [ 0, RED_ONE,  0,  2,  0],
+                  [ 0,  0,  BLACK_ONE,  0,  0],
+                  [ 0,  0,  0, RED_ONE,  0],
+                  [ 2,  4,  5,  8,  BLACK_ONE]])
     v = rb.array([0, 0, 9, 0, 0])
     # test rank-1 mutliplication
     result = A @ v
@@ -192,13 +194,13 @@ def test_vector_matrix_rproduct():
     assert_equal(result, expected.reshape((5, 1)))
 
 def test_triangularization():
-    R = rb.array([[-1, 0, 0, 2, 0, 3, 0],
-                  [ 0,-1, 0, 0, 0, 0, 0],
-                  [ 2, 0, 1, 0, 0, 0, 0],
-                  [ 0, 0, 0,-1, 0, 0, 0],
-                  [ 0, 2, 0, 0,-1, 0, 3],
-                  [ 0, 0, 0, 0, 0, 1, 0],
-                  [ 0, 0, 0, 0, 0, 0, 1]
+    R = rb.array([[RED_ONE, 0, 0, 2, 0, 3, 0],
+                  [ 0, RED_ONE, 0, 0, 0, 0, 0],
+                  [ 2, 0, BLACK_ONE, 0, 0, 0, 0],
+                  [ 0, 0, 0, RED_ONE, 0, 0, 0],
+                  [ 0, 2, 0, 0, RED_ONE, 0, 3],
+                  [ 0, 0, 0, 0, 0, BLACK_ONE, 0],
+                  [ 0, 0, 0, 0, 0, 0, BLACK_ONE]
                   ])
     A_star: rb.array = R.transitive_closure().W
     A_cannonical = topological_ordering(A_star)
