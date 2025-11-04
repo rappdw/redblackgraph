@@ -1,9 +1,8 @@
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
-  # Version is hardcoded for now - will be updated manually for releases
-  # TODO: Investigate proper dynamic versioning with meson-python
-  version: '0.6.0',
+  # Get version from git tag dynamically
+  version: run_command('git', 'describe', '--tags', '--abbrev=0', check: false).stdout().strip().substring(1),
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [
