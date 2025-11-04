@@ -1,9 +1,8 @@
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
-  # This version is only used by meson internally and for local builds
-  # Actual wheel version is determined by setuptools_scm from git tags via meson-python
-  version: '0.6.0',
+  # Version is determined dynamically by setuptools_scm from git tags via meson-python
+  # No version specified here - meson-python will use setuptools_scm automatically
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [

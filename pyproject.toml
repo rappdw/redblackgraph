@@ -8,7 +8,7 @@ requires = [
     "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
     "numpy>=2.0.0,<3.0",
-    "setuptools_scm>=8.0",  # For dynamic versioning from git tags
+    "setuptools_scm[toml]>=8.0",  # For dynamic versioning from git tags
 ]
 build-backend = "mesonpy"
 
@@ -84,9 +84,6 @@ build = "cp310-* cp311-* cp312-*"
 # Skip PyPy, musllinux, and 32-bit builds
 skip = "pp* *-musllinux_* *-win32 *-manylinux_i686"
 
-# Force version for setuptools_scm - bypasses git detection entirely
-environment = { SETUPTOOLS_SCM_PRETEND_VERSION = "0.6.0" }
-
 # Test that the wheel can be imported successfully
 test-command = "python -c \"import redblackgraph; print('✓ Import successful, version:', redblackgraph.__version__)\""
 
@@ -121,8 +118,8 @@ before-build = [
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 
 [tool.setuptools_scm]
-# Get version from git tags
-write_to = "redblackgraph/_version.py"
+# Get version from git tags for meson-python
+# Note: write_to is not needed with meson-python, it handles version internally
 version_scheme = "post-release"
 local_scheme = "no-local-version"
 
