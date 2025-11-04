@@ -84,10 +84,6 @@ build = "cp310-* cp311-* cp312-*"
 # Skip PyPy, musllinux, and 32-bit builds
 skip = "pp* *-musllinux_* *-win32 *-manylinux_i686"
 
-# Fetch tags for setuptools_scm version detection
-# The || true ensures build continues even if git fetch fails (e.g., in source tarball builds)
-before-build = "git fetch --force --tags || true"
-
 # Test that the wheel can be imported successfully
 test-command = "python -c \"import redblackgraph; print('✓ Import successful, version:', redblackgraph.__version__)\""
 
