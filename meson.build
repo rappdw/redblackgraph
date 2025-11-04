@@ -1,8 +1,18 @@
+# Get version from git, with fallback
+_git_result = run_command('git', 'describe', '--tags', '--abbrev=0', check: false)
+_git_version = _git_result.stdout().strip()
+
+# Default to 0.6.0, but use git version if available and starts with 'v'
+if _git_result.returncode() == 0 and _git_version != '' and _git_version.startswith('v')
+  _version = _git_version.substring(1)
+else
+  _version = '0.6.0'
+endif
+
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
-  # Get version from git tag dynamically
-  version: run_command('git', 'describe', '--tags', '--abbrev=0', check: false).stdout().strip().substring(1),
+  version: _version,
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [
