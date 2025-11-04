@@ -14,7 +14,7 @@ build-backend = "mesonpy"
 [project]
 name = "redblackgraph"
 # Version is set in meson.build (meson-python doesn't support dynamic versioning)
-version = "0.6.0"
+version = "0.6.1-dev"
 description = "Red Black Graph - AVOS algebra for graph computation"
 readme = "README.md"
 requires-python = ">=3.10"

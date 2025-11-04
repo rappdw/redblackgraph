@@ -3,7 +3,7 @@ project(
   'c', 'cpp', 'cython',
   # Version: meson-python doesn't yet support setuptools_scm (see issue #159)
   # For now, version must be manually updated here for each release
-  version: '0.6.0',
+  version: '0.6.1-dev',
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [
