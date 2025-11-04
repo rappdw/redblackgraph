@@ -8,13 +8,13 @@ requires = [
     "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
     "numpy>=2.0.0,<3.0",
-    "setuptools_scm[toml]>=8.0",  # For dynamic versioning from git tags
 ]
 build-backend = "mesonpy"
 
 [project]
 name = "redblackgraph"
-dynamic = ["version"]  # Version determined by setuptools_scm from git tags
+# Version is set in meson.build (meson-python doesn't support dynamic versioning)
+version = "0.6.0"
 description = "Red Black Graph - AVOS algebra for graph computation"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -116,12 +116,6 @@ before-build = [
 ]
 # Use delvewheel to repair wheels and bundle necessary DLLs
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
-
-[tool.setuptools_scm]
-# Get version from git tags for meson-python
-# Note: write_to is not needed with meson-python, it handles version internally
-version_scheme = "post-release"
-local_scheme = "no-local-version"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
