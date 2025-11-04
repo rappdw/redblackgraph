@@ -1,8 +1,9 @@
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
-  # Version is determined dynamically by setuptools_scm from git tags via meson-python
-  # No version specified here - meson-python will use setuptools_scm automatically
+  # Version: meson-python uses setuptools_scm from pyproject.toml to determine version
+  # This default is used only if setuptools_scm fails (e.g., building from tarball without git)
+  version: '0.0.0',  # Fallback - actual version from setuptools_scm
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [
