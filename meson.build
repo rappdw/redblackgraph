@@ -1,17 +1,19 @@
 # Get version from git tag, fallback to 0.0.0 if git is not available
 git = find_program('git', required: false)
+version = '0.0.0'  # Default fallback
+
 if git.found()
   # Get the most recent tag
   version_result = run_command(git, 'describe', '--tags', '--abbrev=0', check: false)
   if version_result.returncode() == 0
     version_raw = version_result.stdout().strip()
     # Remove 'v' prefix if present (v0.6.0 -> 0.6.0)
-    version = version_raw.startswith('v') ? version_raw.substring(1) : version_raw
-  else
-    version = '0.0.0'
+    if version_raw.startswith('v')
+      version = version_raw.substring(1)
+    else
+      version = version_raw
+    endif
   endif
-else
-  version = '0.0.0'
 endif
 
 project(
