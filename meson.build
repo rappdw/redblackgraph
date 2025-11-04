@@ -1,9 +1,25 @@
+# Get version from git tag, fallback to 0.0.0 if git is not available
+git = find_program('git', required: false)
+if git.found()
+  # Get the most recent tag
+  version_result = run_command(git, 'describe', '--tags', '--abbrev=0', check: false)
+  if version_result.returncode() == 0
+    version = version_result.stdout().strip()
+    # Remove 'v' prefix if present
+    if version.startswith('v')
+      version = version.substring(1)
+    endif
+  else
+    version = '0.0.0'
+  endif
+else
+  version = '0.0.0'
+endif
+
 project(
   'redblackgraph',
   'c', 'cpp', 'cython',
-  # Version: meson-python uses setuptools_scm from pyproject.toml to determine version
-  # This default is used only if setuptools_scm fails (e.g., building from tarball without git)
-  version: '0.0.0',  # Fallback - actual version from setuptools_scm
+  version: version,
   license: 'AGPL-3.0-or-later',
   meson_version: '>= 1.2.0',
   default_options: [
