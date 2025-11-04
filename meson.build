@@ -4,11 +4,9 @@ if git.found()
   # Get the most recent tag
   version_result = run_command(git, 'describe', '--tags', '--abbrev=0', check: false)
   if version_result.returncode() == 0
-    version = version_result.stdout().strip()
-    # Remove 'v' prefix if present
-    if version.startswith('v')
-      version = version.substring(1)
-    endif
+    version_raw = version_result.stdout().strip()
+    # Remove 'v' prefix if present (v0.6.0 -> 0.6.0)
+    version = version_raw.startswith('v') ? version_raw.substring(1) : version_raw
   else
     version = '0.0.0'
   endif
