@@ -19,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for setuptools_scm to detect version from tags
       
+      - name: Fetch tags
+        run: git fetch --force --tags
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -55,6 +58,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for setuptools_scm to detect version from tags
+      
+      - name: Fetch tags
+        run: git fetch --force --tags
       
       - name: Set up MSVC (Windows only)
         if: runner.os == 'Windows'
