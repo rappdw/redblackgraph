@@ -71,6 +71,7 @@ BLACK_ONE ⊗ RED_ONE = 0         (cross-gender undefined)
 - **[04_performance_strategy.md](04_performance_strategy.md)** - Optimization targets and benchmarks
 - **[05_testing_plan.md](05_testing_plan.md)** - Validation and correctness testing
 - **[06_implementation_phases.md](06_implementation_phases.md)** - Step-by-step roadmap
+- **[07_triangularization.md](07_triangularization.md)** - GPU-accelerated preprocessing (Phase 3a)
 
 ## Quick Reference: Current Implementation
 
