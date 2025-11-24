@@ -93,6 +93,9 @@ class RbgGraphBuilder(AbstractGraphBuilder):
     def add_gender(self, vertex_id: int, color: int):
         if self.graph is None:
             self.genders[vertex_id] = color
+        else:
+            # For dense graphs, set the diagonal to enable correct edge value assignment
+            self.graph[vertex_id, vertex_id] = color
 
     def build(self):
         self._build_status()
