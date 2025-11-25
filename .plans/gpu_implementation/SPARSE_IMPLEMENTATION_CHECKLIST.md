@@ -214,29 +214,32 @@
 
 ---
 
-## Phase 2b: Upper Triangular Floyd-Warshall
+## Phase 2b: Upper Triangular Floyd-Warshall ✅ COMPLETE
 **Duration:** 2-3 days | **Depends on:** Phase 1
+
+**Status:** Completed on 2024-11-25. All 13 tests passing.
 
 ### 2b.1: Implementation
 **File:** `redblackgraph/sparse/csgraph/_shortest_path.pyx`
 
-- [ ] Modify `_floyd_warshall_avos()` to accept `assume_upper_triangular` flag
-- [ ] Implement optimized triple loop:
+- [x] Modify `_floyd_warshall_avos()` to accept `assume_upper_triangular` flag
+- [x] Implement optimized triple loop:
   ```cython
   for k in range(N):
       for i in range(k+1):      # Only i ≤ k
           for j in range(k, N):  # Only j ≥ k
   ```
-- [ ] Update `floyd_warshall()` wrapper to accept parameter
-- [ ] Update `shortest_path()` to pass through parameter
-- [ ] Update `transitive_closure_floyd_warshall()` wrapper
+- [x] Update `floyd_warshall()` wrapper to accept parameter
+- [x] Update `shortest_path()` to pass through parameter
+- [x] Update `transitive_closure_floyd_warshall()` wrapper
+- [x] Export `floyd_warshall` from `__init__.py`
 
 **Test:** `tests/sparse/test_upper_triangular_closure.py`
-- [ ] Create test file
-- [ ] Test correctness on upper triangular matrices
-- [ ] Measure speedup (expect 1.8-2x)
-- [ ] Verify output stays upper triangular
-- [ ] Test integration with Phase 1 output
+- [x] Create test file
+- [x] Test correctness on upper triangular matrices
+- [x] Measure speedup (expect 1.8-2x)
+- [x] Verify output stays upper triangular
+- [x] Test integration with Phase 1 output
 
 ---
 
