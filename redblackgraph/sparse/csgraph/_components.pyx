@@ -12,15 +12,30 @@ include '_csr_utils.pxi'
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def find_components(A: rb_array, q:Optional[Dict[int, int]] = None) -> Sequence[int]:
+def find_components(A, q:Optional[Dict[int, int]] = None) -> Sequence[int]:
     """
-    Given an input adjacency matrix compute the connected components
-    :param A: input adjacency matrix (this implementation assumes that it is transitively closed)
-    :param q: if set, should be defaultdict(lambda: 0)
-    :return: a vector with matching length of A with the elements holding the connected component id of
-    the identified connected components
+    Given an input adjacency matrix compute the connected components.
+    
+    Automatically dispatches to sparse or dense implementation based on input type.
+    
+    Parameters
+    ----------
+    A : array-like or sparse matrix
+        Input adjacency matrix (this implementation assumes that it is transitively closed)
+    q : dict, optional
+        If set, will be populated with component_id -> vertex_count mapping
+        
+    Returns
+    -------
+    np.ndarray
+        Array with matching length of A with elements holding the connected component id
+        of the identified connected components
     """
-
+    # Dispatch to sparse version for sparse inputs
+    if isspmatrix(A):
+        return find_components_sparse(A, q)
+    
+    # Dense implementation below
     # Component identification is usually done using iterative dfs for each vertex. Since A is
     # transitively closed, we have implicit DFS info in each row. This algorithm utilizes that
     # fact. Conceptually, this algorithm "crawls" the matrix.

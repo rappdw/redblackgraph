@@ -243,8 +243,10 @@
 
 ---
 
-## Phase 3: Sparse Component Finding
+## Phase 3: Sparse Component Finding ✅ COMPLETE
 **Duration:** 2-3 days | **Depends on:** Phase 0
+
+**Status:** Completed on 2024-11-25. 14 new tests + 7 regression tests passing.
 
 ### 3.1: Implementation
 **File:** `redblackgraph/sparse/csgraph/_components.pyx` (modify existing)
@@ -256,12 +258,12 @@
 > ```
 > This iterates all vertices instead of only non-zero edges.
 
-- [ ] Add `find_components_sparse(A_csr)` function (new function, preserve original for dense)
-- [ ] Pre-compute CSC transpose for bidirectional access
-- [ ] Replace O(n²) loop with CSR/CSC index iteration
-- [ ] Update `find_components()` to dispatch: sparse input → `find_components_sparse()`
-- [ ] Maintain same API and output format
-- [ ] Use Phase 0 transpose utilities
+- [x] Add `find_components_sparse(A_csr)` function (new function, preserve original for dense)
+- [x] Pre-compute CSC transpose for bidirectional access
+- [x] Replace O(n²) loop with CSR/CSC index iteration
+- [x] Update `find_components()` to dispatch: sparse input → `find_components_sparse()`
+- [x] Maintain same API and output format
+- [x] Use Phase 0 transpose utilities
 
 **Algorithm:**
 ```cython
@@ -281,16 +283,18 @@ for vertex in unvisited:
 ```
 
 **Test:** `tests/sparse/test_components.py` (new file)
-- [ ] Add sparse matrix tests (100K vertices, <1% density)
-- [ ] Compare output with dense `find_components()` reference
-- [ ] Measure performance (expect O(V+E) scaling)
-- [ ] Test edge cases: single vertices, disconnected components
-- [ ] Ensure existing `tests/avos/test_components.py` still passes (regression)
+- [x] Add sparse matrix tests (100K vertices, <1% density)
+- [x] Compare output with dense `find_components()` reference
+- [x] Measure performance (expect O(V+E) scaling)
+- [x] Test edge cases: single vertices, disconnected components
+- [x] Ensure existing `tests/avos/test_components.py` still passes (regression)
 
 ---
 
-## Phase 4: Sparse Canonical Permutation
+## Phase 4: Sparse Canonical Permutation ✅ COMPLETE
 **Duration:** 3-4 days | **Depends on:** Phase 0, Phase 3
+
+**Status:** Completed on 2024-11-25. All tests passing.
 
 ### 4.1: Implementation
 **File:** `redblackgraph/sparse/csgraph/_ordering.pyx` (modify existing)
@@ -303,11 +307,11 @@ for vertex in unvisited:
 >             ancester_count_for_vertex[i] += MSB(Am[i][j])
 > ```
 
-- [ ] Implement `_get_permutation_sparse(A_csr, q, ids)` (new function)
-- [ ] Use CSR iteration for ancestor counting (row traversal)
-- [ ] Use CSC (transpose) for max relationship values (column traversal)
-- [ ] Update `avos_canonical_ordering()` to dispatch based on input type
-- [ ] Preserve `_get_permutation()` for dense inputs (backwards compatibility)
+- [x] Implement `_get_permutation_sparse(A_csr, q, ids)` (new function)
+- [x] Use CSR iteration for ancestor counting (row traversal)
+- [x] Use CSC (transpose) for max relationship values (column traversal)
+- [x] Update `avos_canonical_ordering()` to dispatch based on input type
+- [x] Preserve `_get_permutation()` for dense inputs (backwards compatibility)
 
 **Algorithm:**
 ```cython
@@ -328,12 +332,12 @@ for i in range(n):
 ```
 
 **Test:** `tests/sparse/test_ordering.py` (new file)
-- [ ] Add sparse matrix tests
-- [ ] Verify canonical property maintained
-- [ ] Compare with dense `_get_permutation()` reference
-- [ ] Measure performance (expect O(V+E+V log V))
-- [ ] Integration test: Full pipeline from load to canonical
-- [ ] Ensure existing `tests/avos/test_ordering.py` still passes (regression)
+- [x] Add sparse matrix tests
+- [x] Verify canonical property maintained
+- [x] Compare with dense `_get_permutation()` reference
+- [x] Measure performance (expect O(V+E+V log V))
+- [x] Integration test: Full pipeline from load to canonical
+- [x] Ensure existing `tests/avos/test_ordering.py` still passes (regression)
 
 ---
 
