@@ -1,0 +1,1903 @@
+{
+  "description": "Auto-generated exclusions for mutual parent relationships",
+  "strategy": "Remove relationship with larger hop count from each mutual pair",
+  "excluded_edges": [
+    {
+      "from_id": "247C-96R",
+      "to_id": "L64Z-MGY",
+      "reason": "Mutual relationship: Hans Carl Haarby (hop 13) <-> Hans Schoug Haarby (hop 12). Removing Hans Carl Haarby->Hans Schoug Haarby",
+      "comment": "Hans Carl Haarby -> Hans Schoug Haarby"
+    },
+    {
+      "from_id": "2BPC-HMC",
+      "to_id": "KWJ6-1BY",
+      "reason": "Mutual relationship: Thomas Holder (hop 13) <-> Thomas Holder (hop 13). Equal hops, removing Thomas Holder->Thomas Holder",
+      "comment": "Thomas Holder -> Thomas Holder"
+    },
+    {
+      "from_id": "2DXG-PCX",
+      "to_id": "9VRT-GJ6",
+      "reason": "Mutual relationship: Clifford Kirkendall (hop 13) <-> Clifford Kirkendall (hop 13). Equal hops, removing Clifford Kirkendall->Clifford Kirkendall",
+      "comment": "Clifford Kirkendall -> Clifford Kirkendall"
+    },
+    {
+      "from_id": "KLLY-YBG",
+      "to_id": "2H23-YD7",
+      "reason": "Mutual relationship: Gustav August Friedrich Braun (hop 12) <-> Christine Pauline Wilhelmine Veigel (hop 13). Removing Christine Pauline Wilhelmine Veigel->Gustav August Friedrich Braun",
+      "comment": "Christine Pauline Wilhelmine Veigel -> Gustav August Friedrich Braun"
+    },
+    {
+      "from_id": "2MM9-GFS",
+      "to_id": "KFYM-L45",
+      "reason": "Mutual relationship: Niklaus Schweizer (hop 10) <-> Jakob Schweizer (hop 10). Equal hops, removing Niklaus Schweizer->Jakob Schweizer",
+      "comment": "Niklaus Schweizer -> Jakob Schweizer"
+    },
+    {
+      "from_id": "933D-HK4",
+      "to_id": "LZY4-D6B",
+      "reason": "Mutual relationship: Charles Henry Owen Turner (hop 13) <-> Clara Bell Turner (hop 13). Equal hops, removing Charles Henry Owen Turner->Clara Bell Turner",
+      "comment": "Charles Henry Owen Turner -> Clara Bell Turner"
+    },
+    {
+      "from_id": "9354-PYN",
+      "to_id": "KHWX-5H7",
+      "reason": "Mutual relationship: Michael Michelsen (hop 13) <-> Frederik Michelsen (hop 12). Removing Michael Michelsen->Frederik Michelsen",
+      "comment": "Michael Michelsen -> Frederik Michelsen"
+    },
+    {
+      "from_id": "945Y-KXL",
+      "to_id": "KWV7-VVV",
+      "reason": "Mutual relationship: Edwin Griffith Davis (hop 12) <-> Edwin Griffith Davis (hop 12). Equal hops, removing Edwin Griffith Davis->Edwin Griffith Davis",
+      "comment": "Edwin Griffith Davis -> Edwin Griffith Davis"
+    },
+    {
+      "from_id": "961Q-4B6",
+      "to_id": "LH1G-7NT",
+      "reason": "Mutual relationship: Thomas Nathan Kunter (hop 12) <-> William Henry Kunter (hop 12). Equal hops, removing Thomas Nathan Kunter->William Henry Kunter",
+      "comment": "Thomas Nathan Kunter -> William Henry Kunter"
+    },
+    {
+      "from_id": "9663-SM8",
+      "to_id": "MHPZ-532",
+      "reason": "Mutual relationship: Daniel Dugmore (hop 13) <-> Elizabeth Cox (hop 13). Equal hops, removing Daniel Dugmore->Elizabeth Cox",
+      "comment": "Daniel Dugmore -> Elizabeth Cox"
+    },
+    {
+      "from_id": "LBKS-6DV",
+      "to_id": "97J8-6F7",
+      "reason": "Mutual relationship: Stefan Stephanus Gablik (hop 12) <-> Josephus Gablik (hop 13). Removing Josephus Gablik->Stefan Stephanus Gablik",
+      "comment": "Josephus Gablik -> Stefan Stephanus Gablik"
+    },
+    {
+      "from_id": "LRCP-KTN",
+      "to_id": "99NN-YW1",
+      "reason": "Mutual relationship: Robert K Beech (hop 8) <-> John Beach (hop 9). Removing John Beach->Robert K Beech",
+      "comment": "John Beach -> Robert K Beech"
+    },
+    {
+      "from_id": "99TS-8S5",
+      "to_id": "LHXQ-38T",
+      "reason": "Mutual relationship: Ole Olsen (hop 13) <-> Ole Olsen (hop 12). Removing Ole Olsen->Ole Olsen",
+      "comment": "Ole Olsen -> Ole Olsen"
+    },
+    {
+      "from_id": "9CJ5-8DD",
+      "to_id": "LZR8-XQH",
+      "reason": "Mutual relationship: John Martin Bender (hop 13) <-> Johan or John Martin Bender (hop 13). Equal hops, removing John Martin Bender->Johan or John Martin Bender",
+      "comment": "John Martin Bender -> Johan or John Martin Bender"
+    },
+    {
+      "from_id": "GWY4-5DK",
+      "to_id": "9F3J-8Q2",
+      "reason": "Mutual relationship: Joseph Shere (hop 12) <-> Harry Levi Shere (hop 13). Removing Harry Levi Shere->Joseph Shere",
+      "comment": "Harry Levi Shere -> Joseph Shere"
+    },
+    {
+      "from_id": "9FQ8-15Q",
+      "to_id": "LJNG-D9G",
+      "reason": "Mutual relationship: Adelbert Whitford Best (hop 13) <->  Best (hop 13). Equal hops, removing Adelbert Whitford Best-> Best",
+      "comment": "Adelbert Whitford Best ->  Best"
+    },
+    {
+      "from_id": "9H82-GGF",
+      "to_id": "9H82-R6W",
+      "reason": "Mutual relationship: Nora May Wolfe (hop 13) <-> Mary Pauline Troxell (hop 13). Equal hops, removing Nora May Wolfe->Mary Pauline Troxell",
+      "comment": "Nora May Wolfe -> Mary Pauline Troxell"
+    },
+    {
+      "from_id": "9J55-L96",
+      "to_id": "GQYZ-T2Y",
+      "reason": "Mutual relationship: Maren Johanne Hansen (hop 13) <-> Hans Rasmussen (hop 13). Equal hops, removing Maren Johanne Hansen->Hans Rasmussen",
+      "comment": "Maren Johanne Hansen -> Hans Rasmussen"
+    },
+    {
+      "from_id": "9JPW-J93",
+      "to_id": "9JPW-JM8",
+      "reason": "Mutual relationship: Albert Bolanz (hop 13) <-> Luise Bolanz (hop 13). Equal hops, removing Albert Bolanz->Luise Bolanz",
+      "comment": "Albert Bolanz -> Luise Bolanz"
+    },
+    {
+      "from_id": "9K84-TF9",
+      "to_id": "G9WS-TP4",
+      "reason": "Mutual relationship: Louis Aldridge (hop 13) <-> Mary Louise Aldrich (hop 13). Equal hops, removing Louis Aldridge->Mary Louise Aldrich",
+      "comment": "Louis Aldridge -> Mary Louise Aldrich"
+    },
+    {
+      "from_id": "9KF1-GGR",
+      "to_id": "LTM2-R1K",
+      "reason": "Mutual relationship: John Paget (hop 13) <-> Sarah Ward (hop 12). Removing John Paget->Sarah Ward",
+      "comment": "John Paget -> Sarah Ward"
+    },
+    {
+      "from_id": "9N4Y-SK1",
+      "to_id": "K4JG-D73",
+      "reason": "Mutual relationship: Henry Savage (hop 13) <-> Henry Savage (hop 13). Equal hops, removing Henry Savage->Henry Savage",
+      "comment": "Henry Savage -> Henry Savage"
+    },
+    {
+      "from_id": "9N5B-KYW",
+      "to_id": "LHNL-YFR",
+      "reason": "Mutual relationship: Mary Eve Geil (hop 13) <-> Henry Geil (hop 12). Removing Mary Eve Geil->Henry Geil",
+      "comment": "Mary Eve Geil -> Henry Geil"
+    },
+    {
+      "from_id": "LTCP-SZX",
+      "to_id": "9N7P-RX4",
+      "reason": "Mutual relationship: James Milburn Prine (hop 11) <-> Mary Elizabeth Prine (hop 12). Removing Mary Elizabeth Prine->James Milburn Prine",
+      "comment": "Mary Elizabeth Prine -> James Milburn Prine"
+    },
+    {
+      "from_id": "9N92-HJ5",
+      "to_id": "LL3V-LCT",
+      "reason": "Mutual relationship: Santiago Romero Daley (hop 10) <-> Eugene Daley (hop 9). Removing Santiago Romero Daley->Eugene Daley",
+      "comment": "Santiago Romero Daley -> Eugene Daley"
+    },
+    {
+      "from_id": "LZ55-QX1",
+      "to_id": "9NFG-ZTH",
+      "reason": "Mutual relationship: James Daley (hop 11) <-> James Daley (hop 12). Removing James Daley->James Daley",
+      "comment": "James Daley -> James Daley"
+    },
+    {
+      "from_id": "9NTR-VBM",
+      "to_id": "LKNY-HZ6",
+      "reason": "Mutual relationship: Danna Delmont Crooks (hop 12) <-> John Crooks (hop 11). Removing Danna Delmont Crooks->John Crooks",
+      "comment": "Danna Delmont Crooks -> John Crooks"
+    },
+    {
+      "from_id": "9Q8T-D92",
+      "to_id": "LC65-RRK",
+      "reason": "Mutual relationship: Maria Angela Camora Zavala (hop 11) <-> Camilo Camara Zavala (hop 10). Removing Maria Angela Camora Zavala->Camilo Camara Zavala",
+      "comment": "Maria Angela Camora Zavala -> Camilo Camara Zavala"
+    },
+    {
+      "from_id": "9QM5-55J",
+      "to_id": "9QM5-5R3",
+      "reason": "Mutual relationship: Mildred Harriet Ross (hop 12) <-> Anne Isabel McAlpine (hop 11). Removing Mildred Harriet Ross->Anne Isabel McAlpine",
+      "comment": "Mildred Harriet Ross -> Anne Isabel McAlpine"
+    },
+    {
+      "from_id": "9SGB-M3V",
+      "to_id": "MCH1-HQ6",
+      "reason": "Mutual relationship: Ralph James Franklin Miller (hop 13) <-> David Cornelius Miller (hop 13). Equal hops, removing Ralph James Franklin Miller->David Cornelius Miller",
+      "comment": "Ralph James Franklin Miller -> David Cornelius Miller"
+    },
+    {
+      "from_id": "9V3F-5QN",
+      "to_id": "K4RF-V3N",
+      "reason": "Mutual relationship: Nettie Eileen Hull (hop 13) <-> Mary Jane Millsap (hop 12). Removing Nettie Eileen Hull->Mary Jane Millsap",
+      "comment": "Nettie Eileen Hull -> Mary Jane Millsap"
+    },
+    {
+      "from_id": "9V4J-TG8",
+      "to_id": "9V4J-TG1",
+      "reason": "Mutual relationship: Lawrence Peter Skow (hop 12) <-> Christian Skow (hop 13). Removing Christian Skow->Lawrence Peter Skow",
+      "comment": "Christian Skow -> Lawrence Peter Skow"
+    },
+    {
+      "from_id": "9VHX-NC6",
+      "to_id": "GM4Z-Q81",
+      "reason": "Mutual relationship: Frank J. Aubrey (hop 13) <-> Frank J Aubrey (hop 13). Equal hops, removing Frank J. Aubrey->Frank J Aubrey",
+      "comment": "Frank J. Aubrey -> Frank J Aubrey"
+    },
+    {
+      "from_id": "9VJ3-CHV",
+      "to_id": "K8GJ-FQK",
+      "reason": "Mutual relationship: Mark Wright Dibble (hop 13) <-> William Burris Dibble (hop 12). Removing Mark Wright Dibble->William Burris Dibble",
+      "comment": "Mark Wright Dibble -> William Burris Dibble"
+    },
+    {
+      "from_id": "9VZS-HPR",
+      "to_id": "KJZG-DGG",
+      "reason": "Mutual relationship: John Charles Firestone Clow (hop 12) <-> Samuel Culbertson Clow (hop 11). Removing John Charles Firestone Clow->Samuel Culbertson Clow",
+      "comment": "John Charles Firestone Clow -> Samuel Culbertson Clow"
+    },
+    {
+      "from_id": "9XSL-SZ9",
+      "to_id": "K87D-VVW",
+      "reason": "Mutual relationship: Catherine Elizabeth Knoll (hop 12) <-> Pauline Katherine Wintholz (hop 12). Equal hops, removing Catherine Elizabeth Knoll->Pauline Katherine Wintholz",
+      "comment": "Catherine Elizabeth Knoll -> Pauline Katherine Wintholz"
+    },
+    {
+      "from_id": "G9LN-GJ3",
+      "to_id": "G32B-5DR",
+      "reason": "Mutual relationship: Minnie Derby McAlpine Martin (hop 11) <-> Margaret J Henry (hop 12). Removing Margaret J Henry->Minnie Derby McAlpine Martin",
+      "comment": "Margaret J Henry -> Minnie Derby McAlpine Martin"
+    },
+    {
+      "from_id": "G32H-SJQ",
+      "to_id": "MJLJ-LKK",
+      "reason": "Mutual relationship: Frank Chase Sibley Jr. (hop 12) <-> Frank Chase Sibley Sr. (hop 12). Equal hops, removing Frank Chase Sibley Jr.->Frank Chase Sibley Sr.",
+      "comment": "Frank Chase Sibley Jr. -> Frank Chase Sibley Sr."
+    },
+    {
+      "from_id": "G37D-K6Q",
+      "to_id": "KCZ8-PSL",
+      "reason": "Mutual relationship: Johann Graber (hop 13) <-> Maria Elisabeth von Gunten (hop 12). Removing Johann Graber->Maria Elisabeth von Gunten",
+      "comment": "Johann Graber -> Maria Elisabeth von Gunten"
+    },
+    {
+      "from_id": "KL5Z-WZT",
+      "to_id": "G3GH-VXR",
+      "reason": "Mutual relationship: Paul H Tappe (hop 12) <-> Henry Tappe (hop 13). Removing Henry Tappe->Paul H Tappe",
+      "comment": "Henry Tappe -> Paul H Tappe"
+    },
+    {
+      "from_id": "G3J4-9YF",
+      "to_id": "GCR7-NJB",
+      "reason": "Mutual relationship: William F Stewart (hop 13) <-> Stewart  (hop 13). Equal hops, removing William F Stewart->Stewart ",
+      "comment": "William F Stewart -> Stewart "
+    },
+    {
+      "from_id": "G3XY-M3N",
+      "to_id": "G3XT-BQQ",
+      "reason": "Mutual relationship: Myra Julia Hinds (hop 12) <-> Durward Hinds (hop 13). Removing Durward Hinds->Myra Julia Hinds",
+      "comment": "Durward Hinds -> Myra Julia Hinds"
+    },
+    {
+      "from_id": "G3YB-84W",
+      "to_id": "GZPM-RG5",
+      "reason": "Mutual relationship: Thomas Richard Martin (hop 13) <-> Annie Mae Martin (hop 13). Equal hops, removing Thomas Richard Martin->Annie Mae Martin",
+      "comment": "Thomas Richard Martin -> Annie Mae Martin"
+    },
+    {
+      "from_id": "G47F-8N2",
+      "to_id": "KCK7-7LL",
+      "reason": "Mutual relationship: John H Calhoun (hop 13) <-> Andrew Harvey Franklin Calhoun (hop 13). Equal hops, removing John H Calhoun->Andrew Harvey Franklin Calhoun",
+      "comment": "John H Calhoun -> Andrew Harvey Franklin Calhoun"
+    },
+    {
+      "from_id": "G49L-X41",
+      "to_id": "G49G-MRV",
+      "reason": "Mutual relationship: Thomas Neil Stilwell (hop 11) <-> Olive Kate Stilwell (hop 12). Removing Olive Kate Stilwell->Thomas Neil Stilwell",
+      "comment": "Olive Kate Stilwell -> Thomas Neil Stilwell"
+    },
+    {
+      "from_id": "G4BD-11W",
+      "to_id": "KL3N-1J8",
+      "reason": "Mutual relationship: Alice Smith (hop 13) <-> William Smith (hop 12). Removing Alice Smith->William Smith",
+      "comment": "Alice Smith -> William Smith"
+    },
+    {
+      "from_id": "G4D7-FXV",
+      "to_id": "GHRY-WFW",
+      "reason": "Mutual relationship: John W McGowan (hop 13) <-> James Hubert McGowan (hop 13). Equal hops, removing John W McGowan->James Hubert McGowan",
+      "comment": "John W McGowan -> James Hubert McGowan"
+    },
+    {
+      "from_id": "G4D7-K48",
+      "to_id": "LWTW-T5Q",
+      "reason": "Mutual relationship: David Robert Mease (hop 10) <-> Darius Wilson Mease (hop 10). Equal hops, removing David Robert Mease->Darius Wilson Mease",
+      "comment": "David Robert Mease -> Darius Wilson Mease"
+    },
+    {
+      "from_id": "G71B-16M",
+      "to_id": "LKSJ-NSM",
+      "reason": "Mutual relationship: Robert Smith (hop 13) <-> Robert Martin Smith (hop 13). Equal hops, removing Robert Smith->Robert Martin Smith",
+      "comment": "Robert Smith -> Robert Martin Smith"
+    },
+    {
+      "from_id": "G73S-4X5",
+      "to_id": "KWC7-4KJ",
+      "reason": "Mutual relationship: Dennis E Howcroft (hop 11) <-> Emma Elizabeth Belliston (hop 10). Removing Dennis E Howcroft->Emma Elizabeth Belliston",
+      "comment": "Dennis E Howcroft -> Emma Elizabeth Belliston"
+    },
+    {
+      "from_id": "G7D2-J1Y",
+      "to_id": "GWK6-778",
+      "reason": "Mutual relationship: George Albert Pruitt (hop 13) <-> Mary Pruett (hop 13). Equal hops, removing George Albert Pruitt->Mary Pruett",
+      "comment": "George Albert Pruitt -> Mary Pruett"
+    },
+    {
+      "from_id": "G7NK-679",
+      "to_id": "L836-GPK",
+      "reason": "Mutual relationship: Ersie Isabel Gordon (hop 13) <-> Robert Martin Gordon (hop 13). Equal hops, removing Ersie Isabel Gordon->Robert Martin Gordon",
+      "comment": "Ersie Isabel Gordon -> Robert Martin Gordon"
+    },
+    {
+      "from_id": "G7S9-9XC",
+      "to_id": "L4QG-33Y",
+      "reason": "Mutual relationship: Nielsine Kristensen (hop 13) <-> Birthe Marie Pedersdatter (hop 12). Removing Nielsine Kristensen->Birthe Marie Pedersdatter",
+      "comment": "Nielsine Kristensen -> Birthe Marie Pedersdatter"
+    },
+    {
+      "from_id": "GQKW-582",
+      "to_id": "G7VP-WFZ",
+      "reason": "Mutual relationship: John Shrader (hop 12) <-> Johannas Christian \"John\" Schroeder (hop 13). Removing Johannas Christian \"John\" Schroeder->John Shrader",
+      "comment": "Johannas Christian \"John\" Schroeder -> John Shrader"
+    },
+    {
+      "from_id": "G7Y4-5QJ",
+      "to_id": "MM3D-X26",
+      "reason": "Mutual relationship: Samantha Florence Wagoner (hop 13) <-> Roy W Wagoner (hop 12). Removing Samantha Florence Wagoner->Roy W Wagoner",
+      "comment": "Samantha Florence Wagoner -> Roy W Wagoner"
+    },
+    {
+      "from_id": "G8K3-VW2",
+      "to_id": "KPW8-2VT",
+      "reason": "Mutual relationship: Joseph William Robertson (hop 13) <-> Joseph Robertson (hop 13). Equal hops, removing Joseph William Robertson->Joseph Robertson",
+      "comment": "Joseph William Robertson -> Joseph Robertson"
+    },
+    {
+      "from_id": "G8N5-59P",
+      "to_id": "L75D-T78",
+      "reason": "Mutual relationship: Virgil William Weddle (hop 13) <-> David Dolan Weddle (hop 13). Equal hops, removing Virgil William Weddle->David Dolan Weddle",
+      "comment": "Virgil William Weddle -> David Dolan Weddle"
+    },
+    {
+      "from_id": "G8VG-T33",
+      "to_id": "L848-Q72",
+      "reason": "Mutual relationship: Father Cranson (hop 13) <-> Thomas Cranson (hop 12). Removing Father Cranson->Thomas Cranson",
+      "comment": "Father Cranson -> Thomas Cranson"
+    },
+    {
+      "from_id": "G94H-T7N",
+      "to_id": "LZ86-M5G",
+      "reason": "Mutual relationship: Jose S Tavares (hop 13) <-> Jacinto Tavares (hop 12). Removing Jose S Tavares->Jacinto Tavares",
+      "comment": "Jose S Tavares -> Jacinto Tavares"
+    },
+    {
+      "from_id": "G99K-59Y",
+      "to_id": "L624-NBW",
+      "reason": "Mutual relationship: Nils Halvorsen (hop 13) <-> Halvor Nilsen (hop 13). Equal hops, removing Nils Halvorsen->Halvor Nilsen",
+      "comment": "Nils Halvorsen -> Halvor Nilsen"
+    },
+    {
+      "from_id": "G9G9-397",
+      "to_id": "LD5Q-YM7",
+      "reason": "Mutual relationship: Joseph Rovai (hop 13) <-> William Joseph Schimmel (hop 13). Equal hops, removing Joseph Rovai->William Joseph Schimmel",
+      "comment": "Joseph Rovai -> William Joseph Schimmel"
+    },
+    {
+      "from_id": "G9JX-N11",
+      "to_id": "LHN8-SFT",
+      "reason": "Mutual relationship: Wister Cain Dickey (hop 12) <-> Wister Cain Dickey (hop 11). Removing Wister Cain Dickey->Wister Cain Dickey",
+      "comment": "Wister Cain Dickey -> Wister Cain Dickey"
+    },
+    {
+      "from_id": "G9K8-6B3",
+      "to_id": "GSC9-1X7",
+      "reason": "Mutual relationship: Ada May Jeffers (hop 13) <-> Angie M Patterson (hop 13). Equal hops, removing Ada May Jeffers->Angie M Patterson",
+      "comment": "Ada May Jeffers -> Angie M Patterson"
+    },
+    {
+      "from_id": "G9N6-TNG",
+      "to_id": "KWZB-CKF",
+      "reason": "Mutual relationship: John M Forrest (hop 12) <-> John Meikle Forrest (hop 12). Equal hops, removing John M Forrest->John Meikle Forrest",
+      "comment": "John M Forrest -> John Meikle Forrest"
+    },
+    {
+      "from_id": "G9S4-DQ5",
+      "to_id": "LT7L-FXW",
+      "reason": "Mutual relationship: Genevieve Ybarra (hop 13) <-> Juan Ybarra Vega (hop 13). Equal hops, removing Genevieve Ybarra->Juan Ybarra Vega",
+      "comment": "Genevieve Ybarra -> Juan Ybarra Vega"
+    },
+    {
+      "from_id": "MJKK-XRY",
+      "to_id": "GCM7-LWS",
+      "reason": "Mutual relationship: George Hall (hop 12) <-> Rowland Hall (hop 13). Removing Rowland Hall->George Hall",
+      "comment": "Rowland Hall -> George Hall"
+    },
+    {
+      "from_id": "GCXJ-H8Q",
+      "to_id": "GCXN-Y3K",
+      "reason": "Mutual relationship: Juluis Holweg (hop 13) <-> Frederick J Holweg (hop 13). Equal hops, removing Juluis Holweg->Frederick J Holweg",
+      "comment": "Juluis Holweg -> Frederick J Holweg"
+    },
+    {
+      "from_id": "LV7H-PCH",
+      "to_id": "GD89-3CJ",
+      "reason": "Mutual relationship: Evelyn Bates (hop 11) <-> Alfred Bates (hop 12). Removing Alfred Bates->Evelyn Bates",
+      "comment": "Alfred Bates -> Evelyn Bates"
+    },
+    {
+      "from_id": "LKCC-MDW",
+      "to_id": "GD8N-31B",
+      "reason": "Mutual relationship: Ida Marie Chozen (hop 12) <-> Maurice Kenneth Chozen (hop 13). Removing Maurice Kenneth Chozen->Ida Marie Chozen",
+      "comment": "Maurice Kenneth Chozen -> Ida Marie Chozen"
+    },
+    {
+      "from_id": "GDF5-1K8",
+      "to_id": "LBCX-DHR",
+      "reason": "Mutual relationship: William Edgar Irwin (hop 13) <-> Everett V Irwin (hop 13). Equal hops, removing William Edgar Irwin->Everett V Irwin",
+      "comment": "William Edgar Irwin -> Everett V Irwin"
+    },
+    {
+      "from_id": "GDH5-BX1",
+      "to_id": "KWJ4-ZFL",
+      "reason": "Mutual relationship: Thomas  (hop 12) <-> Thomas Knowles (hop 11). Removing Thomas ->Thomas Knowles",
+      "comment": "Thomas  -> Thomas Knowles"
+    },
+    {
+      "from_id": "GH3H-2S9",
+      "to_id": "KZJ2-2P9",
+      "reason": "Mutual relationship: David Ohler (hop 13) <-> Catharinae Imhof (hop 13). Equal hops, removing David Ohler->Catharinae Imhof",
+      "comment": "David Ohler -> Catharinae Imhof"
+    },
+    {
+      "from_id": "GHBM-RJQ",
+      "to_id": "GHY1-4PH",
+      "reason": "Mutual relationship: Ruth B Ingrum (hop 13) <-> Sallie T Ingrum (hop 13). Equal hops, removing Ruth B Ingrum->Sallie T Ingrum",
+      "comment": "Ruth B Ingrum -> Sallie T Ingrum"
+    },
+    {
+      "from_id": "GHJD-W6X",
+      "to_id": "KFTF-32Y",
+      "reason": "Mutual relationship: Eva Hudsonpillar (hop 13) <-> Sarah Viola Gilbert (hop 12). Removing Eva Hudsonpillar->Sarah Viola Gilbert",
+      "comment": "Eva Hudsonpillar -> Sarah Viola Gilbert"
+    },
+    {
+      "from_id": "GHNM-9KP",
+      "to_id": "L8W2-3Y3",
+      "reason": "Mutual relationship: George Joerimann (hop 13) <-> George Albert Joerimann (hop 12). Removing George Joerimann->George Albert Joerimann",
+      "comment": "George Joerimann -> George Albert Joerimann"
+    },
+    {
+      "from_id": "GMH1-69K",
+      "to_id": "LXMZ-S12",
+      "reason": "Mutual relationship: Robert Jackson Glaze (hop 13) <-> Serilda Annie Singleton (hop 13). Equal hops, removing Robert Jackson Glaze->Serilda Annie Singleton",
+      "comment": "Robert Jackson Glaze -> Serilda Annie Singleton"
+    },
+    {
+      "from_id": "GMH8-KNS",
+      "to_id": "GMH8-WV7",
+      "reason": "Mutual relationship: Julia Catherine Augimeri (hop 13) <-> Mary Letto (hop 12). Removing Julia Catherine Augimeri->Mary Letto",
+      "comment": "Julia Catherine Augimeri -> Mary Letto"
+    },
+    {
+      "from_id": "GMHD-3TP",
+      "to_id": "GMH8-WV7",
+      "reason": "Mutual relationship: Mary Letto (hop 12) <-> Dominick Augimeri (hop 13). Removing Dominick Augimeri->Mary Letto",
+      "comment": "Dominick Augimeri -> Mary Letto"
+    },
+    {
+      "from_id": "GML8-R2K",
+      "to_id": "KWCR-XLM",
+      "reason": "Mutual relationship: Amy Leonce Caillaud (hop 13) <-> Eugenia Alice Foster (hop 12). Removing Amy Leonce Caillaud->Eugenia Alice Foster",
+      "comment": "Amy Leonce Caillaud -> Eugenia Alice Foster"
+    },
+    {
+      "from_id": "GMPX-GKG",
+      "to_id": "L7PV-DLH",
+      "reason": "Mutual relationship: William Earl Stephenson (hop 12) <-> David Atchison Stephenson (hop 11). Removing William Earl Stephenson->David Atchison Stephenson",
+      "comment": "William Earl Stephenson -> David Atchison Stephenson"
+    },
+    {
+      "from_id": "GMQS-4R2",
+      "to_id": "GMQS-3VF",
+      "reason": "Mutual relationship: Leonard Monroe Warner (hop 10) <-> Leonard Monroe Warner (hop 11). Removing Leonard Monroe Warner->Leonard Monroe Warner",
+      "comment": "Leonard Monroe Warner -> Leonard Monroe Warner"
+    },
+    {
+      "from_id": "GMR7-M7C",
+      "to_id": "KZ5L-7VC",
+      "reason": "Mutual relationship: Henry Ward Finsen (hop 13) <-> Frederick H. Finsen (hop 12). Removing Henry Ward Finsen->Frederick H. Finsen",
+      "comment": "Henry Ward Finsen -> Frederick H. Finsen"
+    },
+    {
+      "from_id": "GQC4-JCX",
+      "to_id": "LJ26-KPM",
+      "reason": "Mutual relationship: Ralph Raymond Jones (hop 13) <-> Stanley Jones (hop 12). Removing Ralph Raymond Jones->Stanley Jones",
+      "comment": "Ralph Raymond Jones -> Stanley Jones"
+    },
+    {
+      "from_id": "GQFX-NF1",
+      "to_id": "K8PB-W2R",
+      "reason": "Mutual relationship: Jacob S\u00f8rensen (hop 12) <-> Kirsten Maria Jacobsdatter (hop 12). Equal hops, removing Jacob S\u00f8rensen->Kirsten Maria Jacobsdatter",
+      "comment": "Jacob S\u00f8rensen -> Kirsten Maria Jacobsdatter"
+    },
+    {
+      "from_id": "GQM3-613",
+      "to_id": "GQM3-ZT7",
+      "reason": "Mutual relationship: Adelheid Manz (hop 13) <-> Emilie Brand (hop 13). Equal hops, removing Adelheid Manz->Emilie Brand",
+      "comment": "Adelheid Manz -> Emilie Brand"
+    },
+    {
+      "from_id": "GS63-ZDY",
+      "to_id": "KWZ8-L8J",
+      "reason": "Mutual relationship: JoAnn Kay Kelso Decoria (hop 13) <-> Sylvan Daniel DeCoria (hop 12). Removing JoAnn Kay Kelso Decoria->Sylvan Daniel DeCoria",
+      "comment": "JoAnn Kay Kelso Decoria -> Sylvan Daniel DeCoria"
+    },
+    {
+      "from_id": "GSDG-595",
+      "to_id": "LBSS-4QQ",
+      "reason": "Mutual relationship: Shelton Moody Holt (hop 13) <-> James Robert Holt (hop 12). Removing Shelton Moody Holt->James Robert Holt",
+      "comment": "Shelton Moody Holt -> James Robert Holt"
+    },
+    {
+      "from_id": "GSJ5-W6V",
+      "to_id": "LBZ3-CD2",
+      "reason": "Mutual relationship: Charles Glenn Diffin (hop 12) <-> Charles Glenn Diffin (hop 12). Equal hops, removing Charles Glenn Diffin->Charles Glenn Diffin",
+      "comment": "Charles Glenn Diffin -> Charles Glenn Diffin"
+    },
+    {
+      "from_id": "GSL6-J6R",
+      "to_id": "KWVQ-G84",
+      "reason": "Mutual relationship: Sarah Arinda Everton (hop 11) <-> Mary Florence Kelsey (hop 11). Equal hops, removing Sarah Arinda Everton->Mary Florence Kelsey",
+      "comment": "Sarah Arinda Everton -> Mary Florence Kelsey"
+    },
+    {
+      "from_id": "GSTL-796",
+      "to_id": "KZM8-SZ1",
+      "reason": "Mutual relationship: Henry W Forder (hop 12) <-> Everett Forder (hop 11). Removing Henry W Forder->Everett Forder",
+      "comment": "Henry W Forder -> Everett Forder"
+    },
+    {
+      "from_id": "GWD4-GW8",
+      "to_id": "LWPK-6CN",
+      "reason": "Mutual relationship: Andrew Aitken (hop 13) <-> Richard Whyte Aitken (hop 12). Removing Andrew Aitken->Richard Whyte Aitken",
+      "comment": "Andrew Aitken -> Richard Whyte Aitken"
+    },
+    {
+      "from_id": "GWPC-48F",
+      "to_id": "K2WV-1B4",
+      "reason": "Mutual relationship: Connie Mae Meierotto (hop 13) <-> Douglas Jessop Holmes (hop 12). Removing Connie Mae Meierotto->Douglas Jessop Holmes",
+      "comment": "Connie Mae Meierotto -> Douglas Jessop Holmes"
+    },
+    {
+      "from_id": "GWZX-47N",
+      "to_id": "GWZX-71F",
+      "reason": "Mutual relationship: Rasmus Christoffersen (hop 13) <-> Johanne Rasmusen (hop 13). Equal hops, removing Rasmus Christoffersen->Johanne Rasmusen",
+      "comment": "Rasmus Christoffersen -> Johanne Rasmusen"
+    },
+    {
+      "from_id": "GZCV-SJL",
+      "to_id": "LKZY-KL2",
+      "reason": "Mutual relationship: Nantje Stam (hop 13) <-> Cornelis Stam (hop 13). Equal hops, removing Nantje Stam->Cornelis Stam",
+      "comment": "Nantje Stam -> Cornelis Stam"
+    },
+    {
+      "from_id": "K197-TNH",
+      "to_id": "KN1R-F1V",
+      "reason": "Mutual relationship: William August Newman (hop 13) <-> Paul William Newman (hop 13). Equal hops, removing William August Newman->Paul William Newman",
+      "comment": "William August Newman -> Paul William Newman"
+    },
+    {
+      "from_id": "LWYV-81H",
+      "to_id": "K279-FZP",
+      "reason": "Mutual relationship: Dorothea Steinemann (hop 12) <-> Hans Georg Hugentobler (hop 13). Removing Hans Georg Hugentobler->Dorothea Steinemann",
+      "comment": "Hans Georg Hugentobler -> Dorothea Steinemann"
+    },
+    {
+      "from_id": "LWYV-MB3",
+      "to_id": "K279-FZP",
+      "reason": "Mutual relationship: Dorothea Steinemann (hop 12) <-> Jacob Hugentobler (hop 13). Removing Jacob Hugentobler->Dorothea Steinemann",
+      "comment": "Jacob Hugentobler -> Dorothea Steinemann"
+    },
+    {
+      "from_id": "K2LR-9JX",
+      "to_id": "M24F-Q5R",
+      "reason": "Mutual relationship: Gordon Riley Fuller (hop 13) <-> Gordon Earl Fuller (hop 13). Equal hops, removing Gordon Riley Fuller->Gordon Earl Fuller",
+      "comment": "Gordon Riley Fuller -> Gordon Earl Fuller"
+    },
+    {
+      "from_id": "KWVP-TCT",
+      "to_id": "K2MH-59D",
+      "reason": "Mutual relationship: Anna Maria Berger (hop 12) <-> Annie Berger (hop 13). Removing Annie Berger->Anna Maria Berger",
+      "comment": "Annie Berger -> Anna Maria Berger"
+    },
+    {
+      "from_id": "K2Q6-5TZ",
+      "to_id": "KWCD-FPR",
+      "reason": "Mutual relationship: Lars Johan Wedding (hop 13) <-> Synnove Aasheim (hop 12). Removing Lars Johan Wedding->Synnove Aasheim",
+      "comment": "Lars Johan Wedding -> Synnove Aasheim"
+    },
+    {
+      "from_id": "KWCG-R61",
+      "to_id": "K2WC-1RQ",
+      "reason": "Mutual relationship: Lilly May Dubois (hop 12) <-> Irma Ruth Elton (hop 13). Removing Irma Ruth Elton->Lilly May Dubois",
+      "comment": "Irma Ruth Elton -> Lilly May Dubois"
+    },
+    {
+      "from_id": "K2XN-BT2",
+      "to_id": "LVF1-ZNW",
+      "reason": "Mutual relationship: Harry Spare Northam (hop 12) <-> Mary Caroline Northam (hop 11). Removing Harry Spare Northam->Mary Caroline Northam",
+      "comment": "Harry Spare Northam -> Mary Caroline Northam"
+    },
+    {
+      "from_id": "LZKM-J8V",
+      "to_id": "K2XR-FCJ",
+      "reason": "Mutual relationship: John Fentress Malpass (hop 12) <-> Amy Sellers (hop 13). Removing Amy Sellers->John Fentress Malpass",
+      "comment": "Amy Sellers -> John Fentress Malpass"
+    },
+    {
+      "from_id": "K4PJ-5Z8",
+      "to_id": "KWJV-KYG",
+      "reason": "Mutual relationship: Nancy Ann Baker (hop 13) <-> Jesse Clark Pilcher (hop 13). Equal hops, removing Nancy Ann Baker->Jesse Clark Pilcher",
+      "comment": "Nancy Ann Baker -> Jesse Clark Pilcher"
+    },
+    {
+      "from_id": "K4VB-8B1",
+      "to_id": "LZ64-KJ2",
+      "reason": "Mutual relationship: Robert Lemount (hop 10) <-> John Lamont (hop 9). Removing Robert Lemount->John Lamont",
+      "comment": "Robert Lemount -> John Lamont"
+    },
+    {
+      "from_id": "K636-FWR",
+      "to_id": "KHVX-RZY",
+      "reason": "Mutual relationship: Oliver William Qualls (hop 12) <-> Pearl Ethyl Qualls (hop 11). Removing Oliver William Qualls->Pearl Ethyl Qualls",
+      "comment": "Oliver William Qualls -> Pearl Ethyl Qualls"
+    },
+    {
+      "from_id": "L2RV-JT8",
+      "to_id": "K638-7MM",
+      "reason": "Mutual relationship: Hans Martin Kirn (hop 12) <-> Han\u00df Martin Kirn (hop 13). Removing Han\u00df Martin Kirn->Hans Martin Kirn",
+      "comment": "Han\u00df Martin Kirn -> Hans Martin Kirn"
+    },
+    {
+      "from_id": "K8X3-PXR",
+      "to_id": "K673-3GP",
+      "reason": "Mutual relationship: Mary Ann Browning (hop 12) <-> Ann Elizabeth White (hop 13). Removing Ann Elizabeth White->Mary Ann Browning",
+      "comment": "Ann Elizabeth White -> Mary Ann Browning"
+    },
+    {
+      "from_id": "KFZH-LHZ",
+      "to_id": "K68T-D7V",
+      "reason": "Mutual relationship: Walter Earchman Henderson (hop 12) <-> Walter Henderson (hop 13). Removing Walter Henderson->Walter Earchman Henderson",
+      "comment": "Walter Henderson -> Walter Earchman Henderson"
+    },
+    {
+      "from_id": "K6HH-GTQ",
+      "to_id": "LTY5-VRW",
+      "reason": "Mutual relationship: Adam Moosmann (hop 13) <-> Jacob Moosmann (hop 12). Removing Adam Moosmann->Jacob Moosmann",
+      "comment": "Adam Moosmann -> Jacob Moosmann"
+    },
+    {
+      "from_id": "K6SN-ZYN",
+      "to_id": "KNBL-DS7",
+      "reason": "Mutual relationship: Marshall, Sarah Elizabeth Miller (hop 13) <-> Sarah Ann Jenkins (hop 13). Equal hops, removing Marshall, Sarah Elizabeth Miller->Sarah Ann Jenkins",
+      "comment": "Marshall, Sarah Elizabeth Miller -> Sarah Ann Jenkins"
+    },
+    {
+      "from_id": "K82R-V43",
+      "to_id": "L1BG-WN6",
+      "reason": "Mutual relationship: Thomas Beach (hop 11) <-> Justice Meadows Beach (hop 11). Equal hops, removing Thomas Beach->Justice Meadows Beach",
+      "comment": "Thomas Beach -> Justice Meadows Beach"
+    },
+    {
+      "from_id": "K89S-151",
+      "to_id": "LKJ3-B89",
+      "reason": "Mutual relationship: Alfred J. Henderson (hop 13) <-> Walter Andrew Henderson (hop 13). Equal hops, removing Alfred J. Henderson->Walter Andrew Henderson",
+      "comment": "Alfred J. Henderson -> Walter Andrew Henderson"
+    },
+    {
+      "from_id": "K8J5-9GM",
+      "to_id": "LRG5-BV7",
+      "reason": "Mutual relationship: John Halvorsen (hop 12) <-> Halvor Johnson Bakhus (hop 12). Equal hops, removing John Halvorsen->Halvor Johnson Bakhus",
+      "comment": "John Halvorsen -> Halvor Johnson Bakhus"
+    },
+    {
+      "from_id": "K8N4-BB8",
+      "to_id": "LTMP-RPC",
+      "reason": "Mutual relationship: Eliza Simmons (hop 13) <-> Mary Ann Barrow (hop 13). Equal hops, removing Eliza Simmons->Mary Ann Barrow",
+      "comment": "Eliza Simmons -> Mary Ann Barrow"
+    },
+    {
+      "from_id": "K8T4-NS5",
+      "to_id": "KJWR-1GC",
+      "reason": "Mutual relationship: Alexander Chapman Mccallister (hop 11) <-> Oscar Lockwood McCallister (hop 11). Equal hops, removing Alexander Chapman Mccallister->Oscar Lockwood McCallister",
+      "comment": "Alexander Chapman Mccallister -> Oscar Lockwood McCallister"
+    },
+    {
+      "from_id": "MQ9V-S26",
+      "to_id": "K8TR-189",
+      "reason": "Mutual relationship: Ole Christian Sandersen (hop 11) <-> Sander Oluf Olsen (hop 12). Removing Sander Oluf Olsen->Ole Christian Sandersen",
+      "comment": "Sander Oluf Olsen -> Ole Christian Sandersen"
+    },
+    {
+      "from_id": "K8WC-2S5",
+      "to_id": "KL74-R5Q",
+      "reason": "Mutual relationship: Katharine Schlotzhauer (hop 13) <-> Henry Schlotzhauer (hop 13). Equal hops, removing Katharine Schlotzhauer->Henry Schlotzhauer",
+      "comment": "Katharine Schlotzhauer -> Henry Schlotzhauer"
+    },
+    {
+      "from_id": "K8Y5-SQG",
+      "to_id": "LH3C-GPX",
+      "reason": "Mutual relationship: Johannes Marti (hop 12) <-> Elisabetha Landolf (hop 11). Removing Johannes Marti->Elisabetha Landolf",
+      "comment": "Johannes Marti -> Elisabetha Landolf"
+    },
+    {
+      "from_id": "K8YW-FK8",
+      "to_id": "KHS4-PJ6",
+      "reason": "Mutual relationship: Margaret Woof (hop 13) <-> Richard Woof Thompson (hop 13). Equal hops, removing Margaret Woof->Richard Woof Thompson",
+      "comment": "Margaret Woof -> Richard Woof Thompson"
+    },
+    {
+      "from_id": "KC4L-R1J",
+      "to_id": "LZDS-JYF",
+      "reason": "Mutual relationship: Jacob Moosmann (hop 12) <-> Maria Moosmann (hop 12). Equal hops, removing Jacob Moosmann->Maria Moosmann",
+      "comment": "Jacob Moosmann -> Maria Moosmann"
+    },
+    {
+      "from_id": "KCDZ-54Y",
+      "to_id": "KCCP-VH2",
+      "reason": "Mutual relationship: Augusta Wedel (hop 11) <-> Paulina Jeworsky (hop 12). Removing Paulina Jeworsky->Augusta Wedel",
+      "comment": "Paulina Jeworsky -> Augusta Wedel"
+    },
+    {
+      "from_id": "KCHW-6CN",
+      "to_id": "KPHS-4HT",
+      "reason": "Mutual relationship: Anna Moosman (hop 11) <-> Anna Maria Brunner (hop 11). Equal hops, removing Anna Moosman->Anna Maria Brunner",
+      "comment": "Anna Moosman -> Anna Maria Brunner"
+    },
+    {
+      "from_id": "KCMF-HN2",
+      "to_id": "LHMT-7YL",
+      "reason": "Mutual relationship: Peter Aebersold (hop 13) <-> Peter Aebersold (hop 12). Removing Peter Aebersold->Peter Aebersold",
+      "comment": "Peter Aebersold -> Peter Aebersold"
+    },
+    {
+      "from_id": "KCP3-F9F",
+      "to_id": "KGCR-DR8",
+      "reason": "Mutual relationship: David Baughman (hop 12) <-> Silas Michael Baughman (hop 11). Removing David Baughman->Silas Michael Baughman",
+      "comment": "David Baughman -> Silas Michael Baughman"
+    },
+    {
+      "from_id": "KCQ8-MG1",
+      "to_id": "LH8F-VVQ",
+      "reason": "Mutual relationship: Bruce John Cox (hop 13) <-> John Rathbun Cox (hop 13). Equal hops, removing Bruce John Cox->John Rathbun Cox",
+      "comment": "Bruce John Cox -> John Rathbun Cox"
+    },
+    {
+      "from_id": "KCRS-X2V",
+      "to_id": "KH1R-DZH",
+      "reason": "Mutual relationship: Walter Franz Reiger (hop 12) <-> Walter Max Rieger (hop 12). Equal hops, removing Walter Franz Reiger->Walter Max Rieger",
+      "comment": "Walter Franz Reiger -> Walter Max Rieger"
+    },
+    {
+      "from_id": "KNHF-8RZ",
+      "to_id": "KCTP-4ZD",
+      "reason": "Mutual relationship: Elisabeth Marti (hop 12) <-> Johannes Lanz (hop 13). Removing Johannes Lanz->Elisabeth Marti",
+      "comment": "Johannes Lanz -> Elisabeth Marti"
+    },
+    {
+      "from_id": "KCW7-QG9",
+      "to_id": "KG97-2MZ",
+      "reason": "Mutual relationship: Josephine Matilda Gray (hop 13) <-> John William Gray (hop 13). Equal hops, removing Josephine Matilda Gray->John William Gray",
+      "comment": "Josephine Matilda Gray -> John William Gray"
+    },
+    {
+      "from_id": "KCXZ-NCQ",
+      "to_id": "MBMB-KPD",
+      "reason": "Mutual relationship: Philipp Jakob Trump (hop 13) <-> Johann Nikolaus Trump (hop 12). Removing Philipp Jakob Trump->Johann Nikolaus Trump",
+      "comment": "Philipp Jakob Trump -> Johann Nikolaus Trump"
+    },
+    {
+      "from_id": "KD32-YH2",
+      "to_id": "KZFV-L5G",
+      "reason": "Mutual relationship: Jens Agrie Jensen (hop 13) <-> Ane Marie Hansen (hop 13). Equal hops, removing Jens Agrie Jensen->Ane Marie Hansen",
+      "comment": "Jens Agrie Jensen -> Ane Marie Hansen"
+    },
+    {
+      "from_id": "KDQ3-VQN",
+      "to_id": "LXW7-HJ2",
+      "reason": "Mutual relationship: Alice Nuttall (hop 13) <-> Robert Nuttall (hop 13). Equal hops, removing Alice Nuttall->Robert Nuttall",
+      "comment": "Alice Nuttall -> Robert Nuttall"
+    },
+    {
+      "from_id": "KG9B-21N",
+      "to_id": "L232-66W",
+      "reason": "Mutual relationship: Peter Good (hop 13) <-> Peter Good (hop 12). Removing Peter Good->Peter Good",
+      "comment": "Peter Good -> Peter Good"
+    },
+    {
+      "from_id": "KG9M-7YH",
+      "to_id": "LZJP-823",
+      "reason": "Mutual relationship: James W. Hamlin (hop 13) <-> Frances \"Fannie\" Calavan (hop 13). Equal hops, removing James W. Hamlin->Frances \"Fannie\" Calavan",
+      "comment": "James W. Hamlin -> Frances \"Fannie\" Calavan"
+    },
+    {
+      "from_id": "KGH9-P9H",
+      "to_id": "LW1H-MHK",
+      "reason": "Mutual relationship: Mary Elisabet Lorentzen (hop 13) <-> Ludvig Alfred Julius Lorenzen (hop 13). Equal hops, removing Mary Elisabet Lorentzen->Ludvig Alfred Julius Lorenzen",
+      "comment": "Mary Elisabet Lorentzen -> Ludvig Alfred Julius Lorenzen"
+    },
+    {
+      "from_id": "KGVN-DZW",
+      "to_id": "LB91-6VH",
+      "reason": "Mutual relationship: Lottie C. Lake (hop 13) <-> Marion Louise Roberts (hop 13). Equal hops, removing Lottie C. Lake->Marion Louise Roberts",
+      "comment": "Lottie C. Lake -> Marion Louise Roberts"
+    },
+    {
+      "from_id": "KGYZ-84M",
+      "to_id": "L4JM-R4F",
+      "reason": "Mutual relationship: Robert Behle Mulholland (hop 10) <-> Winifred Esther Ruth (hop 9). Removing Robert Behle Mulholland->Winifred Esther Ruth",
+      "comment": "Robert Behle Mulholland -> Winifred Esther Ruth"
+    },
+    {
+      "from_id": "KH1H-MPQ",
+      "to_id": "MV45-MLC",
+      "reason": "Mutual relationship: Richard Best (hop 13) <-> Elizabeth Best (hop 13). Equal hops, removing Richard Best->Elizabeth Best",
+      "comment": "Richard Best -> Elizabeth Best"
+    },
+    {
+      "from_id": "KH4L-KMM",
+      "to_id": "LW1B-7YW",
+      "reason": "Mutual relationship: Edgar Wallace Gurganious (hop 13) <-> Kinchen Devane Gurganious (hop 12). Removing Edgar Wallace Gurganious->Kinchen Devane Gurganious",
+      "comment": "Edgar Wallace Gurganious -> Kinchen Devane Gurganious"
+    },
+    {
+      "from_id": "KH4Y-H4Z",
+      "to_id": "KP4P-173",
+      "reason": "Mutual relationship: Robert John Westwood (hop 13) <-> Roberta Jean Westwood (hop 13). Equal hops, removing Robert John Westwood->Roberta Jean Westwood",
+      "comment": "Robert John Westwood -> Roberta Jean Westwood"
+    },
+    {
+      "from_id": "KWC5-5KJ",
+      "to_id": "KHFV-7JJ",
+      "reason": "Mutual relationship: Lenore Perkins Howard (hop 12) <-> Dora May Gragg (hop 13). Removing Dora May Gragg->Lenore Perkins Howard",
+      "comment": "Dora May Gragg -> Lenore Perkins Howard"
+    },
+    {
+      "from_id": "KHQ9-R64",
+      "to_id": "LCZ7-LZW",
+      "reason": "Mutual relationship: Bendicht Siegenthaler (hop 11) <-> Elisabetha Lehmann (hop 11). Equal hops, removing Bendicht Siegenthaler->Elisabetha Lehmann",
+      "comment": "Bendicht Siegenthaler -> Elisabetha Lehmann"
+    },
+    {
+      "from_id": "KHSG-F49",
+      "to_id": "LH82-44D",
+      "reason": "Mutual relationship: William Jones (hop 13) <-> Anne Jones (hop 12). Removing William Jones->Anne Jones",
+      "comment": "William Jones -> Anne Jones"
+    },
+    {
+      "from_id": "KL2Q-QYK",
+      "to_id": "KLJB-YP7",
+      "reason": "Mutual relationship: Josephine Rose Dilley (hop 13) <-> Oren Clemons Dilley (hop 12). Removing Josephine Rose Dilley->Oren Clemons Dilley",
+      "comment": "Josephine Rose Dilley -> Oren Clemons Dilley"
+    },
+    {
+      "from_id": "KL9D-YMM",
+      "to_id": "L2FP-X6Y",
+      "reason": "Mutual relationship: Maria Barbara M\u00fchlhei\u00dfer (hop 12) <-> Johann Ge\u00f6rg M\u00fchlheiser (hop 12). Equal hops, removing Maria Barbara M\u00fchlhei\u00dfer->Johann Ge\u00f6rg M\u00fchlheiser",
+      "comment": "Maria Barbara M\u00fchlhei\u00dfer -> Johann Ge\u00f6rg M\u00fchlheiser"
+    },
+    {
+      "from_id": "KLB9-99R",
+      "to_id": "KLB9-J4T",
+      "reason": "Mutual relationship: Harry Lee Peeples (hop 12) <-> Homer Kerry Peeples (hop 12). Equal hops, removing Harry Lee Peeples->Homer Kerry Peeples",
+      "comment": "Harry Lee Peeples -> Homer Kerry Peeples"
+    },
+    {
+      "from_id": "KLFZ-XZL",
+      "to_id": "KLFZ-8XS",
+      "reason": "Mutual relationship: Enrique Bassi Acosta (hop 11) <-> Cresencia Parpana Acosta (hop 12). Removing Cresencia Parpana Acosta->Enrique Bassi Acosta",
+      "comment": "Cresencia Parpana Acosta -> Enrique Bassi Acosta"
+    },
+    {
+      "from_id": "KLQJ-314",
+      "to_id": "KLQJ-317",
+      "reason": "Mutual relationship: Henrietta Southerland (hop 13) <-> Grace W. Southerland (hop 13). Equal hops, removing Henrietta Southerland->Grace W. Southerland",
+      "comment": "Henrietta Southerland -> Grace W. Southerland"
+    },
+    {
+      "from_id": "L714-N9D",
+      "to_id": "KLV6-JVX",
+      "reason": "Mutual relationship: Iva Eldora McBride (hop 12) <-> Maria Barker (hop 13). Removing Maria Barker->Iva Eldora McBride",
+      "comment": "Maria Barker -> Iva Eldora McBride"
+    },
+    {
+      "from_id": "KN6P-1DP",
+      "to_id": "KN6V-8N4",
+      "reason": "Mutual relationship: Cheryl Ann Culp (hop 13) <-> Margie Faye Henderson (hop 12). Removing Cheryl Ann Culp->Margie Faye Henderson",
+      "comment": "Cheryl Ann Culp -> Margie Faye Henderson"
+    },
+    {
+      "from_id": "MQLC-JNP",
+      "to_id": "KNDX-QTG",
+      "reason": "Mutual relationship: Elizabeth Blazedale (hop 11) <-> Thomas German (hop 12). Removing Thomas German->Elizabeth Blazedale",
+      "comment": "Thomas German -> Elizabeth Blazedale"
+    },
+    {
+      "from_id": "KNHN-QQ2",
+      "to_id": "LZJN-GHV",
+      "reason": "Mutual relationship: Niklaus Lanz (hop 13) <-> Johannes Lanz (hop 12). Removing Niklaus Lanz->Johannes Lanz",
+      "comment": "Niklaus Lanz -> Johannes Lanz"
+    },
+    {
+      "from_id": "LRTW-WCS",
+      "to_id": "KNV4-K6K",
+      "reason": "Mutual relationship: Dexter Wells (hop 12) <-> Lydia Wells (hop 13). Removing Lydia Wells->Dexter Wells",
+      "comment": "Lydia Wells -> Dexter Wells"
+    },
+    {
+      "from_id": "KP34-ZYV",
+      "to_id": "LLM3-B4Y",
+      "reason": "Mutual relationship: Myrtle Jeanette Quinn (hop 12) <-> Russell Merril Olsen (Quinn) (hop 11). Removing Myrtle Jeanette Quinn->Russell Merril Olsen (Quinn)",
+      "comment": "Myrtle Jeanette Quinn -> Russell Merril Olsen (Quinn)"
+    },
+    {
+      "from_id": "LHJQ-8B4",
+      "to_id": "KP72-4C1",
+      "reason": "Mutual relationship: Lydia Keifer (hop 11) <-> Philip L. Weimer (hop 12). Removing Philip L. Weimer->Lydia Keifer",
+      "comment": "Philip L. Weimer -> Lydia Keifer"
+    },
+    {
+      "from_id": "KPDP-1K1",
+      "to_id": "L7SQ-BC8",
+      "reason": "Mutual relationship: Frank Joseph Larsen (hop 13) <-> Hortense Cleo Larsen (hop 13). Equal hops, removing Frank Joseph Larsen->Hortense Cleo Larsen",
+      "comment": "Frank Joseph Larsen -> Hortense Cleo Larsen"
+    },
+    {
+      "from_id": "KPQW-MMS",
+      "to_id": "LZP7-MZY",
+      "reason": "Mutual relationship: Bendicht Schmutz (hop 10) <-> Anna Sch\u00fcppach (hop 9). Removing Bendicht Schmutz->Anna Sch\u00fcppach",
+      "comment": "Bendicht Schmutz -> Anna Sch\u00fcppach"
+    },
+    {
+      "from_id": "KTZL-PGG",
+      "to_id": "KTZL-PT4",
+      "reason": "Mutual relationship: William Freeman Waterman (hop 13) <-> Olive Hovey Freeman (hop 12). Removing William Freeman Waterman->Olive Hovey Freeman",
+      "comment": "William Freeman Waterman -> Olive Hovey Freeman"
+    },
+    {
+      "from_id": "KVGS-12N",
+      "to_id": "KWZM-776",
+      "reason": "Mutual relationship: Lewis Neil Calton (hop 13) <-> Fredrick Louis Calton (hop 12). Removing Lewis Neil Calton->Fredrick Louis Calton",
+      "comment": "Lewis Neil Calton -> Fredrick Louis Calton"
+    },
+    {
+      "from_id": "KVLY-626",
+      "to_id": "LHQM-WXM",
+      "reason": "Mutual relationship: Frederick Erwin (hop 12) <-> Eliza Penland (hop 11). Removing Frederick Erwin->Eliza Penland",
+      "comment": "Frederick Erwin -> Eliza Penland"
+    },
+    {
+      "from_id": "L5FK-HSS",
+      "to_id": "KW67-YD6",
+      "reason": "Mutual relationship: Johannes Kammermann (hop 11) <-> Christina Schmid (hop 12). Removing Christina Schmid->Johannes Kammermann",
+      "comment": "Christina Schmid -> Johannes Kammermann"
+    },
+    {
+      "from_id": "L2SS-2ZD",
+      "to_id": "KW83-YHX",
+      "reason": "Mutual relationship: Sibyl Pearl Whitmore (hop 11) <-> Bryant Whitmore Giles (hop 12). Removing Bryant Whitmore Giles->Sibyl Pearl Whitmore",
+      "comment": "Bryant Whitmore Giles -> Sibyl Pearl Whitmore"
+    },
+    {
+      "from_id": "KW8G-K1Y",
+      "to_id": "KWC4-WWZ",
+      "reason": "Mutual relationship: Daniel Franklin Updyke (hop 12) <-> Daniel Franklin Updyke (hop 12). Equal hops, removing Daniel Franklin Updyke->Daniel Franklin Updyke",
+      "comment": "Daniel Franklin Updyke -> Daniel Franklin Updyke"
+    },
+    {
+      "from_id": "KW8X-7M4",
+      "to_id": "KWZ9-P8L",
+      "reason": "Mutual relationship: Judy Anne Alger (hop 13) <-> Laura Christensen (hop 13). Equal hops, removing Judy Anne Alger->Laura Christensen",
+      "comment": "Judy Anne Alger -> Laura Christensen"
+    },
+    {
+      "from_id": "KWC1-JD5",
+      "to_id": "LH8N-5D8",
+      "reason": "Mutual relationship: Eli Benjamin Jones (hop 13) <-> Mary Jane Daniels (hop 12). Removing Eli Benjamin Jones->Mary Jane Daniels",
+      "comment": "Eli Benjamin Jones -> Mary Jane Daniels"
+    },
+    {
+      "from_id": "KWCJ-RPN",
+      "to_id": "KWC1-KM6",
+      "reason": "Mutual relationship: Wesley Conrad Maag (hop 11) <-> Emma Lorene Maag (hop 12). Removing Emma Lorene Maag->Wesley Conrad Maag",
+      "comment": "Emma Lorene Maag -> Wesley Conrad Maag"
+    },
+    {
+      "from_id": "KWC2-G13",
+      "to_id": "KWC3-L4R",
+      "reason": "Mutual relationship: Thomas Alfred Lemmon (hop 13) <-> Vera Nellie Thomas (hop 12). Removing Thomas Alfred Lemmon->Vera Nellie Thomas",
+      "comment": "Thomas Alfred Lemmon -> Vera Nellie Thomas"
+    },
+    {
+      "from_id": "KWVG-TXH",
+      "to_id": "KWC3-BXH",
+      "reason": "Mutual relationship: John James Godson Webster (hop 9) <-> Echo Urie Webster (hop 10). Removing Echo Urie Webster->John James Godson Webster",
+      "comment": "Echo Urie Webster -> John James Godson Webster"
+    },
+    {
+      "from_id": "KWC4-BD9",
+      "to_id": "KWCZ-XJ4",
+      "reason": "Mutual relationship: Kenneth Charles Knudsen (hop 11) <-> Johnathan Wells Knudsen (hop 11). Equal hops, removing Kenneth Charles Knudsen->Johnathan Wells Knudsen",
+      "comment": "Kenneth Charles Knudsen -> Johnathan Wells Knudsen"
+    },
+    {
+      "from_id": "KWC5-D4J",
+      "to_id": "KWJC-KGY",
+      "reason": "Mutual relationship: Elizabeth Harris (hop 12) <-> Richard Merrill Harris (hop 12). Equal hops, removing Elizabeth Harris->Richard Merrill Harris",
+      "comment": "Elizabeth Harris -> Richard Merrill Harris"
+    },
+    {
+      "from_id": "KWC5-YBG",
+      "to_id": "KWCC-6XP",
+      "reason": "Mutual relationship: Lena Housmann (hop 13) <-> Fern Magdalene Jensen (hop 13). Equal hops, removing Lena Housmann->Fern Magdalene Jensen",
+      "comment": "Lena Housmann -> Fern Magdalene Jensen"
+    },
+    {
+      "from_id": "KWJH-HVW",
+      "to_id": "KWC6-Z4Y",
+      "reason": "Mutual relationship: Thelma Foster (hop 12) <-> Lorenzo Foster (hop 13). Removing Lorenzo Foster->Thelma Foster",
+      "comment": "Lorenzo Foster -> Thelma Foster"
+    },
+    {
+      "from_id": "KWZF-6MS",
+      "to_id": "KWC8-DS6",
+      "reason": "Mutual relationship: Nellie June Bell (hop 11) <-> Mary June Brewer (hop 12). Removing Mary June Brewer->Nellie June Bell",
+      "comment": "Mary June Brewer -> Nellie June Bell"
+    },
+    {
+      "from_id": "KWC8-WS3",
+      "to_id": "KWCH-KCL",
+      "reason": "Mutual relationship: Wynn Chester Anderson (hop 12) <-> Charles Theodore Anderson (hop 12). Equal hops, removing Wynn Chester Anderson->Charles Theodore Anderson",
+      "comment": "Wynn Chester Anderson -> Charles Theodore Anderson"
+    },
+    {
+      "from_id": "KWCC-9K9",
+      "to_id": "KWCC-9KH",
+      "reason": "Mutual relationship: Margaret Rolfson Bryan (hop 12) <-> Anna Helena Rolfson (hop 12). Equal hops, removing Margaret Rolfson Bryan->Anna Helena Rolfson",
+      "comment": "Margaret Rolfson Bryan -> Anna Helena Rolfson"
+    },
+    {
+      "from_id": "KWCC-C9L",
+      "to_id": "KWJJ-4MN",
+      "reason": "Mutual relationship: Emily Boweter (hop 13) <-> Emily Jeanne Griggs (hop 13). Equal hops, removing Emily Boweter->Emily Jeanne Griggs",
+      "comment": "Emily Boweter -> Emily Jeanne Griggs"
+    },
+    {
+      "from_id": "KWCC-MR2",
+      "to_id": "KWCC-MRY",
+      "reason": "Mutual relationship: Ruth Van Dyke (hop 12) <-> Pearl Ethel Porter (hop 11). Removing Ruth Van Dyke->Pearl Ethel Porter",
+      "comment": "Ruth Van Dyke -> Pearl Ethel Porter"
+    },
+    {
+      "from_id": "KWCC-ZCG",
+      "to_id": "KWZN-7HF",
+      "reason": "Mutual relationship: Rodney Banfield Capron (hop 13) <-> Charles Bruce Capron (hop 13). Equal hops, removing Rodney Banfield Capron->Charles Bruce Capron",
+      "comment": "Rodney Banfield Capron -> Charles Bruce Capron"
+    },
+    {
+      "from_id": "KWCF-HXC",
+      "to_id": "KWCK-S5C",
+      "reason": "Mutual relationship: William Ray Rumel (hop 12) <-> Stephen Henry Rumel (hop 12). Equal hops, removing William Ray Rumel->Stephen Henry Rumel",
+      "comment": "William Ray Rumel -> Stephen Henry Rumel"
+    },
+    {
+      "from_id": "KWCH-C7P",
+      "to_id": "KWZW-4HX",
+      "reason": "Mutual relationship: Edna Matilda Sorenson (hop 11) <-> Johanna Marie Nielson (hop 10). Removing Edna Matilda Sorenson->Johanna Marie Nielson",
+      "comment": "Edna Matilda Sorenson -> Johanna Marie Nielson"
+    },
+    {
+      "from_id": "KWCH-RWQ",
+      "to_id": "KWCH-RWZ",
+      "reason": "Mutual relationship: Marcell Eugene Bridges (hop 11) <-> Aldon Marcelle Bridges (hop 11). Equal hops, removing Marcell Eugene Bridges->Aldon Marcelle Bridges",
+      "comment": "Marcell Eugene Bridges -> Aldon Marcelle Bridges"
+    },
+    {
+      "from_id": "KWCP-SJF",
+      "to_id": "KWZD-WQN",
+      "reason": "Mutual relationship: Julia Constance Allen (hop 13) <-> Blanche Matkin (hop 13). Equal hops, removing Julia Constance Allen->Blanche Matkin",
+      "comment": "Julia Constance Allen -> Blanche Matkin"
+    },
+    {
+      "from_id": "KWCR-5Z1",
+      "to_id": "LNKB-7NT",
+      "reason": "Mutual relationship: Virginia Crow (hop 13) <-> Deward Steven Bowles (hop 13). Equal hops, removing Virginia Crow->Deward Steven Bowles",
+      "comment": "Virginia Crow -> Deward Steven Bowles"
+    },
+    {
+      "from_id": "KWCR-5Z1",
+      "to_id": "LVPM-1M4",
+      "reason": "Mutual relationship: Virginia Crow (hop 13) <-> Aaron Victor Bowles (hop 13). Equal hops, removing Virginia Crow->Aaron Victor Bowles",
+      "comment": "Virginia Crow -> Aaron Victor Bowles"
+    },
+    {
+      "from_id": "KWCT-SXV",
+      "to_id": "KWZM-NWV",
+      "reason": "Mutual relationship: Doris Renae Francom (hop 11) <-> Walter Tunbridge Francom (hop 11). Equal hops, removing Doris Renae Francom->Walter Tunbridge Francom",
+      "comment": "Doris Renae Francom -> Walter Tunbridge Francom"
+    },
+    {
+      "from_id": "KWCV-BXG",
+      "to_id": "LFBL-G11",
+      "reason": "Mutual relationship: Phyrne Elizabeth Ence (hop 10) <-> Bette Jeanne Baker (hop 9). Removing Phyrne Elizabeth Ence->Bette Jeanne Baker",
+      "comment": "Phyrne Elizabeth Ence -> Bette Jeanne Baker"
+    },
+    {
+      "from_id": "KWJH-BLX",
+      "to_id": "KWCV-NP7",
+      "reason": "Mutual relationship: Bessie Naomi Bishop (hop 12) <-> Randall Lavon Johnson (hop 13). Removing Randall Lavon Johnson->Bessie Naomi Bishop",
+      "comment": "Randall Lavon Johnson -> Bessie Naomi Bishop"
+    },
+    {
+      "from_id": "KWCW-R56",
+      "to_id": "KWJZ-N4H",
+      "reason": "Mutual relationship: James Henry Berensen (hop 11) <-> Caroline Amalie Thomsen (hop 10). Removing James Henry Berensen->Caroline Amalie Thomsen",
+      "comment": "James Henry Berensen -> Caroline Amalie Thomsen"
+    },
+    {
+      "from_id": "KWCY-7Y5",
+      "to_id": "KWCY-7YR",
+      "reason": "Mutual relationship: Charles Dee Rowsell (hop 12) <-> Charles Rowsell (hop 11). Removing Charles Dee Rowsell->Charles Rowsell",
+      "comment": "Charles Dee Rowsell -> Charles Rowsell"
+    },
+    {
+      "from_id": "KWZX-YRN",
+      "to_id": "KWCY-L8Q",
+      "reason": "Mutual relationship: Kathleen Jones Robertson (hop 11) <-> Catherine Hannah Griffiths (hop 12). Removing Catherine Hannah Griffiths->Kathleen Jones Robertson",
+      "comment": "Catherine Hannah Griffiths -> Kathleen Jones Robertson"
+    },
+    {
+      "from_id": "KWCZ-HBJ",
+      "to_id": "KWCZ-HBW",
+      "reason": "Mutual relationship: Mervin Andrew Lake (hop 12) <-> Katherine Olga Lake (hop 11). Removing Mervin Andrew Lake->Katherine Olga Lake",
+      "comment": "Mervin Andrew Lake -> Katherine Olga Lake"
+    },
+    {
+      "from_id": "KWCZ-HBN",
+      "to_id": "KWCZ-HBW",
+      "reason": "Mutual relationship: Helen Beryle O'Neil (hop 12) <-> Katherine Olga Lake (hop 11). Removing Helen Beryle O'Neil->Katherine Olga Lake",
+      "comment": "Helen Beryle O'Neil -> Katherine Olga Lake"
+    },
+    {
+      "from_id": "KWZ1-8CL",
+      "to_id": "KWCZ-MQ7",
+      "reason": "Mutual relationship: Louisa Maria Clement (hop 11) <-> Elvin R Cox (hop 12). Removing Elvin R Cox->Louisa Maria Clement",
+      "comment": "Elvin R Cox -> Louisa Maria Clement"
+    },
+    {
+      "from_id": "KWDZ-MSM",
+      "to_id": "KWZ2-W1Z",
+      "reason": "Mutual relationship: Robert Andrew Hunt (hop 13) <-> Andrew George Hunt (hop 13). Equal hops, removing Robert Andrew Hunt->Andrew George Hunt",
+      "comment": "Robert Andrew Hunt -> Andrew George Hunt"
+    },
+    {
+      "from_id": "KWH3-CS4",
+      "to_id": "KWHM-J5L",
+      "reason": "Mutual relationship: Robert Arnold Nattress (hop 13) <-> Patricia Ann Nattress (hop 12). Removing Robert Arnold Nattress->Patricia Ann Nattress",
+      "comment": "Robert Arnold Nattress -> Patricia Ann Nattress"
+    },
+    {
+      "from_id": "KWHK-JD6",
+      "to_id": "KWZS-LR9",
+      "reason": "Mutual relationship: Samuel Barr Scott (hop 12) <-> Austin Miller Scott (hop 12). Equal hops, removing Samuel Barr Scott->Austin Miller Scott",
+      "comment": "Samuel Barr Scott -> Austin Miller Scott"
+    },
+    {
+      "from_id": "KWHS-F1X",
+      "to_id": "KWZS-9Z9",
+      "reason": "Mutual relationship: Jack Lavon Mortensen (hop 12) <-> Rex L Mortensen (hop 12). Equal hops, removing Jack Lavon Mortensen->Rex L Mortensen",
+      "comment": "Jack Lavon Mortensen -> Rex L Mortensen"
+    },
+    {
+      "from_id": "KWNJ-L7V",
+      "to_id": "KWJB-C76",
+      "reason": "Mutual relationship: Ernst Marius Ernstsen (hop 10) <-> Hans Ernstsen (hop 11). Removing Hans Ernstsen->Ernst Marius Ernstsen",
+      "comment": "Hans Ernstsen -> Ernst Marius Ernstsen"
+    },
+    {
+      "from_id": "KWJC-B3H",
+      "to_id": "KWZC-FV5",
+      "reason": "Mutual relationship: Sarah Ellen Call (hop 13) <-> Cyril Josiah Call (hop 12). Removing Sarah Ellen Call->Cyril Josiah Call",
+      "comment": "Sarah Ellen Call -> Cyril Josiah Call"
+    },
+    {
+      "from_id": "KZCG-T67",
+      "to_id": "KWJC-CVB",
+      "reason": "Mutual relationship: Peter Roughley (hop 11) <-> Richard Roughley (hop 12). Removing Richard Roughley->Peter Roughley",
+      "comment": "Richard Roughley -> Peter Roughley"
+    },
+    {
+      "from_id": "KWJF-MTG",
+      "to_id": "KWJJ-53D",
+      "reason": "Mutual relationship: Albert Marinius Henriksen (hop 13) <-> Jens Marinius Henriksen (hop 12). Removing Albert Marinius Henriksen->Jens Marinius Henriksen",
+      "comment": "Albert Marinius Henriksen -> Jens Marinius Henriksen"
+    },
+    {
+      "from_id": "KWNP-M1H",
+      "to_id": "KWJJ-55Q",
+      "reason": "Mutual relationship: Christopher Johnsen (hop 11) <-> John Christopherson Johnson (hop 12). Removing John Christopherson Johnson->Christopher Johnsen",
+      "comment": "John Christopherson Johnson -> Christopher Johnsen"
+    },
+    {
+      "from_id": "KWJZ-6ZZ",
+      "to_id": "KWV5-HRR",
+      "reason": "Mutual relationship: Julia Rebecca Walton (hop 11) <-> Harriet Ann Laughlin (hop 11). Equal hops, removing Julia Rebecca Walton->Harriet Ann Laughlin",
+      "comment": "Julia Rebecca Walton -> Harriet Ann Laughlin"
+    },
+    {
+      "from_id": "KZJ4-Y68",
+      "to_id": "KWJZ-73K",
+      "reason": "Mutual relationship: Lucy B. Young (hop 11) <-> Alta Faye Smith (hop 12). Removing Alta Faye Smith->Lucy B. Young",
+      "comment": "Alta Faye Smith -> Lucy B. Young"
+    },
+    {
+      "from_id": "KWVW-LWP",
+      "to_id": "KWNJ-TW7",
+      "reason": "Mutual relationship: Jakob Metzener (hop 12) <-> Kasper Metzener (hop 13). Removing Kasper Metzener->Jakob Metzener",
+      "comment": "Kasper Metzener -> Jakob Metzener"
+    },
+    {
+      "from_id": "KWZ7-ZKN",
+      "to_id": "KWNY-X71",
+      "reason": "Mutual relationship: Charles Henry Swindle (hop 11) <-> Vincent Swindle (hop 12). Removing Vincent Swindle->Charles Henry Swindle",
+      "comment": "Vincent Swindle -> Charles Henry Swindle"
+    },
+    {
+      "from_id": "KWZ7-4VJ",
+      "to_id": "LYRV-V7X",
+      "reason": "Mutual relationship: George Lorain Wilcox (hop 13) <-> Roma Wilcox (hop 13). Equal hops, removing George Lorain Wilcox->Roma Wilcox",
+      "comment": "George Lorain Wilcox -> Roma Wilcox"
+    },
+    {
+      "from_id": "KWZ8-7WL",
+      "to_id": "KWZ8-7W5",
+      "reason": "Mutual relationship: Dean Dixon Nuttall (hop 10) <-> Ronald Dean Nuttall (hop 11). Removing Ronald Dean Nuttall->Dean Dixon Nuttall",
+      "comment": "Ronald Dean Nuttall -> Dean Dixon Nuttall"
+    },
+    {
+      "from_id": "KWZ9-9T6",
+      "to_id": "KWZX-TJL",
+      "reason": "Mutual relationship: Clifton Kay Conk (hop 13) <-> Leo Alma Conk (hop 12). Removing Clifton Kay Conk->Leo Alma Conk",
+      "comment": "Clifton Kay Conk -> Leo Alma Conk"
+    },
+    {
+      "from_id": "KWZ9-MC1",
+      "to_id": "KWZ9-MZM",
+      "reason": "Mutual relationship: Patrosinia Dominguez (hop 13) <-> Epigmenio Jimenez Rosales (hop 12). Removing Patrosinia Dominguez->Epigmenio Jimenez Rosales",
+      "comment": "Patrosinia Dominguez -> Epigmenio Jimenez Rosales"
+    },
+    {
+      "from_id": "KWZD-72Z",
+      "to_id": "KZXY-RKQ",
+      "reason": "Mutual relationship: Iva Pearl Smart (hop 13) <-> Nola Ann Long (hop 13). Equal hops, removing Iva Pearl Smart->Nola Ann Long",
+      "comment": "Iva Pearl Smart -> Nola Ann Long"
+    },
+    {
+      "from_id": "KWZF-B95",
+      "to_id": "KWZZ-1WD",
+      "reason": "Mutual relationship: Leona Crandall (hop 10) <-> Ethel Platt (hop 10). Equal hops, removing Leona Crandall->Ethel Platt",
+      "comment": "Leona Crandall -> Ethel Platt"
+    },
+    {
+      "from_id": "KWZM-WFH",
+      "to_id": "KWZS-BMT",
+      "reason": "Mutual relationship: Harvetta Follett (hop 12) <-> Harvey Haws Follett (hop 11). Removing Harvetta Follett->Harvey Haws Follett",
+      "comment": "Harvetta Follett -> Harvey Haws Follett"
+    },
+    {
+      "from_id": "KWZN-JMK",
+      "to_id": "KWZS-137",
+      "reason": "Mutual relationship: Charles Clifford Thornton (hop 12) <-> Ellis Clifford Thornton (hop 12). Equal hops, removing Charles Clifford Thornton->Ellis Clifford Thornton",
+      "comment": "Charles Clifford Thornton -> Ellis Clifford Thornton"
+    },
+    {
+      "from_id": "KWZW-3X4",
+      "to_id": "KWZW-3X8",
+      "reason": "Mutual relationship: Robert Montgomery Francis (hop 12) <-> Priscilla Elizabeth Montgomery (hop 11). Removing Robert Montgomery Francis->Priscilla Elizabeth Montgomery",
+      "comment": "Robert Montgomery Francis -> Priscilla Elizabeth Montgomery"
+    },
+    {
+      "from_id": "MTCK-MVS",
+      "to_id": "KZ6N-RJX",
+      "reason": "Mutual relationship: George William Dunn (hop 12) <-> John Dunn (hop 13). Removing John Dunn->George William Dunn",
+      "comment": "John Dunn -> George William Dunn"
+    },
+    {
+      "from_id": "M6XG-DCY",
+      "to_id": "KZNJ-L6Q",
+      "reason": "Mutual relationship: Hans Hansen (hop 12) <-> Hans Christian Hansen (hop 13). Removing Hans Christian Hansen->Hans Hansen",
+      "comment": "Hans Christian Hansen -> Hans Hansen"
+    },
+    {
+      "from_id": "L15Y-FWV",
+      "to_id": "L51S-DDT",
+      "reason": "Mutual relationship: Mack A Pyle (hop 12) <-> Welcome Ernest Pyle (hop 12). Equal hops, removing Mack A Pyle->Welcome Ernest Pyle",
+      "comment": "Mack A Pyle -> Welcome Ernest Pyle"
+    },
+    {
+      "from_id": "L19T-194",
+      "to_id": "L197-45X",
+      "reason": "Mutual relationship: David A Lindsay (hop 11) <-> David A Lindsay (hop 12). Removing David A Lindsay->David A Lindsay",
+      "comment": "David A Lindsay -> David A Lindsay"
+    },
+    {
+      "from_id": "L2JL-Q5W",
+      "to_id": "L1R6-YCB",
+      "reason": "Mutual relationship: Joseph Gordon (hop 12) <-> William M Gordon (hop 13). Removing William M Gordon->Joseph Gordon",
+      "comment": "William M Gordon -> Joseph Gordon"
+    },
+    {
+      "from_id": "L218-W9M",
+      "to_id": "LVJC-3QY",
+      "reason": "Mutual relationship: Marie Helene J\u00f8rgensen (hop 13) <-> Johanna Marie Christensen (hop 13). Equal hops, removing Marie Helene J\u00f8rgensen->Johanna Marie Christensen",
+      "comment": "Marie Helene J\u00f8rgensen -> Johanna Marie Christensen"
+    },
+    {
+      "from_id": "L2GD-7K2",
+      "to_id": "L2GD-744",
+      "reason": "Mutual relationship: Anna Belle Bailey (hop 12) <-> Roger Calhoun Riddell (hop 13). Removing Roger Calhoun Riddell->Anna Belle Bailey",
+      "comment": "Roger Calhoun Riddell -> Anna Belle Bailey"
+    },
+    {
+      "from_id": "L5K9-5WT",
+      "to_id": "L2L2-DFL",
+      "reason": "Mutual relationship: Hans Embretsen (hop 12) <-> Engebret Hansen Skogen (hop 13). Removing Engebret Hansen Skogen->Hans Embretsen",
+      "comment": "Engebret Hansen Skogen -> Hans Embretsen"
+    },
+    {
+      "from_id": "LRN8-VJ3",
+      "to_id": "L2MP-B2M",
+      "reason": "Mutual relationship: Louis Joseph Cormier (hop 12) <-> Julie Cormier (hop 13). Removing Julie Cormier->Louis Joseph Cormier",
+      "comment": "Julie Cormier -> Louis Joseph Cormier"
+    },
+    {
+      "from_id": "L2SL-175",
+      "to_id": "LCQQ-W8S",
+      "reason": "Mutual relationship: Everett Clement Bell (hop 13) <-> Norma Bell (hop 12). Removing Everett Clement Bell->Norma Bell",
+      "comment": "Everett Clement Bell -> Norma Bell"
+    },
+    {
+      "from_id": "L2WN-N4J",
+      "to_id": "L4L1-7NZ",
+      "reason": "Mutual relationship: Thomas Bingham Walsh (hop 13) <-> Frederick Thomas Walsh (hop 13). Equal hops, removing Thomas Bingham Walsh->Frederick Thomas Walsh",
+      "comment": "Thomas Bingham Walsh -> Frederick Thomas Walsh"
+    },
+    {
+      "from_id": "L2YT-WGL",
+      "to_id": "L2XG-TM4",
+      "reason": "Mutual relationship: John Wollie Withem (hop 11) <-> Nancy Wallace (hop 12). Removing Nancy Wallace->John Wollie Withem",
+      "comment": "Nancy Wallace -> John Wollie Withem"
+    },
+    {
+      "from_id": "L415-Q5W",
+      "to_id": "L415-QVP",
+      "reason": "Mutual relationship: Everett Millman Lloid (hop 13) <-> Eva Millman (hop 12). Removing Everett Millman Lloid->Eva Millman",
+      "comment": "Everett Millman Lloid -> Eva Millman"
+    },
+    {
+      "from_id": "L42K-Q34",
+      "to_id": "M27J-9WW",
+      "reason": "Mutual relationship: John Vale Price (hop 12) <-> Elizabeth Price (hop 12). Equal hops, removing John Vale Price->Elizabeth Price",
+      "comment": "John Vale Price -> Elizabeth Price"
+    },
+    {
+      "from_id": "L43W-KWR",
+      "to_id": "LY5K-QV1",
+      "reason": "Mutual relationship: Katharina Margaret Linenberger (hop 13) <-> Pauline Braun (hop 12). Removing Katharina Margaret Linenberger->Pauline Braun",
+      "comment": "Katharina Margaret Linenberger -> Pauline Braun"
+    },
+    {
+      "from_id": "L4B1-CKZ",
+      "to_id": "M97V-LG4",
+      "reason": "Mutual relationship: Eldora \u201cDora\u201d Martin (hop 13) <-> Elva V Ober (hop 13). Equal hops, removing Eldora \u201cDora\u201d Martin->Elva V Ober",
+      "comment": "Eldora \u201cDora\u201d Martin -> Elva V Ober"
+    },
+    {
+      "from_id": "L4F1-KGN",
+      "to_id": "L4F1-KGV",
+      "reason": "Mutual relationship: Joseph Ferguson Cudworth (hop 13) <-> Robert Harrop Cudworth (hop 13). Equal hops, removing Joseph Ferguson Cudworth->Robert Harrop Cudworth",
+      "comment": "Joseph Ferguson Cudworth -> Robert Harrop Cudworth"
+    },
+    {
+      "from_id": "L4H6-2RJ",
+      "to_id": "LZRF-Y6N",
+      "reason": "Mutual relationship: Thomas Atkinson (hop 13) <-> Elizabeth Ann Corbett (hop 12). Removing Thomas Atkinson->Elizabeth Ann Corbett",
+      "comment": "Thomas Atkinson -> Elizabeth Ann Corbett"
+    },
+    {
+      "from_id": "L4J9-K83",
+      "to_id": "LCTH-4N6",
+      "reason": "Mutual relationship: Katharina Gosteli (hop 11) <-> Benedicht Gosteli (hop 11). Equal hops, removing Katharina Gosteli->Benedicht Gosteli",
+      "comment": "Katharina Gosteli -> Benedicht Gosteli"
+    },
+    {
+      "from_id": "L4MM-YTQ",
+      "to_id": "MYM9-7BM",
+      "reason": "Mutual relationship: Louis Edwin Graham (hop 13) <-> Rueben Allen Graham (hop 13). Equal hops, removing Louis Edwin Graham->Rueben Allen Graham",
+      "comment": "Louis Edwin Graham -> Rueben Allen Graham"
+    },
+    {
+      "from_id": "L4NW-JBR",
+      "to_id": "LLQ6-18G",
+      "reason": "Mutual relationship: Johann Kaufmann (hop 13) <-> Johannes Kaufmann (hop 12). Removing Johann Kaufmann->Johannes Kaufmann",
+      "comment": "Johann Kaufmann -> Johannes Kaufmann"
+    },
+    {
+      "from_id": "MSTT-V9X",
+      "to_id": "L4QB-87W",
+      "reason": "Mutual relationship: Georgiana Whittaker (hop 12) <-> Hugh Whittaker Shaw (hop 13). Removing Hugh Whittaker Shaw->Georgiana Whittaker",
+      "comment": "Hugh Whittaker Shaw -> Georgiana Whittaker"
+    },
+    {
+      "from_id": "L4QD-FM8",
+      "to_id": "L4QD-V4C",
+      "reason": "Mutual relationship: Evelyn Imogene Porter (hop 13) <-> Annie Alzena Bundick (hop 12). Removing Evelyn Imogene Porter->Annie Alzena Bundick",
+      "comment": "Evelyn Imogene Porter -> Annie Alzena Bundick"
+    },
+    {
+      "from_id": "L4WP-L97",
+      "to_id": "MB7J-XH5",
+      "reason": "Mutual relationship: James Logan Meikle (hop 13) <-> James Duncan Meikle (hop 13). Equal hops, removing James Logan Meikle->James Duncan Meikle",
+      "comment": "James Logan Meikle -> James Duncan Meikle"
+    },
+    {
+      "from_id": "L5KH-37C",
+      "to_id": "L5KH-WCK",
+      "reason": "Mutual relationship: John W Sorber (hop 11) <-> Irene Sorber (hop 10). Removing John W Sorber->Irene Sorber",
+      "comment": "John W Sorber -> Irene Sorber"
+    },
+    {
+      "from_id": "L5VT-WJW",
+      "to_id": "L5VT-Z3P",
+      "reason": "Mutual relationship: Sarah Wallace (hop 12) <-> Emma Yates (hop 12). Equal hops, removing Sarah Wallace->Emma Yates",
+      "comment": "Sarah Wallace -> Emma Yates"
+    },
+    {
+      "from_id": "L61V-CSW",
+      "to_id": "LVMC-YT2",
+      "reason": "Mutual relationship: Frances Sylvia Pooloa (hop 13) <-> Abraham Pooloa (hop 13). Equal hops, removing Frances Sylvia Pooloa->Abraham Pooloa",
+      "comment": "Frances Sylvia Pooloa -> Abraham Pooloa"
+    },
+    {
+      "from_id": "L648-3PN",
+      "to_id": "LFJZ-Z1B",
+      "reason": "Mutual relationship: William Oliver Perry (hop 13) <-> William Oliver Perry (hop 13). Equal hops, removing William Oliver Perry->William Oliver Perry",
+      "comment": "William Oliver Perry -> William Oliver Perry"
+    },
+    {
+      "from_id": "L648-3PN",
+      "to_id": "LJXS-TFW",
+      "reason": "Mutual relationship: William Oliver Perry (hop 13) <-> William Oliver Perry (hop 13). Equal hops, removing William Oliver Perry->William Oliver Perry",
+      "comment": "William Oliver Perry -> William Oliver Perry"
+    },
+    {
+      "from_id": "L6HN-T4S",
+      "to_id": "LD8M-YTS",
+      "reason": "Mutual relationship: Agnes V Johnson (hop 13) <-> Carl Andrew Swenson (hop 12). Removing Agnes V Johnson->Carl Andrew Swenson",
+      "comment": "Agnes V Johnson -> Carl Andrew Swenson"
+    },
+    {
+      "from_id": "L71X-L51",
+      "to_id": "L71X-LBZ",
+      "reason": "Mutual relationship: Benjamin Cardinal (hop 13) <-> Florence Lucy Cardinal (hop 13). Equal hops, removing Benjamin Cardinal->Florence Lucy Cardinal",
+      "comment": "Benjamin Cardinal -> Florence Lucy Cardinal"
+    },
+    {
+      "from_id": "LK38-HN6",
+      "to_id": "L71Z-DQJ",
+      "reason": "Mutual relationship: Harold Richards Toomer (hop 11) <-> Harold Kimball Toomer (hop 12). Removing Harold Kimball Toomer->Harold Richards Toomer",
+      "comment": "Harold Kimball Toomer -> Harold Richards Toomer"
+    },
+    {
+      "from_id": "L74C-C6M",
+      "to_id": "LTHC-SM3",
+      "reason": "Mutual relationship: Peter Odelon Morin (hop 13) <-> Joseph Geffray Morin (hop 13). Equal hops, removing Peter Odelon Morin->Joseph Geffray Morin",
+      "comment": "Peter Odelon Morin -> Joseph Geffray Morin"
+    },
+    {
+      "from_id": "L77Q-BKF",
+      "to_id": "L77Q-BKN",
+      "reason": "Mutual relationship: Morten Andreas Andersen (hop 13) <-> Anders Mortensen (hop 13). Equal hops, removing Morten Andreas Andersen->Anders Mortensen",
+      "comment": "Morten Andreas Andersen -> Anders Mortensen"
+    },
+    {
+      "from_id": "LQ5D-WKY",
+      "to_id": "L7J3-3D1",
+      "reason": "Mutual relationship: Sir Phillip Henry Goss (hop 12) <-> John Gosse (hop 13). Removing John Gosse->Sir Phillip Henry Goss",
+      "comment": "John Gosse -> Sir Phillip Henry Goss"
+    },
+    {
+      "from_id": "MY8L-CX6",
+      "to_id": "L7NM-NTH",
+      "reason": "Mutual relationship: Syver Olson (hop 12) <-> Ole Syversen (hop 13). Removing Ole Syversen->Syver Olson",
+      "comment": "Ole Syversen -> Syver Olson"
+    },
+    {
+      "from_id": "L7PH-KD4",
+      "to_id": "L7PH-KQC",
+      "reason": "Mutual relationship: Mary Jane Newman (hop 13) <-> Alecia Noon (hop 13). Equal hops, removing Mary Jane Newman->Alecia Noon",
+      "comment": "Mary Jane Newman -> Alecia Noon"
+    },
+    {
+      "from_id": "L7PW-7LL",
+      "to_id": "LZ2K-89D",
+      "reason": "Mutual relationship: Anna Franz (hop 10) <-> Gerhard F Reimer (hop 10). Equal hops, removing Anna Franz->Gerhard F Reimer",
+      "comment": "Anna Franz -> Gerhard F Reimer"
+    },
+    {
+      "from_id": "L83H-76B",
+      "to_id": "L83H-7XR",
+      "reason": "Mutual relationship: Jacob Henry Beaman (hop 12) <-> John Leonard Beaman (hop 12). Equal hops, removing Jacob Henry Beaman->John Leonard Beaman",
+      "comment": "Jacob Henry Beaman -> John Leonard Beaman"
+    },
+    {
+      "from_id": "L89X-VWG",
+      "to_id": "LY3M-WVB",
+      "reason": "Mutual relationship: Wyatt Aubrey Ferguson (hop 13) <-> Eloise Gertrude Ferguson (hop 13). Equal hops, removing Wyatt Aubrey Ferguson->Eloise Gertrude Ferguson",
+      "comment": "Wyatt Aubrey Ferguson -> Eloise Gertrude Ferguson"
+    },
+    {
+      "from_id": "LB19-RGZ",
+      "to_id": "MXQS-Q3G",
+      "reason": "Mutual relationship: Susan Johnson (hop 13) <-> Johnathan Johnson (hop 13). Equal hops, removing Susan Johnson->Johnathan Johnson",
+      "comment": "Susan Johnson -> Johnathan Johnson"
+    },
+    {
+      "from_id": "LB1N-2YN",
+      "to_id": "LB1N-PQ9",
+      "reason": "Mutual relationship: Mary E Mccalley (hop 13) <-> William R Hainey (hop 13). Equal hops, removing Mary E Mccalley->William R Hainey",
+      "comment": "Mary E Mccalley -> William R Hainey"
+    },
+    {
+      "from_id": "LV7J-YH2",
+      "to_id": "LB2G-1QY",
+      "reason": "Mutual relationship: Laura Mae Pollard (hop 12) <-> Glen Alvin Coppedge (hop 13). Removing Glen Alvin Coppedge->Laura Mae Pollard",
+      "comment": "Glen Alvin Coppedge -> Laura Mae Pollard"
+    },
+    {
+      "from_id": "LBR4-DFV",
+      "to_id": "LBR4-XBS",
+      "reason": "Mutual relationship: Thomas Jones (hop 13) <-> William Jones (hop 13). Equal hops, removing Thomas Jones->William Jones",
+      "comment": "Thomas Jones -> William Jones"
+    },
+    {
+      "from_id": "LBTN-HRC",
+      "to_id": "LY6G-9XH",
+      "reason": "Mutual relationship: Johann Friederich Schiek (hop 13) <-> Anna Maria Harer (hop 12). Removing Johann Friederich Schiek->Anna Maria Harer",
+      "comment": "Johann Friederich Schiek -> Anna Maria Harer"
+    },
+    {
+      "from_id": "LLW7-G7T",
+      "to_id": "LC3F-6TW",
+      "reason": "Mutual relationship: Dudley Caywood (hop 12) <-> Dudley Caywood (hop 13). Removing Dudley Caywood->Dudley Caywood",
+      "comment": "Dudley Caywood -> Dudley Caywood"
+    },
+    {
+      "from_id": "LC3N-F2P",
+      "to_id": "LCQL-NYF",
+      "reason": "Mutual relationship: Michael Ridgway (hop 13) <-> David Ridgway (hop 12). Removing Michael Ridgway->David Ridgway",
+      "comment": "Michael Ridgway -> David Ridgway"
+    },
+    {
+      "from_id": "LCCB-QZT",
+      "to_id": "LCCR-JR5",
+      "reason": "Mutual relationship: John Roy Rafter (hop 10) <-> John P Rafter (hop 10). Equal hops, removing John Roy Rafter->John P Rafter",
+      "comment": "John Roy Rafter -> John P Rafter"
+    },
+    {
+      "from_id": "LCVG-W5L",
+      "to_id": "M51F-3WC",
+      "reason": "Mutual relationship: Andrew Jackson Higgins (hop 13) <-> Marcus Luther Higgins (hop 13). Equal hops, removing Andrew Jackson Higgins->Marcus Luther Higgins",
+      "comment": "Andrew Jackson Higgins -> Marcus Luther Higgins"
+    },
+    {
+      "from_id": "LCVX-MNW",
+      "to_id": "LHPW-85W",
+      "reason": "Mutual relationship: William Norris (hop 13) <-> George Norris (hop 12). Removing William Norris->George Norris",
+      "comment": "William Norris -> George Norris"
+    },
+    {
+      "from_id": "LCWJ-W4J",
+      "to_id": "LZZZ-2R6",
+      "reason": "Mutual relationship: Joseph Thomas Clifton (hop 13) <-> William Thomas Clifton (hop 12). Removing Joseph Thomas Clifton->William Thomas Clifton",
+      "comment": "Joseph Thomas Clifton -> William Thomas Clifton"
+    },
+    {
+      "from_id": "LCXZ-D66",
+      "to_id": "LZN9-YBP",
+      "reason": "Mutual relationship: Louisa D Beverage (hop 13) <-> Thomas Beverage (hop 12). Removing Louisa D Beverage->Thomas Beverage",
+      "comment": "Louisa D Beverage -> Thomas Beverage"
+    },
+    {
+      "from_id": "LCZT-SYQ",
+      "to_id": "LK1J-DCT",
+      "reason": "Mutual relationship: Henry Jacob Burkholder (hop 13) <-> Henry S. Burkholder (hop 13). Equal hops, removing Henry Jacob Burkholder->Henry S. Burkholder",
+      "comment": "Henry Jacob Burkholder -> Henry S. Burkholder"
+    },
+    {
+      "from_id": "LDK4-Z9F",
+      "to_id": "LH6Z-4FJ",
+      "reason": "Mutual relationship: James Henry Strickland (hop 13) <-> Thomas Harrison Strickland (hop 13). Equal hops, removing James Henry Strickland->Thomas Harrison Strickland",
+      "comment": "James Henry Strickland -> Thomas Harrison Strickland"
+    },
+    {
+      "from_id": "LFPR-83X",
+      "to_id": "LFPP-Y7N",
+      "reason": "Mutual relationship: Charles Hugh Leete (hop 12) <-> Rodney Jack Leete (hop 13). Removing Rodney Jack Leete->Charles Hugh Leete",
+      "comment": "Rodney Jack Leete -> Charles Hugh Leete"
+    },
+    {
+      "from_id": "LH67-HZ7",
+      "to_id": "LH67-ZSR",
+      "reason": "Mutual relationship: Waldo Emerson Raiford (hop 12) <-> Kenneth Henry Raiford (hop 12). Equal hops, removing Waldo Emerson Raiford->Kenneth Henry Raiford",
+      "comment": "Waldo Emerson Raiford -> Kenneth Henry Raiford"
+    },
+    {
+      "from_id": "LH69-3L9",
+      "to_id": "LWVQ-WYN",
+      "reason": "Mutual relationship: Charles William Fuller (hop 13) <-> Willis Marsh Fuller (hop 13). Equal hops, removing Charles William Fuller->Willis Marsh Fuller",
+      "comment": "Charles William Fuller -> Willis Marsh Fuller"
+    },
+    {
+      "from_id": "LHFW-P9M",
+      "to_id": "M86L-F18",
+      "reason": "Mutual relationship: Dorothy Richardson (hop 12) <-> Paul Richardson (hop 12). Equal hops, removing Dorothy Richardson->Paul Richardson",
+      "comment": "Dorothy Richardson -> Paul Richardson"
+    },
+    {
+      "from_id": "LHHT-W14",
+      "to_id": "LHHT-W1C",
+      "reason": "Mutual relationship: Grace M Bullock (hop 13) <-> Nellie E. Callahan (hop 13). Equal hops, removing Grace M Bullock->Nellie E. Callahan",
+      "comment": "Grace M Bullock -> Nellie E. Callahan"
+    },
+    {
+      "from_id": "LTHK-62M",
+      "to_id": "LHQM-WXM",
+      "reason": "Mutual relationship: Eliza Penland (hop 11) <-> Alwayne Erwin (hop 12). Removing Alwayne Erwin->Eliza Penland",
+      "comment": "Alwayne Erwin -> Eliza Penland"
+    },
+    {
+      "from_id": "LHTY-7PN",
+      "to_id": "MC2D-6M6",
+      "reason": "Mutual relationship: Ellen R Walker (hop 13) <-> Addie Isobel Howland (hop 13). Equal hops, removing Ellen R Walker->Addie Isobel Howland",
+      "comment": "Ellen R Walker -> Addie Isobel Howland"
+    },
+    {
+      "from_id": "LHWD-S73",
+      "to_id": "LHWZ-1YW",
+      "reason": "Mutual relationship: Lawrence Timothy Crowley (hop 12) <-> George Patrick Crowley (hop 12). Equal hops, removing Lawrence Timothy Crowley->George Patrick Crowley",
+      "comment": "Lawrence Timothy Crowley -> George Patrick Crowley"
+    },
+    {
+      "from_id": "MBNC-RJF",
+      "to_id": "LJ2H-JMJ",
+      "reason": "Mutual relationship: Lars Martinius Wilhelm Ruth (hop 12) <-> Agnes Adelgunde  (hop 13). Removing Agnes Adelgunde ->Lars Martinius Wilhelm Ruth",
+      "comment": "Agnes Adelgunde  -> Lars Martinius Wilhelm Ruth"
+    },
+    {
+      "from_id": "LJQX-MRJ",
+      "to_id": "LVHJ-B1Y",
+      "reason": "Mutual relationship: Benjamin Brooks Wilkinson (hop 11) <->  Wilkinson (hop 11). Equal hops, removing Benjamin Brooks Wilkinson-> Wilkinson",
+      "comment": "Benjamin Brooks Wilkinson ->  Wilkinson"
+    },
+    {
+      "from_id": "LJYH-QL8",
+      "to_id": "LZ2W-4SD",
+      "reason": "Mutual relationship: Sara Emily McCurdy (hop 13) <-> Charles Albert McCurdy (hop 13). Equal hops, removing Sara Emily McCurdy->Charles Albert McCurdy",
+      "comment": "Sara Emily McCurdy -> Charles Albert McCurdy"
+    },
+    {
+      "from_id": "LK2S-Q7T",
+      "to_id": "LRWF-JGD",
+      "reason": "Mutual relationship: Christen or Christian Burri Tschannen (hop 13) <-> Anna Maria Burf (hop 12). Removing Christen or Christian Burri Tschannen->Anna Maria Burf",
+      "comment": "Christen or Christian Burri Tschannen -> Anna Maria Burf"
+    },
+    {
+      "from_id": "LK7G-CBR",
+      "to_id": "LK7G-4QN",
+      "reason": "Mutual relationship: Manuel Gonzales Silva (hop 11) <-> Arthur Clarence Silva (hop 12). Removing Arthur Clarence Silva->Manuel Gonzales Silva",
+      "comment": "Arthur Clarence Silva -> Manuel Gonzales Silva"
+    },
+    {
+      "from_id": "LZRP-X44",
+      "to_id": "LKCP-P28",
+      "reason": "Mutual relationship: Betty Elizabeth Lea (hop 12) <-> Richard Marsh (hop 13). Removing Richard Marsh->Betty Elizabeth Lea",
+      "comment": "Richard Marsh -> Betty Elizabeth Lea"
+    },
+    {
+      "from_id": "LKR6-WPZ",
+      "to_id": "MPM6-N2W",
+      "reason": "Mutual relationship: Benjamin Senior (hop 13) <-> William Senior (hop 13). Equal hops, removing Benjamin Senior->William Senior",
+      "comment": "Benjamin Senior -> William Senior"
+    },
+    {
+      "from_id": "LL7L-21C",
+      "to_id": "LRC6-YYZ",
+      "reason": "Mutual relationship: Everette Obie Bibee (hop 13) <-> Clyde Lindford Bibee (hop 13). Equal hops, removing Everette Obie Bibee->Clyde Lindford Bibee",
+      "comment": "Everette Obie Bibee -> Clyde Lindford Bibee"
+    },
+    {
+      "from_id": "LLHB-H2J",
+      "to_id": "LRKL-97L",
+      "reason": "Mutual relationship: Mary Chaplin (hop 13) <-> Mary Lavinia West (hop 13). Equal hops, removing Mary Chaplin->Mary Lavinia West",
+      "comment": "Mary Chaplin -> Mary Lavinia West"
+    },
+    {
+      "from_id": "LR29-J5F",
+      "to_id": "LRKW-WTB",
+      "reason": "Mutual relationship: Myrtle Jeanette Setzer (hop 13) <-> Carrie Kathleen Baker (hop 13). Equal hops, removing Myrtle Jeanette Setzer->Carrie Kathleen Baker",
+      "comment": "Myrtle Jeanette Setzer -> Carrie Kathleen Baker"
+    },
+    {
+      "from_id": "LR5S-3WD",
+      "to_id": "LZRV-GWD",
+      "reason": "Mutual relationship: Joseph Oliver (hop 13) <-> Thomas Oliver (hop 12). Removing Joseph Oliver->Thomas Oliver",
+      "comment": "Joseph Oliver -> Thomas Oliver"
+    },
+    {
+      "from_id": "LR8F-52D",
+      "to_id": "LR8W-734",
+      "reason": "Mutual relationship: Mona Eames Mason (hop 13) <-> Lora Elizabeth Eames (hop 13). Equal hops, removing Mona Eames Mason->Lora Elizabeth Eames",
+      "comment": "Mona Eames Mason -> Lora Elizabeth Eames"
+    },
+    {
+      "from_id": "LRCK-MVL",
+      "to_id": "LYMY-99X",
+      "reason": "Mutual relationship: Worthy George Hopes (hop 11) <-> George W Hopes (hop 10). Removing Worthy George Hopes->George W Hopes",
+      "comment": "Worthy George Hopes -> George W Hopes"
+    },
+    {
+      "from_id": "LRK2-D9S",
+      "to_id": "M5KH-P9R",
+      "reason": "Mutual relationship: Edward Buckner (hop 13) <-> Alford Buckner (hop 12). Removing Edward Buckner->Alford Buckner",
+      "comment": "Edward Buckner -> Alford Buckner"
+    },
+    {
+      "from_id": "LRKG-7B7",
+      "to_id": "MYZM-8L5",
+      "reason": "Mutual relationship: James Daniel Setzer (hop 13) <-> John Wesley Setzer (hop 12). Removing James Daniel Setzer->John Wesley Setzer",
+      "comment": "James Daniel Setzer -> John Wesley Setzer"
+    },
+    {
+      "from_id": "LRQK-4K2",
+      "to_id": "MS1P-K6H",
+      "reason": "Mutual relationship: Frederick S. Schultz (hop 12) <-> Friederich Heinrich Christian Schultz (hop 12). Equal hops, removing Frederick S. Schultz->Friederich Heinrich Christian Schultz",
+      "comment": "Frederick S. Schultz -> Friederich Heinrich Christian Schultz"
+    },
+    {
+      "from_id": "LRRF-4WT",
+      "to_id": "LRRF-SC4",
+      "reason": "Mutual relationship: Eugene Clarke (hop 12) <-> Evelyn Marguerite Clarke (hop 12). Equal hops, removing Eugene Clarke->Evelyn Marguerite Clarke",
+      "comment": "Eugene Clarke -> Evelyn Marguerite Clarke"
+    },
+    {
+      "from_id": "LRYH-31C",
+      "to_id": "M98S-W5Q",
+      "reason": "Mutual relationship: Nathaniel John Battershill (hop 13) <-> Nathaniel John Battershill (hop 13). Equal hops, removing Nathaniel John Battershill->Nathaniel John Battershill",
+      "comment": "Nathaniel John Battershill -> Nathaniel John Battershill"
+    },
+    {
+      "from_id": "LTGT-TM8",
+      "to_id": "LZCG-ZST",
+      "reason": "Mutual relationship: Mary Elizabeth Reynolds (hop 13) <-> Julia Marie Ludwig (hop 13). Equal hops, removing Mary Elizabeth Reynolds->Julia Marie Ludwig",
+      "comment": "Mary Elizabeth Reynolds -> Julia Marie Ludwig"
+    },
+    {
+      "from_id": "LTXR-PGG",
+      "to_id": "MQQN-KK9",
+      "reason": "Mutual relationship: Hans Peter Andreas Gjers\u00f8e (hop 13) <-> Hans Marinius Tiedemann Gjers\u00f8e (hop 13). Equal hops, removing Hans Peter Andreas Gjers\u00f8e->Hans Marinius Tiedemann Gjers\u00f8e",
+      "comment": "Hans Peter Andreas Gjers\u00f8e -> Hans Marinius Tiedemann Gjers\u00f8e"
+    },
+    {
+      "from_id": "LVG3-F2V",
+      "to_id": "LVG3-FJX",
+      "reason": "Mutual relationship: James H Hamilton (hop 11) <-> Albert Gibson Hamilton (hop 11). Equal hops, removing James H Hamilton->Albert Gibson Hamilton",
+      "comment": "James H Hamilton -> Albert Gibson Hamilton"
+    },
+    {
+      "from_id": "LVNM-PXZ",
+      "to_id": "LVXB-LJY",
+      "reason": "Mutual relationship: Kenneth Romney (hop 13) <-> Kenneth Romney (hop 12). Removing Kenneth Romney->Kenneth Romney",
+      "comment": "Kenneth Romney -> Kenneth Romney"
+    },
+    {
+      "from_id": "LY63-B1N",
+      "to_id": "LY6Q-S47",
+      "reason": "Mutual relationship: Nettie V. McMillin (hop 12) <-> Julia D. Marshall (hop 12). Equal hops, removing Nettie V. McMillin->Julia D. Marshall",
+      "comment": "Nettie V. McMillin -> Julia D. Marshall"
+    },
+    {
+      "from_id": "LYPC-7YL",
+      "to_id": "LYPH-18B",
+      "reason": "Mutual relationship: Rachel A. Kinsey (hop 12) <-> Leonard William Anderegg (hop 11). Removing Rachel A. Kinsey->Leonard William Anderegg",
+      "comment": "Rachel A. Kinsey -> Leonard William Anderegg"
+    },
+    {
+      "from_id": "LZ42-8NB",
+      "to_id": "LZ4G-5JW",
+      "reason": "Mutual relationship: William Chatterton (hop 12) <-> Elizabeth Baxter (hop 12). Equal hops, removing William Chatterton->Elizabeth Baxter",
+      "comment": "William Chatterton -> Elizabeth Baxter"
+    },
+    {
+      "from_id": "LZ6Y-WHH",
+      "to_id": "LZ6Y-7BB",
+      "reason": "Mutual relationship: Peter Tschannen (hop 11) <-> Peter Tschannen (hop 12). Removing Peter Tschannen->Peter Tschannen",
+      "comment": "Peter Tschannen -> Peter Tschannen"
+    },
+    {
+      "from_id": "LZGG-NZJ",
+      "to_id": "LZGR-9TD",
+      "reason": "Mutual relationship: James Coles (hop 13) <-> Henry or Harry Coles (hop 13). Equal hops, removing James Coles->Henry or Harry Coles",
+      "comment": "James Coles -> Henry or Harry Coles"
+    },
+    {
+      "from_id": "LZL1-Q7S",
+      "to_id": "LZRD-K1F",
+      "reason": "Mutual relationship: Berte Maria Olsdatter (hop 13) <-> Ole Magnus Peterson Kolstad (hop 12). Removing Berte Maria Olsdatter->Ole Magnus Peterson Kolstad",
+      "comment": "Berte Maria Olsdatter -> Ole Magnus Peterson Kolstad"
+    },
+    {
+      "from_id": "LZL4-M8N",
+      "to_id": "LZLW-B1S",
+      "reason": "Mutual relationship: Selma Dorathea Dustman (hop 13) <-> John Henry Dustman (hop 13). Equal hops, removing Selma Dorathea Dustman->John Henry Dustman",
+      "comment": "Selma Dorathea Dustman -> John Henry Dustman"
+    },
+    {
+      "from_id": "LZT1-TLD",
+      "to_id": "LZYM-9NY",
+      "reason": "Mutual relationship: Charlotte Mae Herbert (hop 13) <-> Mary Elizabeth Highline (hop 13). Equal hops, removing Charlotte Mae Herbert->Mary Elizabeth Highline",
+      "comment": "Charlotte Mae Herbert -> Mary Elizabeth Highline"
+    },
+    {
+      "from_id": "M68H-Z4F",
+      "to_id": "M68H-ZH9",
+      "reason": "Mutual relationship: Jens Christian Christensen (hop 13) <-> Christen Jensen (hop 13). Equal hops, removing Jens Christian Christensen->Christen Jensen",
+      "comment": "Jens Christian Christensen -> Christen Jensen"
+    },
+    {
+      "from_id": "M73D-4H6",
+      "to_id": "M73D-4HY",
+      "reason": "Mutual relationship: Peter Lee (hop 13) <-> Arnold Leigh (hop 13). Equal hops, removing Peter Lee->Arnold Leigh",
+      "comment": "Peter Lee -> Arnold Leigh"
+    },
+    {
+      "from_id": "M73D-4HY",
+      "to_id": "M7QS-4ZW",
+      "reason": "Mutual relationship: Arnold Leigh (hop 13) <-> Ellen Leigh (hop 13). Equal hops, removing Arnold Leigh->Ellen Leigh",
+      "comment": "Arnold Leigh -> Ellen Leigh"
+    },
+    {
+      "from_id": "M75D-V9R",
+      "to_id": "M75D-VM7",
+      "reason": "Mutual relationship: Susannah Bagshaw (hop 13) <-> Anne Hughes (hop 12). Removing Susannah Bagshaw->Anne Hughes",
+      "comment": "Susannah Bagshaw -> Anne Hughes"
+    },
+    {
+      "from_id": "MM7K-RZC",
+      "to_id": "MGTY-1R1",
+      "reason": "Mutual relationship: Jens J\u00f8rgen Andersen (hop 12) <-> Ann Kirstine Jensen (hop 13). Removing Ann Kirstine Jensen->Jens J\u00f8rgen Andersen",
+      "comment": "Ann Kirstine Jensen -> Jens J\u00f8rgen Andersen"
+    },
+    {
+      "from_id": "MVL4-9H8",
+      "to_id": "MVL4-9HB",
+      "reason": "Mutual relationship: Mads P Jensen (hop 13) <-> Niels Peder Emil Jensen (hop 13). Equal hops, removing Mads P Jensen->Niels Peder Emil Jensen",
+      "comment": "Mads P Jensen -> Niels Peder Emil Jensen"
+    },
+    {
+      "from_id": "MWYD-GVK",
+      "to_id": "MWYD-GVR",
+      "reason": "Mutual relationship: Hugh Allen Stewart (hop 13) <-> Flora Ora May Stewart (hop 13). Equal hops, removing Hugh Allen Stewart->Flora Ora May Stewart",
+      "comment": "Hugh Allen Stewart -> Flora Ora May Stewart"
+    },
+    {
+      "from_id": "MYDB-TNH",
+      "to_id": "MYDR-2Y7",
+      "reason": "Mutual relationship: Karl Johan Tobiasen (hop 13) <-> Tobias Carlsen (hop 13). Equal hops, removing Karl Johan Tobiasen->Tobias Carlsen",
+      "comment": "Karl Johan Tobiasen -> Tobias Carlsen"
+    },
+    {
+      "from_id": "MZ34-46R",
+      "to_id": "MZ34-4F8",
+      "reason": "Mutual relationship: William Knowles (hop 12) <-> Anna Platiz (hop 12). Equal hops, removing William Knowles->Anna Platiz",
+      "comment": "William Knowles -> Anna Platiz"
+    }
+  ],
+  "excluded_vertices": []
+}

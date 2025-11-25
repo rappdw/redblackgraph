@@ -230,9 +230,10 @@ Examples:
         
         # Check size limits
         if vertices > MAX_EXCEL_COLS and not args.max_vertices:
-            logging.error(f"Graph has {vertices:,} vertices, exceeds Excel column limit ({MAX_EXCEL_COLS:,})")
-            logging.info(f"Use --max-vertices to export a subset")
-            sys.exit(1)
+            logging.warning(f"Graph has {vertices:,} vertices, exceeds Excel column limit ({MAX_EXCEL_COLS:,})")
+            logging.warning(f"Skipping export. Use --max-vertices to export a subset")
+            logging.info(f"✓ Processing complete (export skipped due to size)")
+            return
         
         # Get vertex names from database
         logging.info(f"Loading vertex names from {args.db_path}")
