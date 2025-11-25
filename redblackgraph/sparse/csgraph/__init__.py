@@ -7,7 +7,7 @@ from ._components import (
     merge_component_matrices,
     get_component_vertices,
 )
-from ._ordering import avos_canonical_ordering, _get_permutation
+from ._ordering import avos_canonical_ordering, _get_permutation, _get_permutation_sparse
 from ._permutation import permute, permute_sparse
 from ._topological_sort import topological_sort, topological_ordering, is_upper_triangular
 from ._relational_composition import vertex_relational_composition, edge_relational_composition
