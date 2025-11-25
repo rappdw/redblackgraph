@@ -1,5 +1,10 @@
 from ._shortest_path import shortest_path, floyd_warshall
-from .transitive_closure import transitive_closure, transitive_closure_dijkstra, transitive_closure_floyd_warshall
+from .transitive_closure import (
+    transitive_closure, 
+    transitive_closure_dijkstra, 
+    transitive_closure_floyd_warshall,
+    component_wise_closure
+)
 from ._components import (
     find_components,
     find_components_sparse,
