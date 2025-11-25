@@ -155,38 +155,41 @@
 
 ---
 
-## Phase 1: Sparse Topological Sort
+## Phase 1: Sparse Topological Sort ✅ COMPLETE
 **Duration:** 1-2 days | **Depends on:** Phase 0
+
+**Status:** Completed on 2024-11-25. All 25 tests passing.
 
 ### 1.1: Implementation
 **File:** `redblackgraph/sparse/csgraph/_topological_sort.pyx`
 
-- [ ] Create `_topological_sort.pyx` file
-- [ ] Implement `topological_sort(A)` function
+- [x] Create `_topological_sort.pyx` file
+- [x] Implement `topological_sort(A)` function
   - Use Phase 0 CSR iteration primitives
   - Iterative DFS (stack-based, no recursion)
   - Handle both CSR and rb_array inputs
   - Return permutation array
-- [ ] Implement `topological_ordering(A)` wrapper
+- [x] Implement `topological_ordering(A)` wrapper
   - Call topological_sort
   - Use Phase 0 sparse permutation
   - Return Ordering object
-- [ ] Add to `__init__.py` exports
+- [x] Implement `is_upper_triangular(A)` helper function
+- [x] Add to `__init__.py` exports
 
 **Test:** `tests/sparse/test_topological_sort.py`
-- [ ] Create test file
-- [ ] Compare output with reference implementation
-- [ ] Test on sparse CSR matrices (100K vertices)
-- [ ] Verify upper triangular property of result
-- [ ] Test with multiple disconnected components
-- [ ] Benchmark: Confirm O(V+E) scaling
+- [x] Create test file
+- [x] Compare output with reference implementation
+- [x] Test on sparse CSR matrices (100K vertices)
+- [x] Verify upper triangular property of result
+- [x] Test with multiple disconnected components
+- [x] Benchmark: Confirm O(V+E) scaling
 
 ---
 
 ### 1.2: Build Integration
-- [ ] Add to `meson.build`
-- [ ] Update package `__init__.py`
-- [ ] Rebuild and test
+- [x] Add to `meson.build`
+- [x] Update package `__init__.py`
+- [x] Rebuild and test
 
 ---
 
