@@ -56,10 +56,12 @@ This asymmetry breaks associativity.
 Classical semiring requires: `e⊗x = x⊗e = x` for all x and single e.
 
 **What we have:**
-- `RED_ONE⊗x = x` for all x (LEFT identity)
+- `RED_ONE⊗x = x` for all x ∈ S \ {BLACK_ONE} (LEFT identity, except cross-gender)
 - `x⊗RED_ONE = x` only if x is even, else 0 (RIGHT identity with filter)
-- `BLACK_ONE⊗x = x` for all x (LEFT identity)
+- `BLACK_ONE⊗x = x` for all x ∈ S \ {RED_ONE} (LEFT identity, except cross-gender)
 - `x⊗BLACK_ONE = x` only if x is odd, else 0 (RIGHT identity with filter)
+- `RED_ONE⊗BLACK_ONE = 0` (cross-gender undefined)
+- `BLACK_ONE⊗RED_ONE = 0` (cross-gender undefined)
 
 Neither RED_ONE nor BLACK_ONE is a two-sided identity for all elements.
 
@@ -83,9 +85,14 @@ The domain semantics **constrain** how operations are used, avoiding problematic
 Define separate carriers for even/odd values:
 
 ```
-S_even = {0, 2, 4, 6, ...} ∪ {RED_ONE}
-S_odd = {0, 3, 5, 7, ...} ∪ {BLACK_ONE}
+S_even = {RED_ONE=-1, 2, 4, 6, ...}   (even parity values)
+S_odd = {BLACK_ONE=1, 3, 5, 7, ...}   (odd parity values)
+S = S_even ∪ S_odd ∪ {0}              (0 is absorbing element)
 ```
+
+> Note: RED_ONE=-1 is classified as "even" because it represents male identity,
+> and male ancestors are encoded as even values. Similarly BLACK_ONE=1 is "odd"
+> for female. The value 0 is the absorbing element (annihilator) shared by both.
 
 Operations:
 - ⊗: S_even × S → S
@@ -276,7 +283,7 @@ To complete the definition of the Avos Product, the following conventions are re
 
 Rules 1 and 2 state `RED_ONE⊗BLACK_ONE = RED_ONE` and `BLACK_ONE⊗RED_ONE = RED_ONE`, but we now correctly return 0 for cross-gender products.
 
-**This suggests the parity constraints are a NEW interpretation**, not part of the original algebra definition.
+**This is a semantic improvement:** The current implementation correctly models that cross-gender self-reference is undefined ("father's female-self" or "mother's male-self" don't exist). The old rules treated identities as interchangeable, losing genealogical meaning.
 
 ## 8. Recommendations for Notebook
 
