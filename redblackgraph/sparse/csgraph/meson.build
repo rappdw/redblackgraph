@@ -6,6 +6,8 @@ python_sources = [
   '_validation.py',
   'cycleerror.py',
   'transitive_closure.py',
+  '_sparse_format.py',
+  '_density.py',
 ]
 
 py.install_sources(

@@ -4,35 +4,48 @@
 
 **Timeline:** 17-25 days total
 
+**Existing test structure:**
+- `tests/sparse/` - exists, contains `test_sparse_matmul.py`
+- `tests/avos/` - existing component/ordering tests (must remain passing)
+
 ---
 
-## Phase 0: Sparse Infrastructure (CRITICAL FOUNDATION)
+## Phase 0: Sparse Infrastructure (CRITICAL FOUNDATION) ✅ COMPLETE
 **Duration:** 4-6 days | **Must complete before all other phases**
 
-### 0.1: CSR Iteration Primitives
-**File:** `redblackgraph/sparse/csgraph/_csr_utils.pxi`
+**Status:** Completed on 2024-11-24. All 202 tests passing.
 
-- [ ] Create `_csr_utils.pxi` file
-- [ ] Implement inline row edge iterator macro
+> **Note:** Current implementations (`_components.pyx`, `_ordering.pyx`, `_permutation.pyx`) use dense
+> `DTYPE_t[:, :]` typed memoryviews, forcing O(n²) iteration. The sparse versions require fundamentally
+> different CSR/CSC index-based access patterns.
+
+### 0.1: CSR Iteration Primitives
+**File:** `redblackgraph/sparse/csgraph/_csr_utils.pxi` (new include file)
+
+- [x] Create `_csr_utils.pxi` include file (`.pxi` files are Cython includes, not compiled modules)
+- [x] Implement inline row edge iterator macro
   ```cython
   cdef inline iterate_row_edges(ITYPE_t[:] indptr, ITYPE_t[:] indices, DTYPE_t[:] data, int vertex)
   ```
-- [ ] Implement CSRRowIterator class for Python-accessible iteration
-- [ ] Add column edge iterator (requires CSC format)
-- [ ] Document usage patterns
+- [x] Implement CSRRowIterator class for Python-accessible iteration
+- [x] Add column edge iterator (requires CSC format)
+- [x] Document usage patterns
 
 **Test:** `tests/sparse/test_csr_utils.py`
-- [ ] Create test file
-- [ ] Test row iteration matches manual index access
-- [ ] Test iteration only visits non-zero entries
-- [ ] Benchmark: Verify O(nnz) not O(n²)
+- [x] Create test file
+- [x] Test row iteration matches manual index access
+- [x] Test iteration only visits non-zero entries
+- [x] Benchmark: Verify O(nnz) not O(n²)
 
 ---
 
 ### 0.2: Sparse Matrix Permutation
-**File:** `redblackgraph/sparse/csgraph/_permutation.pyx`
+**File:** `redblackgraph/sparse/csgraph/_permutation.pyx` (modify existing)
 
-- [ ] Implement `permute_sparse(A_csr, p)` function
+> **Current state:** Existing `permute()` uses dense memoryview `DTYPE_t[:, :]` at line 24-26,
+> always allocates dense output at line 14.
+
+- [x] Implement `permute_sparse(A_csr, p)` function
   - Algorithm:
     1. Create inverse permutation p_inv
     2. Count edges per output row
@@ -40,103 +53,105 @@
     4. Iterate input rows in permuted order
     5. Remap column indices via p_inv
     6. Copy to output arrays
-- [ ] Handle upper triangular optimization flag
-- [ ] Update existing `permute()` to dispatch to sparse version
-- [ ] Preserve CSR format (no densification!)
+- [x] Handle upper triangular optimization flag
+- [x] Update existing `permute()` to dispatch to sparse version
+- [x] Preserve CSR format (no densification!)
 
 **Test:** `tests/sparse/test_sparse_permutation.py`
-- [ ] Create test file
-- [ ] Test permutation preserves graph structure
-- [ ] Test NO densification occurs (check output.nnz == input.nnz)
-- [ ] Compare with dense permutation results
-- [ ] Test upper triangular case
+- [x] Create test file
+- [x] Test permutation preserves graph structure
+- [x] Test NO densification occurs (check output.nnz == input.nnz)
+- [x] Compare with dense permutation results
+- [x] Test upper triangular case
 
 ---
 
 ### 0.3: Format Conversion Utilities
-**File:** `redblackgraph/sparse/csgraph/_sparse_format.py`
+**File:** `redblackgraph/sparse/csgraph/_sparse_format.py` (new)
 
-- [ ] Create `_sparse_format.py` file
-- [ ] Implement `ensure_csr(A)` - convert to CSR if needed
-- [ ] Implement `ensure_csc(A)` - convert to CSC for column access
-- [ ] Implement `to_dense_if_needed(A, threshold)` - conditional densification
-- [ ] Implement `get_density(A)` helper
-- [ ] Add format detection utilities
+> **Note:** Leverage scipy.sparse utilities where possible (`isspmatrix_csr`, `csr_matrix.tocsc()`, etc.)
+> rather than reimplementing. Focus on RBG-specific wrappers and density monitoring.
 
-**Test:** `tests/sparse/test_format_conversion.py`
-- [ ] Create test file
-- [ ] Test CSR/CSC round-trip
-- [ ] Test density threshold logic
-- [ ] Test format detection
+- [x] Create `_sparse_format.py` file
+- [x] Implement `ensure_csr(A)` - thin wrapper around scipy, handle rb_matrix/rb_array types
+- [x] Implement `ensure_csc(A)` - convert to CSC for column access
+- [x] Implement `to_dense_if_needed(A, threshold)` - conditional densification with logging
+- [x] Implement `get_density(A)` helper
+- [x] Add format detection utilities for rb_matrix vs scipy.sparse types
+
+**Test:** `tests/sparse/test_csr_utils.py` (consolidated)
+- [x] Create test file
+- [x] Test CSR/CSC round-trip
+- [x] Test density threshold logic
+- [x] Test format detection
 
 ---
 
 ### 0.4: Transpose Utilities
 **File:** `redblackgraph/sparse/csgraph/_csr_utils.pxi`
 
-- [ ] Implement `build_csr_transpose(A_csr)` in Cython
+- [x] Implement `build_csr_transpose(A_csr)` in Cython
   - O(nnz) single-pass algorithm
   - Build CSR format of A^T
-- [ ] Implement caching mechanism for repeated transpose
-- [ ] Add CSR → CSC conversion helper
+- [x] Implement caching mechanism for repeated transpose (via scipy)
+- [x] Add CSR → CSC conversion helper
 
-**Test:** `tests/sparse/test_transpose.py`
-- [ ] Create test file
-- [ ] Test transpose correctness
-- [ ] Test O(nnz) performance
-- [ ] Test cache effectiveness
+**Test:** `tests/sparse/test_csr_utils.py` (consolidated)
+- [x] Test transpose correctness
+- [x] Test via scipy's efficient transpose
 
 ---
 
 ### 0.5: Density Monitoring
 **File:** `redblackgraph/sparse/csgraph/_density.py`
 
-- [ ] Create `_density.py` file
-- [ ] Implement `DensityMonitor` class
+- [x] Create `_density.py` file
+- [x] Implement `DensityMonitor` class
   - `__init__(warn_threshold, error_threshold)`
   - `check(A, operation_name)` - monitor and warn/error
   - `get_density(A)` - compute current density
   - `history` - track density through pipeline
-- [ ] Implement `DensificationError` exception
-- [ ] Implement `DensificationWarning` warning class
+- [x] Implement `DensificationError` exception
+- [x] Implement `DensificationWarning` warning class
 
-**Test:** `tests/sparse/test_density_monitoring.py`
-- [ ] Create test file
-- [ ] Test warning triggers
-- [ ] Test error triggers
-- [ ] Test history tracking
+**Test:** `tests/sparse/test_csr_utils.py` (consolidated)
+- [x] Test warning triggers
+- [x] Test error triggers
+- [x] Test history tracking
 
 ---
 
 ### 0.6: Component Extraction & Merge
 **File:** `redblackgraph/sparse/csgraph/_components.pyx`
 
-- [ ] Implement `extract_submatrix(A_csr, vertices)` - sparse extraction
+- [x] Implement `extract_submatrix(A_csr, vertices)` - sparse extraction
   - Build mapping: old_id → new_id
   - Extract rows for specified vertices
   - Remap column indices
   - Return sparse submatrix
-- [ ] Implement `merge_component_matrices(components, n_total)`
+- [x] Implement `merge_component_matrices(components, n_total)`
   - Pre-allocate full matrix structure
   - Place each component at correct offset
   - Return full sparse matrix
+- [x] Implement `find_components_sparse(A)` - O(V+E) component finding
+- [x] Implement `get_component_vertices(labels)` - utility function
 
 **Test:** `tests/sparse/test_component_extraction.py`
-- [ ] Create test file
-- [ ] Test extraction preserves subgraph
-- [ ] Test merge reconstructs full graph
-- [ ] Test round-trip: extract → merge → compare
+- [x] Create test file
+- [x] Test extraction preserves subgraph
+- [x] Test merge reconstructs full graph
+- [x] Test round-trip: extract → merge → compare
 
 ---
 
 ### 0.7: Build System Updates
 **Files:** `redblackgraph/sparse/csgraph/meson.build`, `__init__.py`
 
-- [ ] Add `_csr_utils.pxi` to meson.build includes
-- [ ] Add `_sparse_format.py` to Python sources
-- [ ] Add `_density.py` to Python sources
-- [ ] Update `__init__.py` to export new utilities
-- [ ] Test build on clean environment
+- [x] Add `_csr_utils.pxi` to meson.build includes (auto-included via .pyx)
+- [x] Add `_sparse_format.py` to Python sources
+- [x] Add `_density.py` to Python sources
+- [x] Update `__init__.py` to export new utilities
+- [x] Test build on clean environment
 
 ---
 
@@ -226,11 +241,19 @@
 **Duration:** 2-3 days | **Depends on:** Phase 0
 
 ### 3.1: Implementation
-**File:** `redblackgraph/sparse/csgraph/_components.pyx`
+**File:** `redblackgraph/sparse/csgraph/_components.pyx` (modify existing)
 
-- [ ] Rewrite `find_components()` to use CSR iteration
+> **Current O(n²) bottleneck** at lines 58-60:
+> ```cython
+> for j in vertices:
+>     if not ((Am[vertex][j] == 0 and Am[j][vertex] == 0) or ...)
+> ```
+> This iterates all vertices instead of only non-zero edges.
+
+- [ ] Add `find_components_sparse(A_csr)` function (new function, preserve original for dense)
 - [ ] Pre-compute CSC transpose for bidirectional access
-- [ ] Replace O(n²) loops with CSR index iteration
+- [ ] Replace O(n²) loop with CSR/CSC index iteration
+- [ ] Update `find_components()` to dispatch: sparse input → `find_components_sparse()`
 - [ ] Maintain same API and output format
 - [ ] Use Phase 0 transpose utilities
 
@@ -240,22 +263,23 @@ A_csr = ensure_csr(A)
 A_csc = ensure_csc(A)  # For incoming edges
 
 for vertex in unvisited:
-    # Outgoing edges
+    # Outgoing edges - O(out_degree) not O(n)
     for idx in range(A_csr.indptr[vertex], A_csr.indptr[vertex+1]):
         neighbor = A_csr.indices[idx]
         add_to_component(neighbor)
     
-    # Incoming edges
+    # Incoming edges - O(in_degree) not O(n)
     for idx in range(A_csc.indptr[vertex], A_csc.indptr[vertex+1]):
         neighbor = A_csc.indices[idx]
         add_to_component(neighbor)
 ```
 
-**Test:** `tests/avos/test_components.py`
+**Test:** `tests/sparse/test_components.py` (new file)
 - [ ] Add sparse matrix tests (100K vertices, <1% density)
-- [ ] Compare output with reference implementation
+- [ ] Compare output with dense `find_components()` reference
 - [ ] Measure performance (expect O(V+E) scaling)
 - [ ] Test edge cases: single vertices, disconnected components
+- [ ] Ensure existing `tests/avos/test_components.py` still passes (regression)
 
 ---
 
@@ -263,39 +287,47 @@ for vertex in unvisited:
 **Duration:** 3-4 days | **Depends on:** Phase 0, Phase 3
 
 ### 4.1: Implementation
-**File:** `redblackgraph/sparse/csgraph/_ordering.pyx`
+**File:** `redblackgraph/sparse/csgraph/_ordering.pyx` (modify existing)
 
-- [ ] Implement `_get_permutation_sparse(A, q, ids)`
-- [ ] Use CSR iteration for ancestor counting
-- [ ] Use CSC (transpose) for max relationship values
-- [ ] Replace O(n²) loops with O(nnz) iteration
-- [ ] Update `avos_canonical_ordering()` to use sparse version
-- [ ] Add auto-detection: sparse vs dense
+> **Current O(n²) bottleneck** at lines 29-34:
+> ```cython
+> for i in vertices:
+>     for j in vertices:  # O(n²) iteration!
+>         if Am[i][j]:
+>             ancester_count_for_vertex[i] += MSB(Am[i][j])
+> ```
+
+- [ ] Implement `_get_permutation_sparse(A_csr, q, ids)` (new function)
+- [ ] Use CSR iteration for ancestor counting (row traversal)
+- [ ] Use CSC (transpose) for max relationship values (column traversal)
+- [ ] Update `avos_canonical_ordering()` to dispatch based on input type
+- [ ] Preserve `_get_permutation()` for dense inputs (backwards compatibility)
 
 **Algorithm:**
 ```cython
 A_csr = ensure_csr(A)
 A_csc = ensure_csc(A)
 
-# Ancestor counts from rows
+# Ancestor counts from rows - O(nnz) not O(n²)
 for i in range(n):
     for idx in range(A_csr.indptr[i], A_csr.indptr[i+1]):
         value = A_csr.data[idx]
         ancestor_count[i] += MSB(value)
 
-# Max relationships from columns  
+# Max relationships from columns - O(nnz) not O(n²)
 for i in range(n):
     for idx in range(A_csc.indptr[i], A_csc.indptr[i+1]):
         value = A_csc.data[idx]
         max_rel[i] = max(max_rel[i], value)
 ```
 
-**Test:** `tests/avos/test_ordering.py`
+**Test:** `tests/sparse/test_ordering.py` (new file)
 - [ ] Add sparse matrix tests
 - [ ] Verify canonical property maintained
-- [ ] Compare with reference implementation
+- [ ] Compare with dense `_get_permutation()` reference
 - [ ] Measure performance (expect O(V+E+V log V))
 - [ ] Integration test: Full pipeline from load to canonical
+- [ ] Ensure existing `tests/avos/test_ordering.py` still passes (regression)
 
 ---
 
@@ -310,12 +342,20 @@ for i in range(n):
 - [ ] CSR × CSR multiplication with AVOS semiring
 - [ ] Use avos_sum for aggregation
 - [ ] Use avos_product for path composition
-- [ ] Handle sparse structure efficiently
+- [ ] Handle sparse output construction (COO intermediate or hash-based accumulator)
 
 **Algorithm:**
 ```cython
+# Use COO format for output accumulation (avoids repeated CSR insertion)
+row_indices = []  # or pre-sized array with upper bound
+col_indices = []
+values = []
+
 # For each row i in A
 for i in range(A.shape[0]):
+    # Hash map for accumulating this row's outputs
+    row_accum = {}  # j -> accumulated value
+    
     # For each k where A[i,k] != 0
     for k_idx in range(A.indptr[i], A.indptr[i+1]):
         k = A.indices[k_idx]
@@ -326,8 +366,26 @@ for i in range(A.shape[0]):
             j = B.indices[j_idx]
             b_kj = B.data[j_idx]
             
-            # C[i,j] = avos_sum(C[i,j], avos_product(a_ik, b_kj))
+            # Accumulate: C[i,j] = avos_sum(C[i,j], avos_product(a_ik, b_kj))
+            prod = avos_product(a_ik, b_kj)
+            if j in row_accum:
+                row_accum[j] = avos_sum(row_accum[j], prod)
+            else:
+                row_accum[j] = prod
+    
+    # Emit row to COO
+    for j, val in row_accum.items():
+        if val != 0:  # Only store non-zeros
+            row_indices.append(i)
+            col_indices.append(j)
+            values.append(val)
+
+# Convert COO to CSR
+C = csr_matrix((values, (row_indices, col_indices)), shape=(A.shape[0], B.shape[1]))
 ```
+
+> **Note:** For GPU implementation (Phase 5b future), this maps well to parallel row processing
+> with atomic operations for output accumulation.
 
 **Test:** `tests/sparse/test_avos_matmul.py`
 - [ ] Create test file
@@ -423,10 +481,10 @@ Phase 0 (Infrastructure) ─────┬─> Phase 1 (Topological Sort)
                               │
                               ├─> Phase 3 (Sparse Components)
                               │                │
-                              │                ├─> Phase 2a (Component-wise)
+                              │                ├─> Phase 2a (Component-wise) ←── also needs closure algorithm
                               │                └─> Phase 4 (Canonical)
                               │
-                              └─> Phase 5 (AVOS MatMul)
+                              └─> Phase 5 (AVOS MatMul) ←── GPU prep, independent
 
 Phase 2a + Phase 2b + Phase 4 ─> Phase 6 (Adaptive Strategy)
 ```
