@@ -25,6 +25,7 @@ cython_extensions = [
   '_relational_composition',
   '_tools',
   '_topological_sort',
+  '_transitive_closure_dag',
 ]
 
 foreach ext_name : cython_extensions
