@@ -5,7 +5,8 @@ from .transitive_closure import (
     transitive_closure_floyd_warshall,
     component_wise_closure,
     transitive_closure_squaring,
-    transitive_closure_adaptive
+    transitive_closure_adaptive,
+    transitive_closure_dag_sparse
 )
 from ._components import (
     find_components,
