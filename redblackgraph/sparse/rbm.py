@@ -45,6 +45,15 @@ class rb_matrix(csr_matrix):
 
         major_axis = self._swap((M, N))[0]
         other = self.__class__(other)  # convert to this format
+        
+        # Ensure matrices are in canonical form (sorted indices, no duplicates)
+        # This prevents segfaults in the C++ code when matrices have been modified in place
+        if not self.has_sorted_indices:
+            self.sort_indices()
+        self.sum_duplicates()
+        if not other.has_sorted_indices:
+            other.sort_indices()
+        other.sum_duplicates()
 
         idx_dtype = get_index_dtype((self.indptr, self.indices,
                                      other.indptr, other.indices),

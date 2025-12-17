@@ -3,7 +3,9 @@ from .transitive_closure import (
     transitive_closure, 
     transitive_closure_dijkstra, 
     transitive_closure_floyd_warshall,
-    component_wise_closure
+    component_wise_closure,
+    transitive_closure_squaring,
+    transitive_closure_adaptive
 )
 from ._components import (
     find_components,
