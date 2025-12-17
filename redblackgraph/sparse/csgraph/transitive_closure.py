@@ -320,77 +320,6 @@ def _sparse_equal(A, B):
     return diff.nnz == 0
 
 
-def _avos_sum_scalar(x, y):
-    """
-    Compute AVOS sum of two scalar values.
-    
-    AVOS sum: a ⊕ b = min(a, b) where 0 is treated as infinity.
-    """
-    if x == 0:
-        return y
-    if y == 0:
-        return x
-    if x < y:
-        return x
-    return y
-
-
-def _avos_product_scalar(lhs, rhs):
-    """
-    Compute AVOS product of two scalar values with parity identity constraints.
-    
-    Identity semantics (asymmetric):
-    - LEFT identity: starting point marker, no filtering
-    - RIGHT identity: gender/parity filter
-      * RED_ONE (-1) filters for even (odd → 0)
-      * BLACK_ONE (1) filters for odd (even → 0)
-    """
-    # The zero property of the avos product
-    if lhs == 0 or rhs == 0:
-        return 0
-    
-    # Identity ⊗ Identity special cases (must come before other checks)
-    # Same-gender self-loops
-    if lhs == -1 and rhs == -1:
-        return -1  # RED_ONE ⊗ RED_ONE = RED_ONE (male self-loop)
-    if lhs == 1 and rhs == 1:
-        return 1   # BLACK_ONE ⊗ BLACK_ONE = BLACK_ONE (female self-loop)
-    
-    # Cross-gender identity cases (RED_ONE is even/male, BLACK_ONE is odd/female)
-    if lhs == -1 and rhs == 1:
-        return 0  # RED_ONE ⊗ BLACK_ONE: male's female self is undefined
-    if lhs == 1 and rhs == -1:
-        return 0  # BLACK_ONE ⊗ RED_ONE: female's male self is undefined
-    
-    # Identity on LEFT: just a starting point marker, treat as 1 for bit-shift
-    x = lhs
-    if lhs == -1:
-        x = 1  # Treat RED_ONE as 1 for composition
-    
-    # Identity on RIGHT: acts as gender/parity filter
-    # When rhs is RED_ONE (-1): filters for even values only
-    if rhs == -1:
-        if lhs & 1:  # lhs is odd (use original lhs, not converted x)
-            return 0  # Odd values have no male self
-        else:
-            return x  # Even values' male self is themselves
-    
-    # When rhs is BLACK_ONE (1): filters for odd values only
-    if rhs == 1:
-        if lhs & 1:  # lhs is odd
-            return x  # Odd values' female self is themselves
-        else:
-            return 0  # Even values have no female self
-
-    # Standard AVOS product: bit-shift composition
-    y = rhs
-    bit_position = 0
-    while y > 1:
-        y >>= 1
-        bit_position += 1
-    return ((rhs & ((1 << bit_position) - 1)) | (x << bit_position))
-
-
 def transitive_closure_dag_sparse(A) -> TransitiveClosure:
     """
     Compute transitive closure of a DAG using truly sparse operations.
@@ -437,6 +366,7 @@ def transitive_closure_dag_sparse(A) -> TransitiveClosure:
     >>> # Closure adds edge 0 -> 2
     """
     from redblackgraph.sparse.csgraph.cycleerror import CycleError
+    from redblackgraph.reference.rbg_math import avos_sum, avos_product
     
     # Convert to CSR if needed
     if not isspmatrix(A):
@@ -506,14 +436,14 @@ def transitive_closure_dag_sparse(A) -> TransitiveClosure:
             # For each entry (w, x) -> val in w's closure, add (v, x) -> v_to_w ⊗ val
             for x, w_to_x in w_closure.items():
                 # Compute AVOS product: v -> w -> x
-                v_to_x = _avos_product_scalar(v_to_w, w_to_x)
+                v_to_x = avos_product(v_to_w, w_to_x)
                 
                 if v_to_x == 0:
                     continue
                 
                 # AVOS sum with existing value (if any)
                 if x in v_closure:
-                    v_closure[x] = _avos_sum_scalar(v_closure[x], v_to_x)
+                    v_closure[x] = avos_sum(v_closure[x], v_to_x)
                 else:
                     v_closure[x] = v_to_x
                 
