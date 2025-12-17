@@ -117,6 +117,6 @@ For detailed instructions, see:
 # A Note on Implementations
 
 * `redblackgraph.reference` - a pure python implementation. This simple implementation is intended primarily for illustrative purposes.
-* `redblackgraph.matrix` and `redblackgrpah.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support avos sum and product. 
-* `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation. 
+* `redblackgraph.matrix` and `redblackgraph.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support avos sum and product. 
+* `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation.   
  
