@@ -324,6 +324,10 @@ def transitive_closure_dag_sparse(A) -> TransitiveClosure:
     """
     Compute transitive closure of a DAG using truly sparse operations.
     
+    This is the sparse-matrix-optimized version of the algorithm. For a pure
+    Python reference implementation that works with plain lists, see
+    :func:`redblackgraph.reference.transitive_closure_dag`.
+    
     This algorithm never allocates O(N²) memory. It uses topological ordering
     and propagates closure information from successors to predecessors.
     
@@ -356,6 +360,10 @@ def transitive_closure_dag_sparse(A) -> TransitiveClosure:
     
     This is the only transitive closure algorithm in this module that
     guarantees no O(N²) memory allocation.
+    
+    See Also
+    --------
+    redblackgraph.reference.transitive_closure_dag : Pure Python reference implementation
     
     Examples
     --------

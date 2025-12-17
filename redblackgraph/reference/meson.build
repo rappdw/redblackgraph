@@ -13,6 +13,7 @@ python_sources = [
   'shortest_path.py',
   'topological_sort.py',
   'transitive_closure.py',
+  'transitive_closure_dag.py',
   'vec_avos.py',
 ]
 
