@@ -10,7 +10,8 @@ from redblackgraph.sparse.csgraph._components import (
     extract_submatrix,
     merge_component_matrices
 )
-from redblackgraph.sparse.csgraph._topological_sort import is_upper_triangular
+from redblackgraph.sparse.csgraph._topological_sort import is_upper_triangular, topological_sort
+from redblackgraph.sparse.csgraph._density import DensificationError
 
 
 def transitive_closure(R: rb_matrix, method="D", assume_upper_triangular=False) -> TransitiveClosure:
@@ -319,12 +320,249 @@ def _sparse_equal(A, B):
     return diff.nnz == 0
 
 
+def _avos_sum_scalar(x, y):
+    """
+    Compute AVOS sum of two scalar values.
+    
+    AVOS sum: a ⊕ b = min(a, b) where 0 is treated as infinity.
+    """
+    if x == 0:
+        return y
+    if y == 0:
+        return x
+    if x < y:
+        return x
+    return y
+
+
+def _avos_product_scalar(lhs, rhs):
+    """
+    Compute AVOS product of two scalar values with parity identity constraints.
+    
+    Identity semantics (asymmetric):
+    - LEFT identity: starting point marker, no filtering
+    - RIGHT identity: gender/parity filter
+      * RED_ONE (-1) filters for even (odd → 0)
+      * BLACK_ONE (1) filters for odd (even → 0)
+    """
+    # The zero property of the avos product
+    if lhs == 0 or rhs == 0:
+        return 0
+    
+    # Identity ⊗ Identity special cases (must come before other checks)
+    # Same-gender self-loops
+    if lhs == -1 and rhs == -1:
+        return -1  # RED_ONE ⊗ RED_ONE = RED_ONE (male self-loop)
+    if lhs == 1 and rhs == 1:
+        return 1   # BLACK_ONE ⊗ BLACK_ONE = BLACK_ONE (female self-loop)
+    
+    # Cross-gender identity cases (RED_ONE is even/male, BLACK_ONE is odd/female)
+    if lhs == -1 and rhs == 1:
+        return 0  # RED_ONE ⊗ BLACK_ONE: male's female self is undefined
+    if lhs == 1 and rhs == -1:
+        return 0  # BLACK_ONE ⊗ RED_ONE: female's male self is undefined
+    
+    # Identity on LEFT: just a starting point marker, treat as 1 for bit-shift
+    x = lhs
+    if lhs == -1:
+        x = 1  # Treat RED_ONE as 1 for composition
+    
+    # Identity on RIGHT: acts as gender/parity filter
+    # When rhs is RED_ONE (-1): filters for even values only
+    if rhs == -1:
+        if lhs & 1:  # lhs is odd (use original lhs, not converted x)
+            return 0  # Odd values have no male self
+        else:
+            return x  # Even values' male self is themselves
+    
+    # When rhs is BLACK_ONE (1): filters for odd values only
+    if rhs == 1:
+        if lhs & 1:  # lhs is odd
+            return x  # Odd values' female self is themselves
+        else:
+            return 0  # Even values have no female self
+
+    # Standard AVOS product: bit-shift composition
+    y = rhs
+    bit_position = 0
+    while y > 1:
+        y >>= 1
+        bit_position += 1
+    return ((rhs & ((1 << bit_position) - 1)) | (x << bit_position))
+
+
+def transitive_closure_dag_sparse(A) -> TransitiveClosure:
+    """
+    Compute transitive closure of a DAG using truly sparse operations.
+    
+    This algorithm never allocates O(N²) memory. It uses topological ordering
+    and propagates closure information from successors to predecessors.
+    
+    Parameters
+    ----------
+    A : sparse matrix or array-like
+        Input adjacency matrix. Must be a directed acyclic graph (DAG).
+        
+    Returns
+    -------
+    TransitiveClosure
+        The transitive closure result with sparse matrix W.
+        
+    Raises
+    ------
+    CycleError
+        If the graph contains a cycle.
+        
+    Notes
+    -----
+    Algorithm:
+    1. Compute topological ordering of vertices
+    2. Process vertices in reverse topological order (sinks first)
+    3. For each vertex v, its closure is: direct edges + union of successor closures
+    4. Store closure for each vertex as a sparse row
+    
+    Complexity:
+    - Time: O(V + E + nnz_closure) where nnz_closure is output non-zeros
+    - Space: O(nnz_closure) - never allocates N×N dense matrix
+    
+    This is the only transitive closure algorithm in this module that
+    guarantees no O(N²) memory allocation.
+    
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> # Simple DAG: 0 -> 1 -> 2
+    >>> A = csr_matrix([[1, 2, 0], [0, 1, 4], [0, 0, 1]], dtype=np.int32)
+    >>> result = transitive_closure_dag_sparse(A)
+    >>> # Closure adds edge 0 -> 2
+    """
+    from redblackgraph.sparse.csgraph.cycleerror import CycleError
+    
+    # Convert to CSR if needed
+    if not isspmatrix(A):
+        A_csr = csr_matrix(A, dtype=np.int32)
+    elif not isinstance(A, csr_matrix):
+        A_csr = A.tocsr()
+    else:
+        A_csr = A
+    
+    n = A_csr.shape[0]
+    
+    if n == 0:
+        return TransitiveClosure(csr_matrix((0, 0), dtype=np.int32), 0)
+    
+    # Get topological ordering (raises CycleError if graph has cycles)
+    try:
+        topo_order = topological_sort(A_csr)
+    except CycleError as e:
+        # Re-raise with the original vertex information
+        raise CycleError(
+            "transitive_closure_dag_sparse requires a DAG (no cycles)",
+            vertex=e.vertex
+        )
+    
+    # Process vertices in reverse topological order (sinks first)
+    # For each vertex, we compute its closure row
+    # closure[v] = {v: identity} ∪ {direct edges from v} ∪ {closure[w] for w in successors(v)}
+    
+    # Store closure for each vertex as a dictionary: col -> value
+    # This is memory-efficient as we only store non-zero entries
+    closure_rows = [None] * n  # closure_rows[v] = dict mapping col -> value
+    
+    # Get CSR arrays for efficient iteration
+    indptr = A_csr.indptr
+    indices = A_csr.indices
+    data = A_csr.data
+    
+    max_value = 0
+    
+    # Process in reverse topological order
+    for v in reversed(topo_order):
+        # Initialize closure for v with its direct edges
+        v_closure = {}
+        
+        # Add direct edges from v (including self-loop/identity)
+        for idx in range(indptr[v], indptr[v + 1]):
+            col = indices[idx]
+            val = data[idx]
+            v_closure[col] = val
+            if abs(val) > max_value:
+                max_value = abs(val)
+        
+        # For each direct successor w of v, add w's closure to v's closure
+        for idx in range(indptr[v], indptr[v + 1]):
+            w = indices[idx]
+            v_to_w = data[idx]
+            
+            # Skip self-loops for propagation
+            if w == v:
+                continue
+            
+            # Get w's closure (already computed since we process in reverse topo order)
+            w_closure = closure_rows[w]
+            if w_closure is None:
+                continue
+            
+            # For each entry (w, x) -> val in w's closure, add (v, x) -> v_to_w ⊗ val
+            for x, w_to_x in w_closure.items():
+                # Compute AVOS product: v -> w -> x
+                v_to_x = _avos_product_scalar(v_to_w, w_to_x)
+                
+                if v_to_x == 0:
+                    continue
+                
+                # AVOS sum with existing value (if any)
+                if x in v_closure:
+                    v_closure[x] = _avos_sum_scalar(v_closure[x], v_to_x)
+                else:
+                    v_closure[x] = v_to_x
+                
+                if abs(v_closure[x]) > max_value:
+                    max_value = abs(v_closure[x])
+        
+        closure_rows[v] = v_closure
+    
+    # Build CSR matrix from closure_rows
+    # Count total non-zeros
+    total_nnz = sum(len(row) if row else 0 for row in closure_rows)
+    
+    # Allocate arrays
+    new_indptr = np.zeros(n + 1, dtype=np.int32)
+    new_indices = np.zeros(total_nnz, dtype=np.int32)
+    new_data = np.zeros(total_nnz, dtype=np.int32)
+    
+    # Fill arrays
+    idx = 0
+    for v in range(n):
+        new_indptr[v] = idx
+        v_closure = closure_rows[v]
+        if v_closure:
+            # Sort by column index for CSR format
+            for col in sorted(v_closure.keys()):
+                new_indices[idx] = col
+                new_data[idx] = v_closure[col]
+                idx += 1
+    new_indptr[n] = idx
+    
+    # Create result matrix
+    result = rb_matrix((new_data, new_indices, new_indptr), shape=(n, n))
+    
+    # Compute diameter from max value
+    if max_value > 1:
+        diameter = int(np.floor(np.log2(max_value)))
+    else:
+        diameter = 0
+    
+    return TransitiveClosure(result, diameter)
+
+
 def transitive_closure_adaptive(
     A,
     method: str = "auto",
     density_threshold: float = 0.1,
     component_threshold: int = 1,
-    size_threshold: int = 1000
+    size_threshold: int = 1000,
+    sparse_only: bool = False
 ) -> TransitiveClosure:
     """
     Compute transitive closure using automatically selected optimal strategy.
@@ -346,32 +584,52 @@ def transitive_closure_adaptive(
         - "D": Force Dijkstra
         - "component": Force component-wise processing
         - "squaring": Force repeated squaring
+        - "dag_sparse": Force sparse DAG closure (no O(N²) allocation)
     density_threshold : float, default 0.1
         Graphs sparser than this use Dijkstra instead of FW
     component_threshold : int, default 1
         Use component-wise processing if more components than this
     size_threshold : int, default 1000
         Graphs larger than this prefer sparse algorithms
+    sparse_only : bool, default False
+        If True, only use algorithms that never allocate O(N²) memory.
+        Currently this means using transitive_closure_dag_sparse, which
+        requires the input to be a DAG. Raises DensificationError if the
+        graph contains cycles or would otherwise require densification.
         
     Returns
     -------
     TransitiveClosure
         The transitive closure result.
         
+    Raises
+    ------
+    DensificationError
+        If sparse_only=True and the graph would require O(N²) allocation
+        (e.g., contains cycles).
+        
     Notes
     -----
-    Decision logic:
+    Decision logic (when sparse_only=False):
     1. If multiple disconnected components → component_wise_closure
     2. Else if very sparse (< density_threshold) and large → Dijkstra
     3. Else if upper triangular → FW with assume_upper_triangular=True
     4. Else → standard Floyd-Warshall
+    
+    When sparse_only=True:
+    - Uses transitive_closure_dag_sparse which never allocates O(N²) memory
+    - Requires input to be a DAG (raises CycleError/DensificationError otherwise)
     
     Examples
     --------
     >>> from scipy.sparse import csr_matrix
     >>> A = csr_matrix([[1, 2, 0], [0, 1, 4], [0, 0, 1]])
     >>> result = transitive_closure_adaptive(A)
+    >>> # With sparse_only mode (for large DAGs)
+    >>> result = transitive_closure_adaptive(A, sparse_only=True)
     """
+    from redblackgraph.sparse.csgraph.cycleerror import CycleError
+    
     # Convert to sparse if needed
     if not isspmatrix(A):
         A_sparse = csr_matrix(A)
@@ -384,6 +642,17 @@ def transitive_closure_adaptive(
     if n == 0:
         return TransitiveClosure(csr_matrix((0, 0), dtype=np.int32), 0)
     
+    # Sparse-only mode: use DAG sparse closure
+    if sparse_only:
+        try:
+            return transitive_closure_dag_sparse(A_sparse)
+        except CycleError as e:
+            raise DensificationError(
+                f"sparse_only=True requires a DAG, but graph contains cycles: {e}",
+                density=1.0,
+                threshold=0.0
+            )
+    
     # Override methods
     if method == "FW":
         return transitive_closure(A_sparse, method="FW")
@@ -393,6 +662,8 @@ def transitive_closure_adaptive(
         return component_wise_closure(A_sparse)
     elif method == "squaring":
         return transitive_closure_squaring(A_sparse)
+    elif method == "dag_sparse":
+        return transitive_closure_dag_sparse(A_sparse)
     
     # Auto selection logic
     
