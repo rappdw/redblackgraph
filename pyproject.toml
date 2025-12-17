@@ -51,7 +51,7 @@ dependencies = [
 [project.optional-dependencies]
 # File I/O utilities (CSV/Excel graph readers/writers)
 io = [
-    "fs-crawler @ file:///home/rappdw/dev/fs-crawler",
+    "fs-crawler @ file:fs-crawler",
     "XlsxWriter",
 ]
 dev = [
@@ -61,7 +61,7 @@ test = [
     "pytest>=3.0",
     "pytest-cov>=2.4",
     "pylint>=1.8.1",
-    "fs-crawler @ file:///home/rappdw/dev/fs-crawler",  # Tests use RelationshipFileReader
+    "fs-crawler @ file:fs-crawler",  # Tests use RelationshipFileReader
     "XlsxWriter",  # Tests use RedBlackGraphWriter
 ]
 
