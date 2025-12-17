@@ -24,58 +24,27 @@ except ImportError:
     cp = None
 
 
-# CUDA kernel for symbolic phase with merge-based approach
+# Maximum unique output columns per row
+# This limits memory per thread, not the column index range
+# Genealogy graphs typically have O(1) edges per node, so this is generous
+MAX_UNIQUE_PER_ROW = 512
+
+
+# CUDA kernel for symbolic phase with dynamic per-row accumulator
 SYMBOLIC_MERGE_KERNEL = r'''
 extern "C" {
 
-// Merge two sorted arrays and count unique elements with upper triangular mask
-// Returns count of unique elements where j >= row_idx
-__device__ int merge_count_unique_masked(
-    const int* __restrict__ list1,
-    int len1,
-    const int* __restrict__ list2,
-    int len2,
-    int row_idx
-) {
-    int i = 0, j = 0;
-    int count = 0;
-    int last = -1;  // Track last seen value to detect duplicates
-    
-    while (i < len1 || j < len2) {
-        int val;
-        
-        // Get next value from whichever list has the smaller element
-        if (i >= len1) {
-            val = list2[j++];
-        } else if (j >= len2) {
-            val = list1[i++];
-        } else if (list1[i] < list2[j]) {
-            val = list1[i++];
-        } else if (list1[i] > list2[j]) {
-            val = list2[j++];
-        } else {
-            // Equal - take from either and advance both
-            val = list1[i++];
-            j++;
-        }
-        
-        // Apply upper triangular mask: only count if val >= row_idx
-        // Also skip if duplicate
-        if (val >= row_idx && val != last) {
-            count++;
-            last = val;
-        }
-    }
-    
-    return count;
-}
+// Maximum unique output columns per row (must match Python constant)
+#define MAX_UNIQUE_PER_ROW 512
 
 // Symbolic phase kernel - one row per thread
 // Computes row_nnz[i] = number of non-zeros in row i of C = A @ A
+// Uses a dynamic per-row accumulator keyed by actual column indices
 __global__ void symbolic_phase_kernel(
     const int* __restrict__ indptrA,
     const int* __restrict__ indicesA,
     int* __restrict__ row_nnz,
+    int* __restrict__ overflow_flag,
     int n_rows
 ) {
     int row_i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -94,24 +63,10 @@ __global__ void symbolic_phase_kernel(
         return;
     }
     
-    // For simplicity in this first version, we'll do a simple approach:
-    // - Collect all candidate columns from all contributing rows
-    // - Sort and unique them
-    // - Apply triangular mask
-    
-    // This is a simplified version - production would use hash sets or
-    // more sophisticated merging. For now, we'll handle small rows.
-    
-    // Count unique columns across all contributing rows
-    int total_count = 0;
-    
-    // Use a simple bitmap for columns (limited to 1024 for this prototype)
-    // In production, use hash tables or dynamic allocation
-    const int MAX_COLS = 1024;
-    bool seen[MAX_COLS];
-    for (int i = 0; i < MAX_COLS; i++) {
-        seen[i] = false;
-    }
+    // Use a dynamic array to track unique column indices
+    // This is keyed by actual column indices, not limited by column index range
+    int unique_cols[MAX_UNIQUE_PER_ROW];
+    int num_unique = 0;
     
     // For each non-zero in row i of A
     for (int k_idx = row_start; k_idx < row_end; k_idx++) {
@@ -125,16 +80,31 @@ __global__ void symbolic_phase_kernel(
             int j = indicesA[j_idx];
             
             // Apply triangular mask: only j >= row_i
-            if (j >= row_i && j < MAX_COLS) {
-                if (!seen[j]) {
-                    seen[j] = true;
-                    total_count++;
+            if (j >= row_i) {
+                // Check if column j is already in our unique set (linear search)
+                bool found = false;
+                for (int u = 0; u < num_unique; u++) {
+                    if (unique_cols[u] == j) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    // Add new unique column
+                    if (num_unique < MAX_UNIQUE_PER_ROW) {
+                        unique_cols[num_unique] = j;
+                        num_unique++;
+                    } else {
+                        // Overflow - set flag and continue
+                        atomicExch(overflow_flag, row_i + 1);  // Store row+1 (0 means no overflow)
+                    }
                 }
             }
         }
     }
     
-    row_nnz[row_i] = total_count;
+    row_nnz[row_i] = num_unique;
 }
 
 } // extern "C"
@@ -172,9 +142,15 @@ class SymbolicPhase:
         
         Returns:
             row_nnz: Array of length n_rows with count of non-zeros per row
+        
+        Raises:
+            RuntimeError: If any row exceeds MAX_UNIQUE_PER_ROW unique output columns
         """
         # Allocate output
         row_nnz = cp.zeros(n_rows, dtype=cp.int32)
+        
+        # Allocate overflow flag (0 = no overflow, row+1 = overflow at row)
+        overflow_flag = cp.zeros(1, dtype=cp.int32)
         
         # Launch kernel - one thread per row
         block_size = 256
@@ -186,8 +162,18 @@ class SymbolicPhase:
         
         self._kernel(
             (grid_size,), (block_size,),
-            (indptrA_i32, indicesA_i32, row_nnz, n_rows)
+            (indptrA_i32, indicesA_i32, row_nnz, overflow_flag, n_rows)
         )
+        
+        # Check for overflow
+        overflow_row = int(overflow_flag[0].get())
+        if overflow_row > 0:
+            raise RuntimeError(
+                f"SpGEMM symbolic phase overflow: row {overflow_row - 1} exceeded "
+                f"maximum of {MAX_UNIQUE_PER_ROW} unique output columns. "
+                f"This typically indicates a very dense graph that exceeds "
+                f"the expected genealogy workload characteristics."
+            )
         
         return row_nnz
 

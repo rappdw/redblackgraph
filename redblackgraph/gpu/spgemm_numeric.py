@@ -22,9 +22,17 @@ except ImportError:
     cp = None
 
 
+# Maximum unique output columns per row (must match symbolic phase)
+# This limits memory per thread, not the column index range
+MAX_UNIQUE_PER_ROW = 512
+
+
 # CUDA kernel for numeric phase with AVOS operations
 NUMERIC_KERNEL = r'''
 extern "C" {
+
+// Maximum unique output columns per row (must match Python constant)
+#define MAX_UNIQUE_PER_ROW 512
 
 // AVOS sum: Non-zero minimum
 __device__ inline int avos_sum(int x, int y) {
@@ -73,45 +81,26 @@ __device__ inline int avos_product(int x, int y) {
     return (y & mask) | (x << bit_position);
 }
 
-// Find intersection of two sorted lists and compute AVOS sum-product
-// Returns accumulated value using AVOS operations
-__device__ int compute_inner_product(
-    const int* __restrict__ indicesA,
-    const int* __restrict__ dataA,
-    int row_i_start,
-    int row_i_end,
-    int row_j_start,
-    int row_j_end
-) {
-    int acc = 0;  // AVOS additive identity
-    int i = row_i_start;
-    int j = row_j_start;
-    
-    // Merge the two sorted index lists to find common k values
-    while (i < row_i_end && j < row_j_end) {
-        int k_i = indicesA[i];
-        int k_j = indicesA[j];
+// Simple insertion sort for small arrays (sorts by column index)
+__device__ void insertion_sort_by_col(int* cols, int* vals, int n) {
+    for (int i = 1; i < n; i++) {
+        int key_col = cols[i];
+        int key_val = vals[i];
+        int j = i - 1;
         
-        if (k_i < k_j) {
-            i++;
-        } else if (k_i > k_j) {
-            j++;
-        } else {
-            // Common index k: compute A[row_i, k] ⊗ A[k, row_j]
-            int val_i = dataA[i];
-            int val_j = dataA[j];
-            int prod = avos_product(val_i, val_j);
-            acc = avos_sum(acc, prod);
-            i++;
-            j++;
+        while (j >= 0 && cols[j] > key_col) {
+            cols[j + 1] = cols[j];
+            vals[j + 1] = vals[j];
+            j--;
         }
+        cols[j + 1] = key_col;
+        vals[j + 1] = key_val;
     }
-    
-    return acc;
 }
 
 // Numeric phase kernel - one row per thread
 // Fills indicesC and dataC based on pattern from symbolic phase
+// Uses dynamic per-row accumulator keyed by actual column indices
 __global__ void numeric_phase_kernel(
     const int* __restrict__ indptrA,
     const int* __restrict__ indicesA,
@@ -119,6 +108,7 @@ __global__ void numeric_phase_kernel(
     const int* __restrict__ indptrC,
     int* __restrict__ indicesC,
     int* __restrict__ dataC,
+    int* __restrict__ overflow_flag,
     int n_rows
 ) {
     int row_i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -141,17 +131,11 @@ __global__ void numeric_phase_kernel(
         return;  // No output for this row
     }
     
-    // For this row, collect all candidate columns and compute values
-    // Using a simple bitmap approach (limited to 1024 cols for prototype)
-    const int MAX_COLS = 1024;
-    int col_values[MAX_COLS];
-    bool col_present[MAX_COLS];
-    
-    // Initialize
-    for (int c = 0; c < MAX_COLS; c++) {
-        col_values[c] = 0;
-        col_present[c] = false;
-    }
+    // Use dynamic arrays to track (column, value) pairs
+    // This is keyed by actual column indices, not limited by column index range
+    int acc_cols[MAX_UNIQUE_PER_ROW];
+    int acc_vals[MAX_UNIQUE_PER_ROW];
+    int num_entries = 0;
     
     // For each non-zero A[i,k] in row i
     for (int k_idx = row_i_start; k_idx < row_i_end; k_idx++) {
@@ -168,27 +152,48 @@ __global__ void numeric_phase_kernel(
             int val_kj = dataA[j_idx];
             
             // Apply triangular mask: only j >= row_i
-            if (j >= row_i && j < MAX_COLS) {
+            if (j >= row_i) {
                 // Compute A[i,k] ⊗ A[k,j]
                 int prod = avos_product(val_ik, val_kj);
                 
-                // Accumulate: C[i,j] += prod (using AVOS sum)
-                if (col_present[j]) {
-                    col_values[j] = avos_sum(col_values[j], prod);
-                } else {
-                    col_values[j] = prod;
-                    col_present[j] = true;
+                if (prod != 0) {
+                    // Check if column j is already in our accumulator (linear search)
+                    int found_idx = -1;
+                    for (int u = 0; u < num_entries; u++) {
+                        if (acc_cols[u] == j) {
+                            found_idx = u;
+                            break;
+                        }
+                    }
+                    
+                    if (found_idx >= 0) {
+                        // Accumulate: C[i,j] += prod (using AVOS sum)
+                        acc_vals[found_idx] = avos_sum(acc_vals[found_idx], prod);
+                    } else {
+                        // Add new entry
+                        if (num_entries < MAX_UNIQUE_PER_ROW) {
+                            acc_cols[num_entries] = j;
+                            acc_vals[num_entries] = prod;
+                            num_entries++;
+                        } else {
+                            // Overflow - set flag
+                            atomicExch(overflow_flag, row_i + 1);
+                        }
+                    }
                 }
             }
         }
     }
     
-    // Write results to output in sorted column order
+    // Sort by column index to maintain CSR invariant
+    insertion_sort_by_col(acc_cols, acc_vals, num_entries);
+    
+    // Write results to output (already sorted by column)
     int out_idx = out_start;
-    for (int j = row_i; j < MAX_COLS && out_idx < out_end; j++) {
-        if (col_present[j] && col_values[j] != 0) {
-            indicesC[out_idx] = j;
-            dataC[out_idx] = col_values[j];
+    for (int u = 0; u < num_entries && out_idx < out_end; u++) {
+        if (acc_vals[u] != 0) {
+            indicesC[out_idx] = acc_cols[u];
+            dataC[out_idx] = acc_vals[u];
             out_idx++;
         }
     }
@@ -236,10 +241,16 @@ class NumericPhase:
         Returns:
             indicesC: Column indices of C (int32)
             dataC: Values of C (int32)
+        
+        Raises:
+            RuntimeError: If any row exceeds MAX_UNIQUE_PER_ROW unique output columns
         """
         # Allocate output arrays
         indicesC = cp.zeros(nnzC, dtype=cp.int32)
         dataC = cp.zeros(nnzC, dtype=cp.int32)
+        
+        # Allocate overflow flag (0 = no overflow, row+1 = overflow at row)
+        overflow_flag = cp.zeros(1, dtype=cp.int32)
         
         # Launch kernel - one thread per row
         block_size = 256
@@ -254,8 +265,18 @@ class NumericPhase:
         self._kernel(
             (grid_size,), (block_size,),
             (indptrA_i32, indicesA_i32, dataA_i32,
-             indptrC_i32, indicesC, dataC, n_rows)
+             indptrC_i32, indicesC, dataC, overflow_flag, n_rows)
         )
+        
+        # Check for overflow
+        overflow_row = int(overflow_flag[0].get())
+        if overflow_row > 0:
+            raise RuntimeError(
+                f"SpGEMM numeric phase overflow: row {overflow_row - 1} exceeded "
+                f"maximum of {MAX_UNIQUE_PER_ROW} unique output columns. "
+                f"This typically indicates a very dense graph that exceeds "
+                f"the expected genealogy workload characteristics."
+            )
         
         return indicesC, dataC
 

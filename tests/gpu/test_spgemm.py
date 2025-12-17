@@ -320,3 +320,80 @@ class TestLargerMatrices:
         assert C_gpu.shape == (n, n)
         assert C_gpu.nnz > 0
         assert C_gpu.triangular
+
+
+class TestLargeColumnIndices:
+    """Test matrices with column indices >= 1024 (previously broken)."""
+    
+    def test_2000x2000_diagonal(self):
+        """Test 2000x2000 diagonal matrix (column indices > 1024)."""
+        n = 2000
+        
+        # Create diagonal matrix with values 2, 3, 4, ...
+        data = np.arange(2, n + 2, dtype=np.int32)
+        A_cpu = sp.diags(data, 0, format='csr', dtype=np.int32)
+        
+        A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
+        C_gpu = spgemm_upper_triangular(A_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # Compute reference
+        C_ref = compute_spgemm_cpu(A_cpu)
+        
+        # Verify correctness
+        assert C_cpu.shape == (n, n)
+        assert C_cpu.nnz == n  # Diagonal @ Diagonal = Diagonal
+        assert np.array_equal(C_cpu.toarray(), C_ref.toarray())
+    
+    def test_1500x1500_sparse_triangular(self):
+        """Test 1500x1500 sparse upper triangular matrix."""
+        n = 1500
+        
+        # Create a simple upper triangular matrix with known structure
+        # Each row i has entries at columns i and i+1 (if i+1 < n)
+        rows = []
+        cols = []
+        data = []
+        
+        for i in range(n):
+            # Diagonal entry
+            rows.append(i)
+            cols.append(i)
+            data.append(2)
+            
+            # Super-diagonal entry (if not last row)
+            if i + 1 < n:
+                rows.append(i)
+                cols.append(i + 1)
+                data.append(3)
+        
+        A_cpu = sp.csr_matrix(
+            (np.array(data, dtype=np.int32), (rows, cols)),
+            shape=(n, n)
+        )
+        
+        A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
+        C_gpu = spgemm_upper_triangular(A_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # Compute reference
+        C_ref = compute_spgemm_cpu(A_cpu)
+        
+        # Verify correctness
+        assert C_cpu.shape == (n, n)
+        assert np.array_equal(C_cpu.toarray(), C_ref.toarray())
+    
+    def test_identity_2000x2000(self):
+        """Test 2000x2000 identity matrix."""
+        n = 2000
+        
+        I_cpu = sp.eye(n, dtype=np.int32, format='csr')
+        I_gpu = CSRMatrixGPU.from_cpu(I_cpu, triangular=True)
+        
+        C_gpu = spgemm_upper_triangular(I_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # I @ I = I
+        assert C_cpu.shape == (n, n)
+        assert C_cpu.nnz == n
+        assert np.array_equal(C_cpu.toarray(), I_cpu.toarray())
