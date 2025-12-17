@@ -4,6 +4,7 @@ from .components import find_components
 from .ordering import avos_canonical_ordering, topological_ordering
 from ..types.ordering import Ordering
 from .transitive_closure import transitive_closure
+from .transitive_closure_dag import transitive_closure_dag, CycleError as ReferenceCycleError
 from .vec_avos import vec_avos
 from .mat_avos import mat_avos
 from .calc_relationship import calculate_relationship, Relationship

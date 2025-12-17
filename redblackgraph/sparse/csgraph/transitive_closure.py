@@ -10,7 +10,8 @@ from redblackgraph.sparse.csgraph._components import (
     extract_submatrix,
     merge_component_matrices
 )
-from redblackgraph.sparse.csgraph._topological_sort import is_upper_triangular
+from redblackgraph.sparse.csgraph._topological_sort import is_upper_triangular, topological_sort
+from redblackgraph.sparse.csgraph._density import DensificationError
 
 
 def transitive_closure(R: rb_matrix, method="D", assume_upper_triangular=False) -> TransitiveClosure:
@@ -319,12 +320,71 @@ def _sparse_equal(A, B):
     return diff.nnz == 0
 
 
+def transitive_closure_dag_sparse(A) -> TransitiveClosure:
+    """
+    Compute transitive closure of a DAG using truly sparse operations.
+    
+    This is the sparse-matrix-optimized version of the algorithm. For a pure
+    Python reference implementation that works with plain lists, see
+    :func:`redblackgraph.reference.transitive_closure_dag`.
+    
+    This algorithm never allocates O(N²) memory. It uses topological ordering
+    and propagates closure information from successors to predecessors.
+    
+    Parameters
+    ----------
+    A : sparse matrix or array-like
+        Input adjacency matrix. Must be a directed acyclic graph (DAG).
+        
+    Returns
+    -------
+    TransitiveClosure
+        The transitive closure result with sparse matrix W.
+        
+    Raises
+    ------
+    CycleError
+        If the graph contains a cycle.
+        
+    Notes
+    -----
+    Algorithm:
+    1. Compute topological ordering of vertices
+    2. Process vertices in reverse topological order (sinks first)
+    3. For each vertex v, its closure is: direct edges + union of successor closures
+    4. Store closure for each vertex as a sparse row
+    
+    Complexity:
+    - Time: O(V + E + nnz_closure) where nnz_closure is output non-zeros
+    - Space: O(nnz_closure) - never allocates N×N dense matrix
+    
+    This is the only transitive closure algorithm in this module that
+    guarantees no O(N²) memory allocation.
+    
+    See Also
+    --------
+    redblackgraph.reference.transitive_closure_dag : Pure Python reference implementation
+    
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> # Simple DAG: 0 -> 1 -> 2
+    >>> A = csr_matrix([[1, 2, 0], [0, 1, 4], [0, 0, 1]], dtype=np.int32)
+    >>> result = transitive_closure_dag_sparse(A)
+    >>> # Closure adds edge 0 -> 2
+    """
+    # Use the Cython implementation for performance
+    from ._transitive_closure_dag import transitive_closure_dag_sparse_cython
+    return transitive_closure_dag_sparse_cython(A)
+
+
 def transitive_closure_adaptive(
     A,
     method: str = "auto",
     density_threshold: float = 0.1,
     component_threshold: int = 1,
-    size_threshold: int = 1000
+    size_threshold: int = 1000,
+    sparse_only: bool = False
 ) -> TransitiveClosure:
     """
     Compute transitive closure using automatically selected optimal strategy.
@@ -346,32 +406,52 @@ def transitive_closure_adaptive(
         - "D": Force Dijkstra
         - "component": Force component-wise processing
         - "squaring": Force repeated squaring
+        - "dag_sparse": Force sparse DAG closure (no O(N²) allocation)
     density_threshold : float, default 0.1
         Graphs sparser than this use Dijkstra instead of FW
     component_threshold : int, default 1
         Use component-wise processing if more components than this
     size_threshold : int, default 1000
         Graphs larger than this prefer sparse algorithms
+    sparse_only : bool, default False
+        If True, only use algorithms that never allocate O(N²) memory.
+        Currently this means using transitive_closure_dag_sparse, which
+        requires the input to be a DAG. Raises DensificationError if the
+        graph contains cycles or would otherwise require densification.
         
     Returns
     -------
     TransitiveClosure
         The transitive closure result.
         
+    Raises
+    ------
+    DensificationError
+        If sparse_only=True and the graph would require O(N²) allocation
+        (e.g., contains cycles).
+        
     Notes
     -----
-    Decision logic:
+    Decision logic (when sparse_only=False):
     1. If multiple disconnected components → component_wise_closure
     2. Else if very sparse (< density_threshold) and large → Dijkstra
     3. Else if upper triangular → FW with assume_upper_triangular=True
     4. Else → standard Floyd-Warshall
+    
+    When sparse_only=True:
+    - Uses transitive_closure_dag_sparse which never allocates O(N²) memory
+    - Requires input to be a DAG (raises CycleError/DensificationError otherwise)
     
     Examples
     --------
     >>> from scipy.sparse import csr_matrix
     >>> A = csr_matrix([[1, 2, 0], [0, 1, 4], [0, 0, 1]])
     >>> result = transitive_closure_adaptive(A)
+    >>> # With sparse_only mode (for large DAGs)
+    >>> result = transitive_closure_adaptive(A, sparse_only=True)
     """
+    from redblackgraph.sparse.csgraph.cycleerror import CycleError
+    
     # Convert to sparse if needed
     if not isspmatrix(A):
         A_sparse = csr_matrix(A)
@@ -384,6 +464,17 @@ def transitive_closure_adaptive(
     if n == 0:
         return TransitiveClosure(csr_matrix((0, 0), dtype=np.int32), 0)
     
+    # Sparse-only mode: use DAG sparse closure
+    if sparse_only:
+        try:
+            return transitive_closure_dag_sparse(A_sparse)
+        except CycleError as e:
+            raise DensificationError(
+                f"sparse_only=True requires a DAG, but graph contains cycles: {e}",
+                density=1.0,
+                threshold=0.0
+            )
+    
     # Override methods
     if method == "FW":
         return transitive_closure(A_sparse, method="FW")
@@ -393,6 +484,8 @@ def transitive_closure_adaptive(
         return component_wise_closure(A_sparse)
     elif method == "squaring":
         return transitive_closure_squaring(A_sparse)
+    elif method == "dag_sparse":
+        return transitive_closure_dag_sparse(A_sparse)
     
     # Auto selection logic
     

@@ -419,7 +419,7 @@ def save_canonical_graph(graph, cache_path: Path, original_metadata: dict, label
 
 
 def compute_canonical_form(input_path: Path, output_path: Path, db_path: Path = None, 
-                          exclusions_path: Path = None):
+                          exclusions_path: Path = None, sparse_only: bool = False):
     """Compute canonical form of a graph and save it.
     
     Args:
@@ -427,6 +427,8 @@ def compute_canonical_form(input_path: Path, output_path: Path, db_path: Path = 
         output_path: Path where canonical graph should be saved
         db_path: Optional path to database for vertex name resolution
         exclusions_path: Optional path to exclusions.json file
+        sparse_only: If True, use sparse-only transitive closure that never
+            allocates O(N^2) memory. Requires the graph to be a DAG.
     """
     logging.info(f"Loading base graph from {input_path}")
     start_time = time.time()
@@ -461,9 +463,15 @@ def compute_canonical_form(input_path: Path, output_path: Path, db_path: Path = 
     
     # Compute transitive closure
     logging.info("Computing transitive closure...")
+    if sparse_only:
+        logging.info("Using sparse-only mode (no O(N^2) memory allocation)")
     start_time = time.time()
     try:
-        closure = graph.transitive_closure()
+        if sparse_only:
+            from redblackgraph.sparse.csgraph.transitive_closure import transitive_closure_adaptive
+            closure = transitive_closure_adaptive(graph, sparse_only=True)
+        else:
+            closure = graph.transitive_closure()
         closure_duration = time.time() - start_time
     except ValueError as e:
         closure_duration = time.time() - start_time
@@ -660,6 +668,13 @@ Examples:
         action='store_true',
         help='Enable verbose logging'
     )
+    parser.add_argument(
+        '--sparse-only',
+        action='store_true',
+        help='Use sparse-only transitive closure that never allocates O(N^2) memory. '
+             'Requires the graph to be a DAG (no cycles). This is recommended for '
+             'very large graphs where memory is a constraint.'
+    )
     
     args = parser.parse_args()
     
@@ -704,8 +719,9 @@ Examples:
                 continue
         
         try:
-            compute_canonical_form(input_file, output_file, args.db_path, exclusions_path)
-            logging.info(f"✓ Successfully processed hop count {hop_count}")
+            compute_canonical_form(input_file, output_file, args.db_path, exclusions_path, 
+                                   sparse_only=args.sparse_only)
+            logging.info(f"Successfully processed hop count {hop_count}")
         except Exception as e:
             logging.error(f"✗ Failed to process hop count {hop_count}: {e}", exc_info=args.verbose)
             if args.verbose:
