@@ -1,0 +1,3 @@
+[submodule "fs-crawler"]
+	path = fs-crawler
+	url = git@github.com:rappdw/fs-crawler.git
