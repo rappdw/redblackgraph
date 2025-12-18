@@ -73,14 +73,26 @@ class rb_matrix(csr_matrix):
                                     maxval=nnz)
         indptr = np.asarray(indptr, dtype=idx_dtype)
         indices = np.empty(nnz, dtype=idx_dtype)
-        data = np.empty(nnz, dtype=upcast(self.dtype, other.dtype))
+        data_dtype = np.dtype(upcast(self.dtype, other.dtype))
+        if data_dtype.kind == 'u' and data_dtype.itemsize < 8:
+            data_dtype = np.dtype(np.uint64)
+        elif data_dtype.kind == 'i' and data_dtype.itemsize < 8:
+            data_dtype = np.dtype(np.int64)
+        data = np.empty(nnz, dtype=data_dtype)
+
+        A_data = self.data
+        B_data = other.data
+        if np.dtype(A_data.dtype) != data_dtype:
+            A_data = np.asarray(A_data, dtype=data_dtype)
+        if np.dtype(B_data.dtype) != data_dtype:
+            B_data = np.asarray(B_data, dtype=data_dtype)
 
         rbm_matmat_pass2(M, N, np.asarray(self.indptr, dtype=idx_dtype),
                          np.asarray(self.indices, dtype=idx_dtype),
-                         self.data,
+                         A_data,
                          np.asarray(other.indptr, dtype=idx_dtype),
                          np.asarray(other.indices, dtype=idx_dtype),
-                         other.data,
+                         B_data,
                          indptr, indices, data)
 
         return self.__class__((data, indices, indptr), shape=(M, N))

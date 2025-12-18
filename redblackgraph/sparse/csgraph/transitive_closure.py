@@ -73,6 +73,12 @@ def transitive_closure_dijkstra(R: rb_matrix) -> TransitiveClosure:
     TransitiveClosure
         The transitive closure result.
     """
+    # The shortest-path Dijkstra implementation is not AVOS-semiring aware.
+    # For graphs that are already in topological order (upper triangular), we can
+    # compute the exact AVOS closure via optimized Floyd-Warshall.
+    if isspmatrix(R) and is_upper_triangular(R.tocsr() if not isinstance(R, csr_matrix) else R):
+        return transitive_closure_floyd_warshall(R, assume_upper_triangular=True)
+
     return transitive_closure(R, method="D")
 
 
@@ -189,7 +195,7 @@ def component_wise_closure(
     return TransitiveClosure(merged, max_diameter)
 
 
-def transitive_closure_squaring(A, max_iterations: int = 64) -> TransitiveClosure:
+def transitive_closure_squaring(A, max_iterations=64) -> TransitiveClosure:
     """
     Compute transitive closure via repeated squaring.
     
@@ -224,11 +230,19 @@ def transitive_closure_squaring(A, max_iterations: int = 64) -> TransitiveClosur
     4. If R unchanged, we've converged
     5. Repeat with R²
     """
+    # Convert to sparse if needed
+    A_sparse = A.tocsr() if isspmatrix(A) and not isinstance(A, csr_matrix) else A
+
+    # Fast path: for sparse upper-triangular matrices we have an exact sparse DAG
+    # transitive closure implementation that avoids repeated squaring.
+    if isspmatrix(A_sparse) and is_upper_triangular(A_sparse):
+        return transitive_closure_dag_sparse(A_sparse)
+
     # Convert to rb_matrix for AVOS operations
-    if not isinstance(A, rb_matrix):
-        R = rb_matrix(A)
+    if not isinstance(A_sparse, rb_matrix):
+        R = rb_matrix(A_sparse)
     else:
-        R = A.copy()
+        R = A_sparse.copy()
     
     n = R.shape[0]
     if n == 0:
