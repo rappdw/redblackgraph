@@ -73,17 +73,53 @@ class rb_matrix(csr_matrix):
                                     maxval=nnz)
         indptr = np.asarray(indptr, dtype=idx_dtype)
         indices = np.empty(nnz, dtype=idx_dtype)
-        data = np.empty(nnz, dtype=upcast(self.dtype, other.dtype))
+        out_dtype = np.dtype(upcast(self.dtype, other.dtype))
+
+        # Promote to 64-bit for safety when calling the AVOS C++ kernels.
+        # For unsigned inputs, note that RED_ONE is represented as the *max*
+        # value of the dtype (e.g. uint8(255)). When upcasting to uint64 we must
+        # remap that sentinel to uint64 max, otherwise the kernel won't recognize
+        # it as RED_ONE.
+        data_dtype = out_dtype
+        if out_dtype.kind == 'u' and out_dtype.itemsize < 8:
+            data_dtype = np.dtype(np.uint64)
+        elif out_dtype.kind == 'i' and out_dtype.itemsize < 8:
+            data_dtype = np.dtype(np.int64)
+        data = np.empty(nnz, dtype=data_dtype)
+
+        A_data = self.data
+        B_data = other.data
+
+        if np.dtype(A_data.dtype) != data_dtype:
+            A_data = np.asarray(A_data, dtype=data_dtype)
+            if out_dtype.kind == 'u' and data_dtype.kind == 'u':
+                orig_max = np.iinfo(self.data.dtype).max
+                tgt_max = np.iinfo(data_dtype).max
+                A_data[A_data == orig_max] = tgt_max
+
+        if np.dtype(B_data.dtype) != data_dtype:
+            B_data = np.asarray(B_data, dtype=data_dtype)
+            if out_dtype.kind == 'u' and data_dtype.kind == 'u':
+                orig_max = np.iinfo(other.data.dtype).max
+                tgt_max = np.iinfo(data_dtype).max
+                B_data[B_data == orig_max] = tgt_max
 
         rbm_matmat_pass2(M, N, np.asarray(self.indptr, dtype=idx_dtype),
                          np.asarray(self.indices, dtype=idx_dtype),
-                         self.data,
+                         A_data,
                          np.asarray(other.indptr, dtype=idx_dtype),
                          np.asarray(other.indices, dtype=idx_dtype),
-                         other.data,
+                         B_data,
                          indptr, indices, data)
 
-        return self.__class__((data, indices, indptr), shape=(M, N))
+        result = rb_matrix((data, indices, indptr), shape=(M, N))
+
+        # If we used a wider dtype for safe computation, cast the result back to
+        # the expected (upcast) output dtype so downstream comparisons and APIs
+        # behave consistently.
+        if result.dtype != out_dtype:
+            result = rb_matrix((result.data.astype(out_dtype, copy=False), result.indices, result.indptr), shape=result.shape)
+        return result
     #
     # def vertex_relational_composition(self, u, v, c, compute_closure=False):
     #     '''

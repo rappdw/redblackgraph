@@ -83,6 +83,21 @@ python -m build
 .venv/bin/pip install -e . --no-build-isolation
 ```
 
+### uv setup script
+
+If you use `uv`, a convenience script is provided to create a fresh `.venv`, install build/test dependencies, perform an editable install using `pip` with `--no-build-isolation`, and install the `test` extra:
+
+```bash
+./bin/setup-uv.sh
+source .venv/bin/activate
+uv run -m pytest
+```
+
+The script expects:
+- `uv` on your `PATH`
+- the `ninja` build tool installed (e.g. `sudo apt install ninja-build` on Debian/Ubuntu)
+- the `fs-crawler` submodule present at `./fs-crawler`
+
 The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 
 # Building and Publishing Wheels

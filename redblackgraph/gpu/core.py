@@ -11,6 +11,33 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
     cp = None
+
+
+def _try_preload_nvrtc() -> bool:
+    if not CUPY_AVAILABLE:
+        return False
+
+    try:
+        import ctypes
+        import glob
+        import os
+        import site
+
+        for sp in site.getsitepackages():
+            cand = glob.glob(os.path.join(sp, "nvidia", "cuda_nvrtc", "lib", "libnvrtc.so*"))
+            if cand:
+                cand.sort(reverse=True)
+                ctypes.CDLL(cand[0], mode=ctypes.RTLD_GLOBAL)
+                return True
+
+        return False
+    except Exception:
+        return False
+
+
+if CUPY_AVAILABLE and not _try_preload_nvrtc():
+    CUPY_AVAILABLE = False
+    cp = None
     
 
 def _check_cupy():

@@ -3,7 +3,6 @@
 requires = [
     "meson-python>=0.15.0",
     "meson>=1.2.0",
-    "ninja",
     "Cython>=3.0.0",
     "tempita>=0.5.2",  # For template processing (.c.in, .h.in files)
     # NumPy is needed at build time for C API headers
@@ -51,8 +50,14 @@ dependencies = [
 [project.optional-dependencies]
 # File I/O utilities (CSV/Excel graph readers/writers)
 io = [
-    "fs-crawler @ file:fs-crawler",
+    "fs-crawler",
     "XlsxWriter",
+]
+gpu = [
+    "cupy-cuda12x",
+    "nvidia-cuda-nvrtc-cu12",
+    "nvidia-cublas-cu12",
+    "nvidia-cusparse-cu12",
 ]
 dev = [
     "wheel>=0.29",
@@ -61,7 +66,7 @@ test = [
     "pytest>=3.0",
     "pytest-cov>=2.4",
     "pylint>=1.8.1",
-    "fs-crawler @ file:fs-crawler",  # Tests use RelationshipFileReader
+    "fs-crawler",  # Tests use RelationshipFileReader
     "XlsxWriter",  # Tests use RedBlackGraphWriter
 ]
 
@@ -123,3 +128,6 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+
+[tool.uv.sources]
+fs-crawler = { path = "fs-crawler" }
