@@ -13,7 +13,7 @@ Migration from versioneer to setuptools_scm with comprehensive PyPI wheel buildi
 ## ✅ Core Changes Completed
 
 ### 1. Version Management Migration
-- [x] **Removed versioneer** (`versioneer.py`, `setup.cfg` config)
+- [x] **Removed versioneer** (`versioneer.py` config)
 - [x] **Added setuptools_scm** to `pyproject.toml` build requirements
 - [x] **Updated `pyproject.toml`**: Changed from static to dynamic version
 - [x] **Updated `__init__.py`**: Simplified version import with fallback
@@ -87,7 +87,6 @@ Migration from versioneer to setuptools_scm with comprehensive PyPI wheel buildi
 4. `pyproject.toml` - setuptools_scm + cibuildwheel config
 5. `redblackgraph/__init__.py` - Updated version import
 6. `redblackgraph/meson.build` - Made _version.py optional
-7. `setup.cfg` - Removed versioneer config
 8. `.github/workflows/build-wheels.yml` - **FIXED** with fetch-depth
 
 ### Deleted Files (2)

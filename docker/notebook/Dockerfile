@@ -1,7 +1,6 @@
 FROM resero/docker-ds
 
 ADD docker/notebook/gen-latex.* /usr/local/bin/
-ADD requirements.txt /tmp/
 
 RUN set -e; \
     apt-get update; \
@@ -13,7 +12,7 @@ RUN set -e; \
     ; \
     wget -q https://github.com/jgm/pandoc/releases/download/1.19.2.1/pandoc-1.19.2.1-1-amd64.deb; \
     dpkg -i pandoc-1.19.2.1-1-amd64.deb; \
-    pip install -r /tmp/requirements.txt; \
+    pip install "numpy>=2.0.0,<3.0" "scipy>=1.11.0" "XlsxWriter"; \
     mkdir -p /home/jovyan/.jupyter/custom; \
     fix-permissions /home/jovyan/.jupyter; \
     apt-get clean; \

@@ -48,11 +48,9 @@ RUN ldconfig \
 
 ENV LLVM_CONFIG /usr/bin/llvm-config-5.0
 
-ADD requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install "numpy>=2.0.0,<3.0" "scipy>=1.11.0" "XlsxWriter"
 
-ADD requirements-numba.txt /requirements-numba.txt
-RUN pip install -r /requirements-numba.txt
+RUN pip install "llvmlite==0.24.0" "numba==0.39.0"
 
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en

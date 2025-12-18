@@ -1,3 +1,0 @@
-include versioneer.py
-include redblackgraph/_version.py
-include README.md
