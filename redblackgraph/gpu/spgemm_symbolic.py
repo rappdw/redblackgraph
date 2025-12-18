@@ -329,7 +329,7 @@ def compute_symbolic_pattern(
     indicesA: 'cp.ndarray',
     n_rows: int,
     n_cols: int
-) -> Tuple['cp.ndarray', int, 'cp.ndarray', 'cp.ndarray', 'cp.ndarray']:
+) -> Tuple['cp.ndarray', int]:
     """
     Compute symbolic pattern for C = A @ A (upper triangular).
 
@@ -340,6 +340,26 @@ def compute_symbolic_pattern(
         indicesA: Column indices of A
         n_rows: Number of rows in A
         n_cols: Number of columns in A
+
+    Returns:
+        indptrC: Row pointers for C (length n_rows + 1)
+        nnzC: Total number of non-zeros in C
+    """
+    indptrC, nnzC, _, _, _ = compute_symbolic_pattern_with_tables(
+        indptrA, indicesA, n_rows, n_cols
+    )
+    return indptrC, nnzC
+
+
+def compute_symbolic_pattern_with_tables(
+    indptrA: 'cp.ndarray',
+    indicesA: 'cp.ndarray',
+    n_rows: int,
+    n_cols: int
+) -> Tuple['cp.ndarray', int, 'cp.ndarray', 'cp.ndarray', 'cp.ndarray']:
+    """
+    Compute symbolic pattern for C = A @ A (upper triangular), returning
+    additional data structures needed by the numeric phase.
 
     Returns:
         indptrC: Row pointers for C (length n_rows + 1)

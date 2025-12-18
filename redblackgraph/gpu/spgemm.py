@@ -17,7 +17,7 @@ Features:
 
 from typing import Optional
 from .csr_gpu import CSRMatrixGPU
-from .spgemm_symbolic import compute_symbolic_pattern
+from redblackgraph.gpu.spgemm_symbolic import compute_symbolic_pattern_with_tables
 from .spgemm_numeric import compute_numeric_values
 
 try:
@@ -71,7 +71,7 @@ def spgemm_upper_triangular(
     n_rows, n_cols = A.shape
 
     # Phase 1: Symbolic - compute output pattern using global memory hash tables
-    indptrC, nnzC, hash_keys, table_offsets, table_sizes = compute_symbolic_pattern(
+    indptrC, nnzC, hash_keys, table_offsets, table_sizes = compute_symbolic_pattern_with_tables(
         A.indptr, A.indices, n_rows, n_cols
     )
 
@@ -198,7 +198,7 @@ def spgemm_with_stats(A: CSRMatrixGPU) -> tuple:
 
     # Symbolic phase - compute output pattern using global memory hash tables
     start = time.perf_counter()
-    indptrC, nnzC, hash_keys, table_offsets, table_sizes = compute_symbolic_pattern(
+    indptrC, nnzC, hash_keys, table_offsets, table_sizes = compute_symbolic_pattern_with_tables(
         A.indptr, A.indices, A.shape[0], A.shape[1]
     )
     cp.cuda.Stream.null.synchronize()  # Wait for GPU

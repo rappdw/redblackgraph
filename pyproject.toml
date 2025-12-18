@@ -53,6 +53,12 @@ io = [
     "fs-crawler",
     "XlsxWriter",
 ]
+gpu = [
+    "cupy-cuda12x",
+    "nvidia-cuda-nvrtc-cu12",
+    "nvidia-cublas-cu12",
+    "nvidia-cusparse-cu12",
+]
 dev = [
     "wheel>=0.29",
 ]

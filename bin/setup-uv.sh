@@ -22,6 +22,16 @@ if [[ ! -d "${repo_root}/fs-crawler" ]]; then
   exit 1
 fi
 
+install_gpu=0
+if [[ "${1:-}" == "--gpu" ]]; then
+  install_gpu=1
+fi
+
+install_spec="."
+if [[ "${install_gpu}" == "1" ]]; then
+  install_spec=".[gpu]"
+fi
+
 cd "${repo_root}"
 
 uv venv --seed
@@ -39,8 +49,15 @@ uv pip install \
   pytest-cov \
   pylint
 
-# Per README: use pip directly for editable install with meson-python
-PATH="${repo_root}/.venv/bin:${PATH}" .venv/bin/python -m pip install -e . --no-build-isolation
+if [[ "${install_gpu}" == "1" ]]; then
+  uv pip install \
+    cupy-cuda12x \
+    nvidia-cuda-nvrtc-cu12 \
+    nvidia-cublas-cu12 \
+    nvidia-cusparse-cu12
+fi
+
+PATH="${repo_root}/.venv/bin:${PATH}" .venv/bin/python -m pip install -e "${install_spec}" --no-build-isolation
 
 # Optional deps used by some utilities/tests
 uv pip install --editable ./fs-crawler XlsxWriter
