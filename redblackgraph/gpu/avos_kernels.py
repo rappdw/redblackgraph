@@ -20,6 +20,37 @@ except ImportError:
     cp = None
 
 
+def _try_preload_nvrtc() -> bool:
+    if not CUPY_AVAILABLE:
+        return False
+
+    try:
+        import ctypes
+        import glob
+        import os
+        import site
+
+        for sp in site.getsitepackages():
+            cand = glob.glob(os.path.join(sp, "nvidia", "cuda_nvrtc", "lib", "libnvrtc.so*"))
+            if cand:
+                cand.sort(reverse=True)
+                ctypes.CDLL(cand[0], mode=ctypes.RTLD_GLOBAL)
+                return True
+
+        return False
+    except Exception:
+        return False
+
+
+if CUPY_AVAILABLE and not _try_preload_nvrtc():
+    # Without NVRTC, CuPy will raise at kernel compilation time.
+    raise ImportError(
+        "CuPy is installed but NVRTC (libnvrtc.so) could not be loaded. "
+        "Install the CUDA NVRTC runtime (e.g. nvidia-cuda-nvrtc-cu12) "
+        "or ensure libnvrtc.so is on your loader path."
+    )
+
+
 class SemiringSpec(NamedTuple):
     """
     Specification of algebraic semiring for matrix operations.

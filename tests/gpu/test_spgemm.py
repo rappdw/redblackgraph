@@ -320,3 +320,109 @@ class TestLargerMatrices:
         assert C_gpu.shape == (n, n)
         assert C_gpu.nnz > 0
         assert C_gpu.triangular
+
+
+class TestLargeColumnIndices:
+    """Test matrices with column indices >= 1024 (previously broken).
+    
+    These tests use analytical verification instead of O(n³) dense CPU reference
+    to keep test runtime reasonable while still validating large column indices.
+    """
+    
+    def test_2000x2000_diagonal(self):
+        """Test 2000x2000 diagonal matrix (column indices > 1024).
+        
+        For diagonal matrix D with D[i,i] = d_i, we have:
+        (D @ D)[i,i] = avos_product(d_i, d_i)
+        
+        This is O(n) verification instead of O(n³).
+        """
+        n = 2000
+        
+        # Create diagonal matrix with values 2, 3, 4, ...
+        data = np.arange(2, n + 2, dtype=np.int32)
+        A_cpu = sp.diags(data, 0, format='csr', dtype=np.int32)
+        
+        A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
+        C_gpu = spgemm_upper_triangular(A_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # Verify structure: diagonal @ diagonal = diagonal
+        assert C_cpu.shape == (n, n)
+        assert C_cpu.nnz == n
+        
+        # Verify values analytically: C[i,i] = avos_product(A[i,i], A[i,i])
+        expected_data = np.array([avos_product(int(d), int(d)) for d in data], dtype=np.int32)
+        assert np.array_equal(C_cpu.diagonal(), expected_data)
+        
+        # Verify it's truly diagonal (no off-diagonal elements)
+        C_dense = C_cpu.toarray()
+        np.fill_diagonal(C_dense, 0)
+        assert np.all(C_dense == 0)
+    
+    def test_1500x1500_sparse_triangular(self):
+        """Test 1500x1500 sparse upper triangular matrix (bidiagonal).
+        
+        For bidiagonal matrix A with A[i,i]=2 and A[i,i+1]=3:
+        (A @ A)[i,j] can be computed analytically using AVOS operations.
+        
+        This is O(n) verification instead of O(n³).
+        """
+        n = 1500
+        
+        # Create bidiagonal matrix: A[i,i]=2, A[i,i+1]=3
+        rows = []
+        cols = []
+        data = []
+        
+        for i in range(n):
+            rows.append(i)
+            cols.append(i)
+            data.append(2)
+            
+            if i + 1 < n:
+                rows.append(i)
+                cols.append(i + 1)
+                data.append(3)
+        
+        A_cpu = sp.csr_matrix(
+            (np.array(data, dtype=np.int32), (rows, cols)),
+            shape=(n, n)
+        )
+        
+        A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
+        C_gpu = spgemm_upper_triangular(A_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # Verify shape
+        assert C_cpu.shape == (n, n)
+        
+        # Build expected result analytically (tridiagonal output)
+        # Use actual AVOS operations to compute expected values
+        expected_diag = np.full(n, avos_product(2, 2), dtype=np.int32)
+        expected_super1 = np.full(n - 1, avos_sum(avos_product(2, 3), avos_product(3, 2)), dtype=np.int32)
+        expected_super2 = np.full(n - 2, avos_product(3, 3), dtype=np.int32)
+        
+        # Verify diagonal values
+        assert np.array_equal(C_cpu.diagonal(0), expected_diag)
+        assert np.array_equal(C_cpu.diagonal(1), expected_super1)
+        assert np.array_equal(C_cpu.diagonal(2), expected_super2)
+        
+        # Verify no other non-zeros (only diagonals 0, 1, 2 should have values)
+        expected_nnz = n + (n - 1) + (n - 2)  # diag + super1 + super2
+        assert C_cpu.nnz == expected_nnz
+    
+    def test_identity_2000x2000(self):
+        """Test 2000x2000 identity matrix."""
+        n = 2000
+        
+        I_cpu = sp.eye(n, dtype=np.int32, format='csr')
+        I_gpu = CSRMatrixGPU.from_cpu(I_cpu, triangular=True)
+        
+        C_gpu = spgemm_upper_triangular(I_gpu)
+        C_cpu = C_gpu.to_cpu()
+        
+        # I @ I = I
+        assert C_cpu.shape == (n, n)
+        assert C_cpu.nnz == n
+        assert np.array_equal(C_cpu.toarray(), I_cpu.toarray())
