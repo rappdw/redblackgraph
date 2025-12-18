@@ -224,32 +224,30 @@ def transitive_closure_squaring(A, max_iterations: int = 64) -> TransitiveClosur
     4. If R unchanged, we've converged
     5. Repeat with R²
     """
-    # Convert to rb_matrix for AVOS operations
-    if not isinstance(A, rb_matrix):
-        R = rb_matrix(A)
+    if not isspmatrix(A):
+        A_sparse = csr_matrix(A)
     else:
-        R = A.copy()
+        A_sparse = A.tocsr() if not isinstance(A, csr_matrix) else A
     
-    n = R.shape[0]
+    n = A_sparse.shape[0]
     if n == 0:
         return TransitiveClosure(csr_matrix((0, 0), dtype=np.int32), 0)
     
-    # Repeated squaring
+    if is_upper_triangular(A_sparse):
+        return transitive_closure_dag_sparse(A_sparse)
+    
+    R = rb_matrix(A_sparse) if not isinstance(A_sparse, rb_matrix) else A_sparse.copy()
+    
     for iteration in range(max_iterations):
-        # Compute R² using AVOS matmul
         R_squared = R @ R
-        
-        # Merge R with R²: take element-wise min (AVOS sum)
-        # For sparse matrices, we need to handle this carefully
+        R_squared.eliminate_zeros()
         R_new = _sparse_avos_sum(R, R_squared)
         
-        # Check convergence: if R unchanged, we're done
         if _sparse_equal(R, R_new):
             break
         
         R = R_new
     
-    # Compute diameter from max value
     if R.nnz > 0:
         max_val = np.max(np.abs(R.data))
         diameter = int(np.floor(np.log2(max_val))) if max_val > 1 else 0
@@ -264,49 +262,87 @@ def _sparse_avos_sum(A, B):
     Compute element-wise AVOS sum (min of non-zeros) of two sparse matrices.
     
     AVOS sum: a ⊕ b = min(a, b) where 0 is treated as infinity.
+    
+    Uses efficient COO-based merge instead of element-wise lil_matrix access.
     """
-    # Convert to rb_matrix if needed
-    if not isinstance(A, rb_matrix):
-        A = rb_matrix(A)
-    if not isinstance(B, rb_matrix):
-        B = rb_matrix(B)
+    from scipy.sparse import coo_matrix
     
-    # For AVOS sum, we need element-wise min where 0 means "no edge"
-    # A value is kept if it's non-zero; among non-zero values, keep the smaller
-    
-    # Get the union of sparsity patterns
-    # Using lil_matrix for efficient construction
-    from scipy.sparse import lil_matrix
+    # Convert to COO for efficient concatenation
+    A_coo = A.tocoo()
+    B_coo = B.tocoo()
     
     n = A.shape[0]
-    result = lil_matrix((n, n), dtype=np.int32)
     
-    A_csr = A.tocsr()
-    B_csr = B.tocsr()
+    # Handle empty matrices
+    if A_coo.nnz == 0 and B_coo.nnz == 0:
+        return rb_matrix(csr_matrix((n, n), dtype=np.int32))
+    if A_coo.nnz == 0:
+        result = rb_matrix(B_coo.tocsr())
+        result.eliminate_zeros()
+        return result
+    if B_coo.nnz == 0:
+        result = rb_matrix(A_coo.tocsr())
+        result.eliminate_zeros()
+        return result
     
-    # Process A's entries
-    for i in range(n):
-        for idx in range(A_csr.indptr[i], A_csr.indptr[i + 1]):
-            j = A_csr.indices[idx]
-            val_a = A_csr.data[idx]
-            result[i, j] = val_a
+    # Concatenate all entries from A and B
+    all_rows = np.concatenate([A_coo.row, B_coo.row])
+    all_cols = np.concatenate([A_coo.col, B_coo.col])
+    all_data = np.concatenate([A_coo.data, B_coo.data])
     
-    # Process B's entries, taking min where overlap
-    for i in range(n):
-        for idx in range(B_csr.indptr[i], B_csr.indptr[i + 1]):
-            j = B_csr.indices[idx]
-            val_b = B_csr.data[idx]
-            
-            current = result[i, j]
-            if current == 0:
-                result[i, j] = val_b
-            else:
-                # AVOS sum: min of absolute values, preserving sign
-                # For RBG, we compare unsigned magnitudes
-                if abs(val_b) < abs(current):
-                    result[i, j] = val_b
+    # Sort by (row, col) to group duplicates together
+    # Use lexsort: sorts by last key first, so (col, row) gives row-major order
+    sort_idx = np.lexsort((all_cols, all_rows))
+    sorted_rows = all_rows[sort_idx]
+    sorted_cols = all_cols[sort_idx]
+    sorted_data = all_data[sort_idx]
     
-    return rb_matrix(result.tocsr())
+    # Find unique (row, col) positions and reduce duplicates using AVOS sum
+    # AVOS sum: min of absolute values, preserving sign of the minimum
+    # If abs values tie, keep the first one (from A)
+    
+    # Create composite key for finding unique positions
+    composite_key = sorted_rows.astype(np.int64) * n + sorted_cols.astype(np.int64)
+    
+    # Find where keys change (boundaries between groups)
+    key_changes = np.concatenate([[True], composite_key[1:] != composite_key[:-1]])
+    
+    # For each group, we need to find the element with minimum absolute value
+    # Use a simple approach: iterate through groups
+    unique_indices = np.where(key_changes)[0]
+    n_unique = len(unique_indices)
+    
+    result_rows = np.empty(n_unique, dtype=np.int32)
+    result_cols = np.empty(n_unique, dtype=np.int32)
+    result_data = np.empty(n_unique, dtype=np.int32)
+    
+    # Process each group
+    for i in range(n_unique):
+        start = unique_indices[i]
+        end = unique_indices[i + 1] if i + 1 < n_unique else len(sorted_data)
+        
+        result_rows[i] = sorted_rows[start]
+        result_cols[i] = sorted_cols[start]
+        
+        # Find minimum absolute value in this group
+        group_data = sorted_data[start:end]
+        abs_vals = np.abs(group_data)
+        min_idx = np.argmin(abs_vals)
+        result_data[i] = group_data[min_idx]
+    
+    # Filter out zeros (AVOS: 0 means no edge)
+    nonzero_mask = result_data != 0
+    result_rows = result_rows[nonzero_mask]
+    result_cols = result_cols[nonzero_mask]
+    result_data = result_data[nonzero_mask]
+    
+    # Build result CSR matrix
+    result_coo = coo_matrix((result_data, (result_rows, result_cols)), shape=(n, n), dtype=np.int32)
+    result = rb_matrix(result_coo.tocsr())
+    result.sum_duplicates()
+    result.sort_indices()
+    
+    return result
 
 
 def _sparse_equal(A, B):
