@@ -20,11 +20,11 @@ from .csr_gpu import CSRMatrixGPU
 from redblackgraph.gpu.spgemm_symbolic import compute_symbolic_pattern_with_tables
 from .spgemm_numeric import compute_numeric_values
 
-try:
+from ._cuda_utils import CUPY_AVAILABLE
+
+if CUPY_AVAILABLE:
     import cupy as cp
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
+else:
     cp = None
 
 

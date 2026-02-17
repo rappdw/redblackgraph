@@ -30,3 +30,15 @@ __all__.extend(['RED_ONE', 'BLACK_ONE', 'red_one_for_dtype', 'black_one_for_dtyp
                 'is_red_one', 'is_black_one'])
 if _io_available:
     __all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter', 'RbgGraphBuilder'])
+
+# Optional GPU acceleration (requires CuPy + CUDA GPU)
+# Install with: pip install redblackgraph[gpu]
+try:
+    from .gpu import CUPY_AVAILABLE as _gpu_available
+    if _gpu_available:
+        from .gpu import rb_matrix_gpu, DevicePolicy, device, is_gpu_available
+        __all__.extend(['rb_matrix_gpu', 'DevicePolicy', 'device', 'is_gpu_available'])
+    else:
+        _gpu_available = False
+except ImportError:
+    _gpu_available = False
