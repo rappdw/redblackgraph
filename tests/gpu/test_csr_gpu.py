@@ -14,7 +14,10 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
 
-pytestmark = pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available")
+pytestmark = [
+    pytest.mark.gpu,
+    pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available"),
+]
 
 
 @pytest.fixture

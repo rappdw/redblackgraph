@@ -27,10 +27,10 @@ from redblackgraph.reference.rbg_math import avos_sum, avos_product
 
 
 # Skip all tests if CuPy not available
-pytestmark = pytest.mark.skipif(
-    not CUPY_AVAILABLE,
-    reason="CuPy not available - GPU tests skipped"
-)
+pytestmark = [
+    pytest.mark.gpu,
+    pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available - GPU tests skipped"),
+]
 
 
 class TestAVOSOperationsGPU:

@@ -17,7 +17,10 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
 
-pytestmark = pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available")
+pytestmark = [
+    pytest.mark.gpu,
+    pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available"),
+]
 
 # Import CPU reference for validation
 from redblackgraph.reference.rbg_math import avos_sum as avos_sum_cpu

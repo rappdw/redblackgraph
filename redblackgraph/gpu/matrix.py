@@ -1,48 +1,41 @@
 """
 GPU-accelerated rb_matrix using CuPy sparse matrices.
 
-This is a naive implementation that:
-1. Wraps cupyx.scipy.sparse.csr_matrix
-2. Implements basic @ operator using element-wise kernels (not optimized)
-3. Provides conversion to/from CPU rb_matrix
+Provides a high-level matrix wrapper that routes ``@`` to the production
+SpGEMM pipeline for upper-triangular matrices and falls back to a naive
+dense path for small non-triangular matrices.
 """
 
-try:
-    import cupy as cp
-    from cupyx.scipy import sparse as cp_sparse
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
-    cp = None
-    cp_sparse = None
+import warnings
 
 import numpy as np
-from .core import avos_sum_gpu, avos_product_gpu, _check_cupy
+
+from ._cuda_utils import CUPY_AVAILABLE, check_cupy
+
+if CUPY_AVAILABLE:
+    import cupy as cp
+    from cupyx.scipy import sparse as cp_sparse
+else:
+    cp = None
+    cp_sparse = None
 
 
 class rb_matrix_gpu:
     """
     GPU-accelerated Red-Black matrix using CuPy sparse CSR format.
-    
-    This is a minimal naive implementation for learning purposes.
-    
+
     Features:
     - Wraps cupyx.scipy.sparse.csr_matrix
     - Supports triangular=True flag for upper triangular matrices
-    - Implements basic @ operator (naive, not optimized)
-    - Provides to_cpu() and from_cpu() conversions
-    
-    NOT YET IMPLEMENTED:
-    - Optimized SpGEMM kernels
-    - Two-phase symbolic/numeric multiplication
-    - Transitive closure
-    - Advanced memory management
+    - Routes ``@`` to production SpGEMM for triangular self-multiplication
+    - Falls back to naive dense path for small non-triangular matrices
+    - Provides to_cpu() / from_cpu() / to_csr_gpu() conversions
     """
-    
+
     def __init__(self, data=None, *, triangular=False, shape=None):
         """
         Initialize GPU rb_matrix.
-        
+
         Args:
             data: Can be:
                 - cupyx.scipy.sparse matrix
@@ -52,25 +45,20 @@ class rb_matrix_gpu:
             triangular: If True, matrix is upper triangular
             shape: Shape tuple (required if data is None)
         """
-        _check_cupy()
-        
+        check_cupy()
+
         self.triangular = triangular
-        
+
         if data is None:
             if shape is None:
                 raise ValueError("shape required when data is None")
-            # Create empty CSR matrix
             self.data = cp_sparse.csr_matrix(shape, dtype=cp.float32)
         elif isinstance(data, cp_sparse.csr_matrix):
             self.data = data
         elif hasattr(data, 'tocsr'):
-            # Convert from other sparse format or CPU sparse matrix
-            # Transfer to GPU if needed
             if hasattr(data, 'get'):
-                # Already on GPU
                 self.data = data.tocsr()
             else:
-                # CPU sparse matrix - convert to CuPy
                 cpu_csr = data.tocsr()
                 self.data = cp_sparse.csr_matrix(
                     (cp.array(cpu_csr.data, dtype=cp.float32),
@@ -79,7 +67,6 @@ class rb_matrix_gpu:
                     shape=cpu_csr.shape
                 )
         elif isinstance(data, tuple) and len(data) == 3:
-            # CSR format: (data, indices, indptr)
             data_arr, indices_arr, indptr_arr = data
             self.data = cp_sparse.csr_matrix(
                 (cp.asarray(data_arr, dtype=cp.float32),
@@ -89,111 +76,127 @@ class rb_matrix_gpu:
             )
         else:
             raise TypeError(f"Unsupported data type: {type(data)}")
-    
+
     @property
     def shape(self):
-        """Matrix shape."""
         return self.data.shape
-    
+
     @property
     def nnz(self):
-        """Number of non-zero elements."""
         return self.data.nnz
-    
+
     def to_cpu(self):
-        """
-        Transfer matrix to CPU.
-        
-        Returns:
-            scipy.sparse.csr_matrix on CPU
-        """
-        # Transfer GPU arrays to CPU
+        """Transfer matrix to CPU as scipy.sparse.csr_matrix."""
         from scipy import sparse as sp_sparse
-        
         return sp_sparse.csr_matrix(
             (self.data.data.get(),
              self.data.indices.get(),
              self.data.indptr.get()),
             shape=self.shape
         )
-    
+
+    def to_csr_gpu(self):
+        """Convert to production CSRMatrixGPU (int32 data).
+
+        Returns:
+            CSRMatrixGPU suitable for use with spgemm_upper_triangular().
+        """
+        from .csr_gpu import CSRMatrixGPU
+
+        cpu_csr = self.to_cpu()
+        cpu_csr.data = cpu_csr.data.astype(np.int32)
+        return CSRMatrixGPU.from_cpu(cpu_csr, triangular=self.triangular)
+
     @classmethod
     def from_cpu(cls, cpu_matrix, triangular=False):
-        """
-        Create GPU matrix from CPU sparse matrix.
-        
-        Args:
-            cpu_matrix: scipy.sparse matrix
-            triangular: If True, matrix is upper triangular
-            
-        Returns:
-            rb_matrix_gpu instance
-        """
+        """Create GPU matrix from CPU sparse matrix."""
         return cls(cpu_matrix, triangular=triangular)
-    
-    def __matmul__(self, other):
+
+    @classmethod
+    def from_csr_gpu(cls, csr_gpu):
+        """Create rb_matrix_gpu from a CSRMatrixGPU.
+
+        Args:
+            csr_gpu: CSRMatrixGPU instance (int32 data)
+
+        Returns:
+            rb_matrix_gpu wrapping a CuPy sparse matrix
         """
-        Matrix multiplication using AVOS operations.
-        
-        NAIVE IMPLEMENTATION: Uses element-wise kernels, not optimized SpGEMM.
-        
-        This is for learning/testing only. Production implementation would use
-        custom two-phase SpGEMM kernels as described in the plan.
+        cpu_csr = csr_gpu.to_cpu()
+        return cls(cpu_csr, triangular=csr_gpu.triangular)
+
+    def __matmul__(self, other):
+        """Matrix multiplication using AVOS operations.
+
+        For upper-triangular self-multiplication (A @ A), routes to the
+        production SpGEMM pipeline. Falls back to a naive dense path for
+        small non-triangular matrices.
         """
         if not isinstance(other, rb_matrix_gpu):
             raise TypeError("Can only multiply rb_matrix_gpu with rb_matrix_gpu")
-        
+
         if self.shape[1] != other.shape[0]:
             raise ValueError(f"Shape mismatch: {self.shape} @ {other.shape}")
-        
-        # NAIVE APPROACH: Convert to dense, multiply, convert back
-        # This is EXTREMELY inefficient and only for demonstration
-        # Real implementation would use custom SpGEMM kernels
-        
-        import warnings
+
+        # Fast path: triangular self-multiply via production SpGEMM
+        if self.triangular and other.triangular:
+            return self._spgemm_matmul(other)
+
+        # Slow path: naive dense fallback
+        return self._naive_matmul(other)
+
+    def _spgemm_matmul(self, other):
+        """Route to production SpGEMM pipeline."""
+        from .spgemm import spgemm_upper_triangular, matmul_gpu
+
+        a_csr = self.to_csr_gpu()
+
+        if other is self:
+            c_csr = spgemm_upper_triangular(a_csr)
+        else:
+            b_csr = other.to_csr_gpu()
+            c_csr = matmul_gpu(a_csr, b_csr)
+
+        return rb_matrix_gpu.from_csr_gpu(c_csr)
+
+    def _naive_matmul(self, other):
+        """Naive dense matrix multiplication (deprecated fallback)."""
+        from .core import avos_sum_gpu as _naive_sum, avos_product_gpu as _naive_prod
+
         warnings.warn(
-            "Using naive dense matrix multiplication. "
-            "This is for learning only and will be slow/memory-intensive!",
-            UserWarning,
-            stacklevel=2
+            "Using naive dense matrix multiplication for non-triangular matrices. "
+            "This is slow and will be removed in a future release. "
+            "Convert to CSRMatrixGPU and use spgemm_upper_triangular() instead.",
+            DeprecationWarning,
+            stacklevel=3,
         )
-        
-        # For very small matrices only
+
         if self.nnz > 10000 or other.nnz > 10000:
             raise NotImplementedError(
                 "Naive implementation limited to small matrices (nnz < 10k). "
                 "Use optimized SpGEMM kernels for production."
             )
-        
-        # Convert to dense
+
         A_dense = self.data.toarray()
         B_dense = other.data.toarray()
-        
-        # Result matrix
         C_dense = cp.zeros((self.shape[0], other.shape[1]), dtype=cp.float32)
-        
-        # Naive triple loop (extremely slow, for demonstration only)
+
         m, n, p = self.shape[0], self.shape[1], other.shape[1]
-        
+
         for i in range(m):
             for j in range(p):
-                # Skip if triangular and j < i
                 if self.triangular and j < i:
                     continue
-                
-                # Compute C[i,j] = sum over k of avos_product(A[i,k], B[k,j])
                 acc = cp.float32(0)
                 for k in range(n):
                     if A_dense[i, k] != 0 and B_dense[k, j] != 0:
-                        prod = avos_product_gpu(A_dense[i, k], B_dense[k, j])
-                        acc = avos_sum_gpu(acc, prod)
+                        prod = _naive_prod(A_dense[i, k], B_dense[k, j])
+                        acc = _naive_sum(acc, prod)
                 C_dense[i, j] = acc
-        
-        # Convert back to sparse
+
         C_sparse = cp_sparse.csr_matrix(C_dense)
-        
         return rb_matrix_gpu(C_sparse, triangular=self.triangular)
-    
+
     def __repr__(self):
         return (f"rb_matrix_gpu(shape={self.shape}, nnz={self.nnz}, "
                 f"triangular={self.triangular}, device='gpu')")

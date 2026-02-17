@@ -1,63 +1,76 @@
 """
-GPU-accelerated AVOS operations using CuPy and CUDA.
+GPU-accelerated Red-Black Graph operations using CuPy and CUDA.
 
-This is a minimal naive implementation to understand:
-1. Build system integration with meson
-2. CuPy integration for GPU arrays
-3. CUDA kernel compilation
-4. Installation on DGX Spark (Grace Hopper)
+Exports
+-------
+Availability:
+    CUPY_AVAILABLE       — True when CuPy + CUDA GPU are usable
+    is_gpu_available()   — same, as a callable
 
-Status: Proof of concept / learning implementation
+Element-wise AVOS ops (production int32 via RawKernel):
+    avos_sum_gpu, avos_product_gpu
+
+Sparse matrix types and SpGEMM:
+    CSRMatrixGPU
+    spgemm_upper_triangular, matmul_gpu, spgemm_with_stats, SpGEMMStats
+
+High-level matrix wrapper:
+    rb_matrix_gpu
+
+Device policy:
+    DevicePolicy, get_device_policy, set_device_policy, device, resolve_device
 """
 
-__all__ = ['rb_matrix_gpu', 'avos_sum_gpu', 'avos_product_gpu']
+# Single source of truth for CuPy / CUDA availability
+from ._cuda_utils import CUPY_AVAILABLE, check_cupy, is_gpu_available
 
-try:
-    import cupy as cp
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
-    cp = None
+# Device policy (works without CuPy)
+from ._device_policy import (
+    DevicePolicy,
+    device,
+    get_device_policy,
+    resolve_device,
+    set_device_policy,
+)
 
+__all__ = [
+    # Availability
+    "CUPY_AVAILABLE",
+    "is_gpu_available",
+    # Device policy
+    "DevicePolicy",
+    "device",
+    "get_device_policy",
+    "set_device_policy",
+    "resolve_device",
+]
 
-def _try_preload_nvrtc() -> bool:
-    if not CUPY_AVAILABLE:
-        return False
+# Production int32 AVOS ops and sparse infrastructure require CuPy at import
+# time because the CUDA kernels are compiled eagerly.  Guard so that
+# ``import redblackgraph.gpu`` never fails on CPU-only machines.
+if CUPY_AVAILABLE:
+    # Production element-wise AVOS operations (int32 RawKernel)
+    from .avos_kernels import avos_product_gpu, avos_sum_gpu
 
-    try:
-        import ctypes
-        import glob
-        import os
-        import site
+    # CSR matrix and SpGEMM
+    from .csr_gpu import CSRMatrixGPU
+    from .spgemm import (
+        SpGEMMStats,
+        matmul_gpu,
+        spgemm_upper_triangular,
+        spgemm_with_stats,
+    )
 
-        # CuPy loads several CUDA libraries via dlopen("lib*.so.*"). If the user
-        # installed NVIDIA Python runtime wheels, preload those libraries from
-        # site-packages so they are discoverable even without a system CUDA toolkit.
-        loaded_any = False
-        for sp in site.getsitepackages():
-            patterns = [
-                os.path.join(sp, "nvidia", "cuda_nvrtc", "lib", "libnvrtc.so*"),
-                os.path.join(sp, "nvidia", "cublas", "lib", "libcublas.so*"),
-                os.path.join(sp, "nvidia", "cusparse", "lib", "libcusparse.so*"),
-            ]
+    # High-level matrix wrapper
+    from .matrix import rb_matrix_gpu
 
-            for pat in patterns:
-                cand = glob.glob(pat)
-                if cand:
-                    cand.sort(reverse=True)
-                    ctypes.CDLL(cand[0], mode=ctypes.RTLD_GLOBAL)
-                    loaded_any = True
-
-        return loaded_any
-    except Exception:
-        return False
-
-
-if CUPY_AVAILABLE and not _try_preload_nvrtc():
-    # If NVRTC can't be loaded, CuPy kernels will fail at runtime.
-    # Mark GPU as unavailable so tests can skip cleanly.
-    CUPY_AVAILABLE = False
-    cp = None
-
-from .core import avos_sum_gpu, avos_product_gpu
-from .matrix import rb_matrix_gpu
+    __all__ += [
+        "avos_sum_gpu",
+        "avos_product_gpu",
+        "CSRMatrixGPU",
+        "spgemm_upper_triangular",
+        "matmul_gpu",
+        "spgemm_with_stats",
+        "SpGEMMStats",
+        "rb_matrix_gpu",
+    ]

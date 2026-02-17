@@ -12,21 +12,12 @@ import numpy as np
 import warnings
 from typing import Optional, Tuple
 
-try:
+from ._cuda_utils import CUPY_AVAILABLE, check_cupy as _check_cupy
+
+if CUPY_AVAILABLE:
     import cupy as cp
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
+else:
     cp = None
-
-
-def _check_cupy():
-    """Check if CuPy is available."""
-    if not CUPY_AVAILABLE:
-        raise ImportError(
-            "CuPy is required for GPU operations. "
-            "Install it with: pip install cupy-cuda12x"
-        )
 
 
 class CSRMatrixGPU:

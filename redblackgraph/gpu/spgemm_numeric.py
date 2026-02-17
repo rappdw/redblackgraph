@@ -15,11 +15,11 @@ The numeric phase computes:
 import numpy as np
 from typing import Tuple
 
-try:
+from ._cuda_utils import CUPY_AVAILABLE
+
+if CUPY_AVAILABLE:
     import cupy as cp
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
+else:
     cp = None
 
 
