@@ -273,6 +273,29 @@ class CSRMatrixGPU:
         from .transitive_closure import transitive_closure_gpu
         return transitive_closure_gpu(self, max_iterations=max_iterations)
 
+    def prefetch(self, device=None):
+        """
+        Prefetch all CSR arrays to the specified device using cudaMemPrefetchAsync.
+
+        On Grace Hopper / GB10 with unified memory, this hints the driver to
+        migrate pages before they are accessed, reducing first-touch faults.
+        On discrete GPUs this is a no-op if the memory is already device-resident.
+
+        Args:
+            device: CuPy device or int. If None, uses the current device.
+        """
+        if device is None:
+            device = cp.cuda.Device()
+        elif isinstance(device, int):
+            device = cp.cuda.Device(device)
+
+        stream = cp.cuda.get_current_stream()
+        for arr in (self.data, self.indices, self.indptr):
+            if arr.nbytes > 0:
+                cp.cuda.runtime.memPrefetchAsync(
+                    arr.data.ptr, arr.nbytes, device.id, stream.ptr
+                )
+
     def __repr__(self) -> str:
         tri_str = " (upper triangular)" if self.triangular else ""
         return (

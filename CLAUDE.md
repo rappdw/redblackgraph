@@ -62,6 +62,15 @@ Three computation backends share the same AVOS algebra semantics:
 - RED_ONE/BLACK_ONE have asymmetric identity/annihilator behavior based on parity — this is NOT a classical semiring
 - All three backends must maintain identical parity constraint semantics
 
+### GPU backend details
+
+The GPU module (`redblackgraph/gpu/`) is pure Python with inline CUDA via CuPy `RawKernel`:
+
+- **`CSRMatrixGPU`** — Sparse matrix with raw int32 buffers (not CuPy sparse). Supports `@` operator, `copy()`, `eliminate_zeros()`, `transitive_closure()`, `prefetch()` (for Grace Hopper UVM).
+- **`spgemm(A, B=None)`** — Two-phase SpGEMM: symbolic phase computes sparsity pattern via per-row hash tables in global memory, numeric phase computes AVOS values using `atomicMin`. Supports both `A @ A` (self-multiply with triangular optimization) and general `A @ B`.
+- **`transitive_closure_gpu(A)`** — Repeated squaring on GPU: `TC(A) = A + A² + A⁴ + ...`. All data stays GPU-resident between iterations (no CPU round-trips).
+- **Kernel singletons**: `SymbolicPhase`, `NumericPhase`, and `AVOSKernels` classes compile CUDA kernels once via `cp.RawKernel` and cache via `get_*()` functions.
+
 ### Key code generation pipeline (dense backend)
 
 Tempita templates (`.h.in`, `.c.in`) → processed by `tempita` → C source → compiled via Meson. NumPy `.c.src` files use `/**begin repeat*/` blocks for multi-type generation. Both happen at build time.
