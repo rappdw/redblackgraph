@@ -15,8 +15,6 @@ __all__ = [
     'CSRMatrixGPU',
     'spgemm', 'spgemm_upper_triangular', 'matmul_gpu',
     'transitive_closure_gpu',
-    # Legacy (naive implementation)
-    'rb_matrix_gpu', 'avos_sum_gpu', 'avos_product_gpu',
 ]
 
 try:
@@ -74,6 +72,4 @@ from .csr_gpu import CSRMatrixGPU
 from .spgemm import spgemm, spgemm_upper_triangular, matmul_gpu
 from .transitive_closure import transitive_closure_gpu
 
-# Legacy (naive implementation)
-from .core import avos_sum_gpu, avos_product_gpu
-from .matrix import rb_matrix_gpu
+
