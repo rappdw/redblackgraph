@@ -232,6 +232,47 @@ class CSRMatrixGPU:
         """Data type of values (always int32)."""
         return self.data.dtype
     
+    def __matmul__(self, other):
+        """Matrix multiplication: C = self @ other using AVOS SpGEMM."""
+        from .spgemm import spgemm
+        if not isinstance(other, CSRMatrixGPU):
+            return NotImplemented
+        return spgemm(self, other)
+
+    def copy(self):
+        """Return a deep copy of this matrix."""
+        return CSRMatrixGPU(
+            self.data.copy(),
+            self.indices.copy(),
+            self.indptr.copy(),
+            self.shape,
+            triangular=self.triangular,
+            validate=False
+        )
+
+    def eliminate_zeros(self):
+        """Remove zero entries from the matrix (in-place)."""
+        mask = self.data != 0
+        if cp.all(mask):
+            return  # Nothing to do
+        new_data = self.data[mask]
+        new_indices = self.indices[mask]
+        # Rebuild indptr
+        indptr_cpu = self.indptr.get()
+        data_mask_cpu = mask.get()
+        new_indptr = np.zeros_like(indptr_cpu)
+        for i in range(len(indptr_cpu) - 1):
+            start, end = indptr_cpu[i], indptr_cpu[i + 1]
+            new_indptr[i + 1] = new_indptr[i] + int(np.sum(data_mask_cpu[start:end]))
+        self.data = new_data
+        self.indices = new_indices
+        self.indptr = cp.asarray(new_indptr)
+
+    def transitive_closure(self, max_iterations=64):
+        """Compute transitive closure via repeated squaring on GPU."""
+        from .transitive_closure import transitive_closure_gpu
+        return transitive_closure_gpu(self, max_iterations=max_iterations)
+
     def __repr__(self) -> str:
         tri_str = " (upper triangular)" if self.triangular else ""
         return (

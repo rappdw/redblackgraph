@@ -1,16 +1,23 @@
 """
 GPU-accelerated AVOS operations using CuPy and CUDA.
 
-This is a minimal naive implementation to understand:
-1. Build system integration with meson
-2. CuPy integration for GPU arrays
-3. CUDA kernel compilation
-4. Installation on DGX Spark (Grace Hopper)
+Provides sparse matrix multiplication (SpGEMM) and transitive closure
+on GPU using the AVOS semiring, with global memory hash tables for
+unlimited output columns per row.
 
-Status: Proof of concept / learning implementation
+Production API:
+- CSRMatrixGPU: Sparse matrix on GPU with raw int32 buffers
+- spgemm: General A @ B sparse matrix multiply
+- transitive_closure_gpu: Repeated squaring on GPU
 """
 
-__all__ = ['rb_matrix_gpu', 'avos_sum_gpu', 'avos_product_gpu']
+__all__ = [
+    'CSRMatrixGPU',
+    'spgemm', 'spgemm_upper_triangular', 'matmul_gpu',
+    'transitive_closure_gpu',
+    # Legacy (naive implementation)
+    'rb_matrix_gpu', 'avos_sum_gpu', 'avos_product_gpu',
+]
 
 try:
     import cupy as cp
@@ -62,5 +69,11 @@ if CUPY_AVAILABLE:
         CUPY_AVAILABLE = False
         cp = None
 
+# Production API
+from .csr_gpu import CSRMatrixGPU
+from .spgemm import spgemm, spgemm_upper_triangular, matmul_gpu
+from .transitive_closure import transitive_closure_gpu
+
+# Legacy (naive implementation)
 from .core import avos_sum_gpu, avos_product_gpu
 from .matrix import rb_matrix_gpu

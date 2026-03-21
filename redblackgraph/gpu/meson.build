@@ -9,6 +9,7 @@ python_sources = [
   'spgemm_symbolic.py',
   'spgemm_numeric.py',
   'spgemm.py',
+  'transitive_closure.py',
   'README.md',
 ]
 
