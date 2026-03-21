@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Setup development environment using uv.
+#
+# Usage:
+#   ./bin/setup-uv.sh          # CPU only
+#   ./bin/setup-uv.sh --gpu    # Include GPU (CuPy) dependencies
+#
+# Prerequisites:
+#   - uv on PATH (https://docs.astral.sh/uv/)
+#   - fs-crawler submodule initialized (git submodule update --init)
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${repo_root}"
 
 if ! command -v uv >/dev/null 2>&1; then
   echo "ERROR: 'uv' is not installed or not on PATH." >&2
@@ -9,17 +20,9 @@ if ! command -v uv >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! command -v ninja >/dev/null 2>&1; then
-  echo "ERROR: 'ninja' is required for meson builds but was not found on PATH." >&2
-  echo "On Debian/Ubuntu: sudo apt install ninja-build" >&2
-  exit 1
-fi
-
 if [[ ! -d "${repo_root}/fs-crawler" ]]; then
-  echo "ERROR: Expected submodule directory '${repo_root}/fs-crawler' was not found." >&2
-  echo "If you use git submodules, initialize it first:" >&2
-  echo "  git submodule update --init --recursive" >&2
-  exit 1
+  echo "Initializing fs-crawler submodule..."
+  git submodule update --init --recursive
 fi
 
 install_gpu=0
@@ -27,47 +30,36 @@ if [[ "${1:-}" == "--gpu" ]]; then
   install_gpu=1
 fi
 
-install_spec="."
-if [[ "${install_gpu}" == "1" ]]; then
-  install_spec=".[gpu]"
-fi
-
-cd "${repo_root}"
-
+# Create venv with uv-managed Python
 uv venv --seed
 
-rm -rf "${repo_root}/build/cp312"
+# Clean stale meson build dirs (editable loader references a specific path)
+rm -rf "${repo_root}/build"
 
-# Build + test tooling
+# Install build dependencies into the venv.
+# Meson-python editable installs require --no-build-isolation, which means
+# build deps from [build-system].requires must be pre-installed.
 uv pip install \
   meson-python \
   meson \
+  ninja \
   cython \
   tempita \
-  numpy \
-  pytest \
-  pytest-cov \
-  pylint
+  numpy
 
+# Editable install with test + io extras
+uv pip install -e ".[test,io]" --no-build-isolation
+
+# GPU extras (optional)
 if [[ "${install_gpu}" == "1" ]]; then
-  uv pip install \
-    cupy-cuda12x \
-    nvidia-cuda-nvrtc-cu12 \
-    nvidia-cublas-cu12 \
-    nvidia-cusparse-cu12
+  uv pip install cupy-cuda12x
 fi
-
-PATH="${repo_root}/.venv/bin:${PATH}" .venv/bin/python -m pip install -e "${install_spec}" --no-build-isolation
-
-# Optional deps used by some utilities/tests
-uv pip install --editable ./fs-crawler XlsxWriter
 
 cat <<'EOF'
 
 Environment is ready.
 
-Next:
   source .venv/bin/activate
-  uv run -m pytest
+  pytest tests/
 
 EOF

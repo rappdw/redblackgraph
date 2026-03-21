@@ -77,26 +77,24 @@ pip install build
 python -m build
 ```
 
-**Note on `uv` users:** If you're using `uv` as your package manager, you may encounter build errors with `uv pip install -e .` due to temporary build directory issues with ninja. Use standard `pip` with `--no-build-isolation` instead:
-```bash
-# For uv users - use pip directly
-.venv/bin/pip install -e . --no-build-isolation
-```
+### uv users
 
-### uv setup script
-
-If you use `uv`, a convenience script is provided to create a fresh `.venv`, install build/test dependencies, perform an editable install using `pip` with `--no-build-isolation`, and install the `test` extra:
+Meson-python editable installs require `--no-build-isolation` (the editable loader
+needs a persistent build directory). A setup script handles this:
 
 ```bash
-./bin/setup-uv.sh
+./bin/setup-uv.sh           # CPU only
+./bin/setup-uv.sh --gpu     # Include CuPy for GPU support
 source .venv/bin/activate
-uv run -m pytest
+pytest tests/
 ```
 
-The script expects:
-- `uv` on your `PATH`
-- the `ninja` build tool installed (e.g. `sudo apt install ninja-build` on Debian/Ubuntu)
-- the `fs-crawler` submodule present at `./fs-crawler`
+Or manually:
+```bash
+uv venv
+uv pip install meson-python meson ninja cython tempita numpy
+uv pip install -e ".[test,io]" --no-build-isolation
+```
 
 The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 
