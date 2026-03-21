@@ -35,10 +35,15 @@ def _try_preload_nvrtc() -> bool:
         return False
 
 
-if CUPY_AVAILABLE and not _try_preload_nvrtc():
-    CUPY_AVAILABLE = False
-    cp = None
-    
+if CUPY_AVAILABLE:
+    _try_preload_nvrtc()  # Best-effort: helps when using pip-installed CUDA wheels
+    # Verify NVRTC actually works (system CUDA toolkit or preloaded wheels)
+    try:
+        cp.RawKernel('extern "C" __global__ void _rbg_probe() {}', '_rbg_probe')
+    except Exception:
+        CUPY_AVAILABLE = False
+        cp = None
+
 
 def _check_cupy():
     """Check if CuPy is available."""

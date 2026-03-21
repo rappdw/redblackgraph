@@ -53,11 +53,14 @@ def _try_preload_nvrtc() -> bool:
         return False
 
 
-if CUPY_AVAILABLE and not _try_preload_nvrtc():
-    # If NVRTC can't be loaded, CuPy kernels will fail at runtime.
-    # Mark GPU as unavailable so tests can skip cleanly.
-    CUPY_AVAILABLE = False
-    cp = None
+if CUPY_AVAILABLE:
+    _try_preload_nvrtc()  # Best-effort: helps when using pip-installed CUDA wheels
+    # Verify NVRTC actually works (system CUDA toolkit or preloaded wheels)
+    try:
+        cp.RawKernel('extern "C" __global__ void _rbg_probe() {}', '_rbg_probe')
+    except Exception:
+        CUPY_AVAILABLE = False
+        cp = None
 
 from .core import avos_sum_gpu, avos_product_gpu
 from .matrix import rb_matrix_gpu

@@ -189,9 +189,13 @@ class rb_matrix_gpu:
                         acc = avos_sum_gpu(acc, prod)
                 C_dense[i, j] = acc
         
-        # Convert back to sparse
-        C_sparse = cp_sparse.csr_matrix(C_dense)
-        
+        # Convert back to sparse without cuBLAS (avoid dense2csr which needs libcublas)
+        mask = C_dense != 0
+        indices = cp.where(mask)
+        data = C_dense[indices]
+        rows, cols = indices
+        C_sparse = cp_sparse.csr_matrix((data, (rows, cols)), shape=C_dense.shape)
+
         return rb_matrix_gpu(C_sparse, triangular=self.triangular)
     
     def __repr__(self):
