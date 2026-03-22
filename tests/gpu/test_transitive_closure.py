@@ -1,5 +1,5 @@
 """
-Tests for GPU transitive closure via repeated squaring.
+Tests for GPU transitive closure via repeated squaring and DAG-specific kernel.
 
 Validates against CPU transitive_closure_squaring() for bit-exact match.
 """
@@ -10,7 +10,7 @@ import scipy.sparse as sp
 
 try:
     import cupy as cp
-    from redblackgraph.gpu import CSRMatrixGPU, transitive_closure_gpu
+    from redblackgraph.gpu import CSRMatrixGPU, transitive_closure_gpu, transitive_closure_dag_gpu
     from redblackgraph.gpu.transitive_closure import sparse_avos_sum_gpu, sparse_equal_gpu
     CUPY_AVAILABLE = True
 except ImportError:
@@ -262,3 +262,99 @@ class TestCSRMatrixGPUOperators:
         assert A.nnz == 3
         A.eliminate_zeros()
         assert A.nnz == 2
+
+
+class TestTransitiveClosureDAGGPU:
+    """Tests for the level-parallel DAG transitive closure kernel."""
+
+    def test_matches_cpu_upper_triangular(self):
+        """GPU DAG closure matches CPU on upper-triangular matrix."""
+        A = np.array([
+            [-1,  2,  0,  4],
+            [ 0,  1,  3,  0],
+            [ 0,  0, -1,  2],
+            [ 0,  0,  0,  1],
+        ], dtype=np.int32)
+        A_csr = sp.csr_matrix(A)
+        from redblackgraph.sparse.csgraph import transitive_closure_squaring
+        tc_cpu = transitive_closure_squaring(A_csr)
+
+        A_gpu = CSRMatrixGPU.from_cpu(A_csr)
+        tc_dag, diameter = transitive_closure_dag_gpu(A_gpu)
+        result = tc_dag.to_cpu().toarray()
+
+        np.testing.assert_array_equal(tc_cpu.W.toarray(), result)
+
+    def test_matches_cpu_lower_triangular(self):
+        """GPU DAG closure matches CPU on lower-triangular matrix."""
+        A = np.array([
+            [ 1,  0,  0,  0],
+            [ 2, -1,  0,  0],
+            [ 0,  3,  1,  0],
+            [ 4,  0,  2, -1],
+        ], dtype=np.int32)
+        A_csr = sp.csr_matrix(A)
+        from redblackgraph.sparse.csgraph import transitive_closure_squaring
+        tc_cpu = transitive_closure_squaring(A_csr)
+
+        A_gpu = CSRMatrixGPU.from_cpu(A_csr)
+        tc_dag, diameter = transitive_closure_dag_gpu(A_gpu)
+        result = tc_dag.to_cpu().toarray()
+
+        np.testing.assert_array_equal(tc_cpu.W.toarray(), result)
+
+    def test_matches_gpu_squaring(self):
+        """GPU DAG closure matches GPU repeated squaring on same input."""
+        A = np.array([
+            [-1,  2,  0,  0,  4],
+            [ 0,  1,  3,  0,  0],
+            [ 0,  0, -1,  2,  0],
+            [ 0,  0,  0,  1,  3],
+            [ 0,  0,  0,  0, -1],
+        ], dtype=np.int32)
+        A_csr = sp.csr_matrix(A)
+        A_gpu = CSRMatrixGPU.from_cpu(A_csr)
+
+        tc_sqr, _ = transitive_closure_gpu(A_gpu.copy())
+        tc_dag, _ = transitive_closure_dag_gpu(A_gpu.copy())
+
+        np.testing.assert_array_equal(
+            tc_sqr.to_cpu().toarray(),
+            tc_dag.to_cpu().toarray()
+        )
+
+    def test_empty_matrix(self):
+        """GPU DAG closure handles empty matrix."""
+        A_csr = sp.csr_matrix((0, 0), dtype=np.int32)
+        A_gpu = CSRMatrixGPU.from_cpu(A_csr)
+        tc, diameter = transitive_closure_dag_gpu(A_gpu)
+        assert tc.shape == (0, 0)
+        assert tc.nnz == 0
+
+    def test_identity_only(self):
+        """GPU DAG closure handles diagonal-only matrix."""
+        A = sp.diags([1, -1, 1], 0, shape=(3, 3), dtype=np.int32, format='csr')
+        A_gpu = CSRMatrixGPU.from_cpu(A)
+        tc, diameter = transitive_closure_dag_gpu(A_gpu)
+        result = tc.to_cpu().toarray()
+        np.testing.assert_array_equal(result, A.toarray())
+
+    def test_synthesized_family_dag(self):
+        """GPU DAG closure matches CPU on synthesized family graph."""
+        from redblackgraph.util.synthesizer import FamilyDagSynthesizer, SynthesizerConfig
+        config = SynthesizerConfig(
+            num_initial_nodes=20, pct_red=50.0, avg_children_per_pairing=2.5,
+            num_generations=4, pct_monogamous=60.0, pct_non_procreating=15.0,
+            seed=42, max_total_vertices=500,
+        )
+        m = FamilyDagSynthesizer(config).synthesize().matrix
+        from redblackgraph.sparse.csgraph import transitive_closure_squaring
+        tc_cpu = transitive_closure_squaring(m)
+
+        A_gpu = CSRMatrixGPU.from_cpu(m)
+        tc_dag, _ = transitive_closure_dag_gpu(A_gpu)
+
+        np.testing.assert_array_equal(
+            tc_cpu.W.toarray(),
+            tc_dag.to_cpu().toarray()
+        )
