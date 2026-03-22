@@ -73,6 +73,36 @@ __global__ void count_candidates_kernel(
 '''
 
 
+# CUDA kernel to compute hash table sizes from candidate counts (all on GPU)
+COMPUTE_TABLE_SIZES_KERNEL = r'''
+extern "C" __global__ void compute_table_sizes(
+    const int* __restrict__ candidates,
+    int* __restrict__ table_sizes,
+    int n_rows
+) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= n_rows) return;
+
+    int c = candidates[i];
+    if (c <= 0) {
+        table_sizes[i] = 0;
+        return;
+    }
+
+    // next_power_of_2(2 * c)
+    unsigned int n = (unsigned int)(2 * c);
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    table_sizes[i] = (int)n;
+}
+'''
+
+
 # CUDA kernel for symbolic phase using global memory hash tables
 SYMBOLIC_HASH_KERNEL = r'''
 extern "C" {
@@ -210,6 +240,9 @@ class SymbolicPhase:
         self._count_module = cp.RawModule(code=COUNT_CANDIDATES_KERNEL)
         self._count_kernel = self._count_module.get_function('count_candidates_kernel')
 
+        self._table_sizes_module = cp.RawModule(code=COMPUTE_TABLE_SIZES_KERNEL)
+        self._table_sizes_kernel = self._table_sizes_module.get_function('compute_table_sizes')
+
         self._hash_module = cp.RawModule(code=SYMBOLIC_HASH_KERNEL)
         self._hash_kernel = self._hash_module.get_function('symbolic_hash_kernel')
         self._count_entries_kernel = self._hash_module.get_function('count_hash_entries_kernel')
@@ -261,18 +294,17 @@ class SymbolicPhase:
              candidates, n_rows, ut_flag)
         )
 
-        # Step 2: Compute hash table sizes (next power of 2, with load factor 0.5)
-        # table_size = next_pow2(max(1, 2 * candidates))
-        candidates_cpu = candidates.get()
-        table_sizes_cpu = np.array([
-            _next_power_of_2(max(1, 2 * c)) if c > 0 else 0
-            for c in candidates_cpu
-        ], dtype=np.int32)
+        # Step 2: Compute hash table sizes on GPU (next power of 2, with load factor 0.5)
+        table_sizes = cp.zeros(n_rows, dtype=cp.int32)
+        self._table_sizes_kernel(
+            (grid_size,), (block_size,),
+            (candidates, table_sizes, n_rows)
+        )
 
-        # Step 3: Compute table offsets (prefix sum) - use int64 for large tables
-        table_offsets_cpu = np.zeros(n_rows + 1, dtype=np.int64)
-        table_offsets_cpu[1:] = np.cumsum(table_sizes_cpu.astype(np.int64))
-        total_hash_size = int(table_offsets_cpu[-1])
+        # Step 3: Compute table offsets (prefix sum) on GPU - use int64 for large tables
+        table_offsets_full = cp.zeros(n_rows + 1, dtype=cp.int64)
+        table_offsets_full[1:] = cp.cumsum(table_sizes.astype(cp.int64))
+        total_hash_size = int(table_offsets_full[-1].get())
 
         # Check memory usage and warn if very large
         hash_memory_mb = total_hash_size * 4 / (1024 * 1024)
@@ -283,8 +315,7 @@ class SymbolicPhase:
                 f"This may cause out-of-memory errors on some GPUs."
             )
 
-        table_sizes = cp.asarray(table_sizes_cpu, dtype=cp.int32)
-        table_offsets = cp.asarray(table_offsets_cpu[:-1], dtype=cp.int64)  # Don't need last element
+        table_offsets = table_offsets_full[:-1]  # Don't need last element
 
         # Step 4: Allocate and initialize hash tables
         if total_hash_size > 0:

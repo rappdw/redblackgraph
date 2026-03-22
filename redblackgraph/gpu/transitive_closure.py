@@ -183,14 +183,87 @@ def sparse_equal_gpu(A: CSRMatrixGPU, B: CSRMatrixGPU) -> bool:
     )
 
 
+_CSR_TO_ROW_KERNEL = r'''
+extern "C" __global__ void csr_to_row_indices(
+    const int* __restrict__ indptr,
+    int* __restrict__ row_indices,
+    int n_rows
+) {
+    int row = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row >= n_rows) return;
+
+    int start = indptr[row];
+    int end = indptr[row + 1];
+    for (int i = start; i < end; i++) {
+        row_indices[i] = row;
+    }
+}
+'''
+
+_csr_to_row_module = None
+
+
 def _csr_to_row_indices(indptr: 'cp.ndarray', nnz: int) -> 'cp.ndarray':
-    """Convert CSR indptr to row index array (COO row indices)."""
+    """Convert CSR indptr to row index array (COO row indices). All on GPU."""
+    global _csr_to_row_module
     n_rows = len(indptr) - 1
-    # cp.repeat needs CPU counts; use numpy for the repeat
-    counts_cpu = cp.diff(indptr).get().astype(np.int32)
-    row_ids_cpu = np.arange(n_rows, dtype=np.int32)
-    row_indices_cpu = np.repeat(row_ids_cpu, counts_cpu)
-    return cp.asarray(row_indices_cpu)
+    row_indices = cp.empty(nnz, dtype=cp.int32)
+    if nnz == 0:
+        return row_indices
+    if _csr_to_row_module is None:
+        _csr_to_row_module = cp.RawModule(code=_CSR_TO_ROW_KERNEL)
+    kernel = _csr_to_row_module.get_function('csr_to_row_indices')
+    block_size = 256
+    grid_size = (n_rows + block_size - 1) // block_size
+    kernel((grid_size,), (block_size,),
+           (indptr, row_indices, n_rows))
+    return row_indices
+
+
+_REDUCE_AVOS_KERNEL = r'''
+extern "C" __global__ void reduce_avos_sum(
+    const int* __restrict__ sorted_data,
+    const long long* __restrict__ unique_indices,
+    const long long* __restrict__ group_ends,
+    int* __restrict__ result,
+    int n_unique
+) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid >= n_unique) return;
+
+    long long start = unique_indices[tid];
+    long long end = group_ends[tid];
+
+    if (end - start == 1) {
+        result[tid] = sorted_data[start];
+        return;
+    }
+
+    // Find element with minimum absolute value
+    int best = sorted_data[start];
+    int best_abs = best < 0 ? -best : best;
+
+    for (long long i = start + 1; i < end; i++) {
+        int val = sorted_data[i];
+        int val_abs = val < 0 ? -val : val;
+        if (val_abs < best_abs) {
+            best = val;
+            best_abs = val_abs;
+        }
+    }
+
+    result[tid] = best;
+}
+'''
+
+_reduce_avos_module = None
+
+
+def _get_reduce_avos_kernel():
+    global _reduce_avos_module
+    if _reduce_avos_module is None:
+        _reduce_avos_module = cp.RawModule(code=_REDUCE_AVOS_KERNEL)
+    return _reduce_avos_module.get_function('reduce_avos_sum')
 
 
 def _reduce_avos_sum(
@@ -200,41 +273,19 @@ def _reduce_avos_sum(
 ) -> 'cp.ndarray':
     """
     For each group of duplicate (row, col) entries, compute AVOS sum.
-
-    AVOS sum = min of absolute values, keeping the sign of the minimum.
-    If abs values tie, keep the first (from A).
+    All on GPU via a CUDA kernel.
     """
     n_unique = len(unique_indices)
     result = cp.empty(n_unique, dtype=cp.int32)
 
-    # Compute group boundaries
-    group_ends = cp.concatenate([unique_indices[1:], cp.array([total_len])])
+    # Ensure int64 to match unique_indices (from cp.where)
+    unique_indices = cp.asarray(unique_indices, dtype=cp.int64)
+    group_ends = cp.concatenate([unique_indices[1:], cp.array([total_len], dtype=cp.int64)])
 
-    # For groups of size 1 (most common), just copy
-    group_sizes = group_ends - unique_indices
-    single_mask = group_sizes == 1
-    result[single_mask] = sorted_data[unique_indices[single_mask]]
-
-    # For groups of size > 1, find minimum absolute value
-    multi_mask = ~single_mask
-    multi_indices = cp.where(multi_mask)[0]
-
-    if len(multi_indices) > 0:
-        # Process multi-entry groups on CPU (typically small number of duplicates)
-        multi_idx_cpu = multi_indices.get()
-        unique_idx_cpu = unique_indices.get()
-        group_ends_cpu = group_ends.get()
-        sorted_data_cpu = sorted_data.get()
-        result_cpu = result.get()
-
-        for i in multi_idx_cpu:
-            start = unique_idx_cpu[i]
-            end = group_ends_cpu[i]
-            group = sorted_data_cpu[start:end]
-            abs_vals = np.abs(group)
-            min_idx = np.argmin(abs_vals)
-            result_cpu[i] = group[min_idx]
-
-        result = cp.asarray(result_cpu)
+    block_size = 256
+    grid_size = (n_unique + block_size - 1) // block_size
+    kernel = _get_reduce_avos_kernel()
+    kernel((grid_size,), (block_size,),
+           (sorted_data, unique_indices, group_ends, result, n_unique))
 
     return result

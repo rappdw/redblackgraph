@@ -1,4 +1,10 @@
-"""Benchmark CPU vs GPU transitive closure across graph sizes."""
+"""Benchmark CPU vs GPU transitive closure across graph sizes.
+
+Compares three paths:
+  1. CPU (auto)   — transitive_closure_squaring(), which now auto-detects
+                    DAGs and uses the O(V+E+nnz) Cython DAG algorithm
+  2. GPU (sqr)    — repeated squaring via CUDA SpGEMM
+"""
 
 import time
 import sys
@@ -46,13 +52,12 @@ for target in SIZES:
 
     print(f"\n--- Graph: {n:,} vertices, {nnz:,} nnz ---", flush=True)
 
-    # CPU: repeated squaring (same algorithm as GPU for fair comparison)
+    # CPU: auto-selects DAG algorithm for triangular matrices
     cpu_time = None
-    if n <= 25_000:
-        # Warm up
-        _ = transitive_closure_squaring(matrix)
+    if n <= 50_000:
+        _ = transitive_closure_squaring(matrix)  # warmup
         times_cpu = []
-        repeats = 3 if n <= 2000 else 1
+        repeats = 3 if n <= 5000 else 1
         for _ in range(repeats):
             t0 = time.perf_counter()
             tc_cpu = transitive_closure_squaring(matrix)
@@ -60,10 +65,9 @@ for target in SIZES:
             times_cpu.append(t1 - t0)
         cpu_time = min(times_cpu)
 
-    # GPU
+    # GPU: repeated squaring
     gpu_matrix = CSRMatrixGPU.from_cpu(matrix)
-    # Warm up
-    _ = transitive_closure_gpu(gpu_matrix.copy())
+    _ = transitive_closure_gpu(gpu_matrix.copy())  # warmup
 
     times_gpu = []
     repeats = 3 if n <= 5000 else 1
@@ -86,9 +90,9 @@ for target in SIZES:
     results.append((n, nnz, cpu_time, gpu_time))
 
 # Print table
-print("\n" + "=" * 72)
-print(f"{'Vertices':>10} {'NNZ':>10} {'CPU (s)':>12} {'GPU (s)':>12} {'Speedup':>10}")
-print("-" * 72)
+print("\n" + "=" * 80)
+print(f"{'Vertices':>10} {'NNZ':>10} {'CPU-DAG (s)':>14} {'GPU-Sqr (s)':>14} {'Relative':>12}")
+print("-" * 80)
 for n, nnz, cpu_t, gpu_t in results:
     cpu_str = f"{cpu_t:.4f}" if cpu_t is not None else "—"
     if cpu_t is not None:
@@ -99,8 +103,9 @@ for n, nnz, cpu_t, gpu_t in results:
             speedup_str = f"{1/ratio:.1f}x CPU"
     else:
         speedup_str = "—"
-    print(f"{n:>10,} {nnz:>10,} {cpu_str:>12} {gpu_t:>12.4f} {speedup_str:>10}")
-print("=" * 72)
-print("\nCPU = sparse repeated squaring (Cython/SciPy)")
-print("GPU = sparse repeated squaring (CUDA SpGEMM)")
-print("Crossover point: GPU faster when Speedup shows 'GPU'")
+    print(f"{n:>10,} {nnz:>10,} {cpu_str:>14} {gpu_t:>14.4f} {speedup_str:>12}")
+print("=" * 80)
+print("\nCPU-DAG = Cython topological propagation, O(V+E+nnz_closure)")
+print("GPU-Sqr = CUDA repeated squaring via SpGEMM, O(nnz² · log d)")
+print("\nNote: CPU uses an asymptotically better algorithm for DAGs.")
+print("GPU advantage requires a DAG-specific GPU kernel (not yet implemented).")
