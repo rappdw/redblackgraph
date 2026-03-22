@@ -14,7 +14,7 @@ Production API:
 __all__ = [
     'CSRMatrixGPU',
     'spgemm', 'spgemm_upper_triangular', 'matmul_gpu',
-    'transitive_closure_gpu',
+    'transitive_closure_gpu', 'transitive_closure_dag_gpu',
 ]
 
 try:
@@ -70,6 +70,6 @@ if CUPY_AVAILABLE:
 # Production API
 from .csr_gpu import CSRMatrixGPU
 from .spgemm import spgemm, spgemm_upper_triangular, matmul_gpu
-from .transitive_closure import transitive_closure_gpu
+from .transitive_closure import transitive_closure_gpu, transitive_closure_dag_gpu
 
 
