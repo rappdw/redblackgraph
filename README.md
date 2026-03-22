@@ -129,6 +129,54 @@ For detailed instructions, see:
 # A Note on Implementations
 
 * `redblackgraph.reference` - a pure python implementation. This simple implementation is intended primarily for illustrative purposes.
-* `redblackgraph.matrix` and `redblackgraph.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support avos sum and product. 
-* `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation.   
- 
+* `redblackgraph.matrix` and `redblackgraph.array` - a Numpy C-API extension for efficient computation with the matrix multiplication operator, @, overloaded to support avos sum and product.
+* `redblackgraph.sparse_matrix` - an optimized implementation built on scipy's sparse matrix implementation.
+* `redblackgraph.gpu` - GPU-accelerated sparse operations using CuPy and inline CUDA kernels. Provides SpGEMM (sparse matrix multiply) and transitive closure on GPU using the AVOS semiring.
+
+# GPU Acceleration
+
+The GPU module (`redblackgraph.gpu`) provides two transitive closure algorithms:
+
+1. **Repeated squaring** (`transitive_closure_gpu`) — works for any graph. Computes TC(A) = A + A² + A⁴ + ... via CUDA SpGEMM with all data GPU-resident between iterations.
+2. **Level-parallel DAG propagation** (`transitive_closure_dag_gpu`) — specialized for DAGs (triangular matrices). Processes vertices by topological level with full GPU parallelism within each level.
+
+## Performance
+
+Benchmarked on synthesized family DAGs (lower-triangular adjacency matrices). CPU uses the Cython O(V+E+nnz) topological propagation algorithm.
+
+| Vertices | NNZ | CPU-DAG (s) | GPU-Sqr (s) | GPU-DAG (s) | Best GPU/CPU |
+|----------|-----|-------------|-------------|-------------|-------------|
+| 442 | 1,226 | 0.0020 | 0.0039 | 0.0032 | 1.6x CPU |
+| 1,326 | 3,728 | 0.0080 | 0.0055 | 0.0038 | **2.1x GPU** |
+| 2,144 | 5,932 | 0.0129 | 0.0059 | 0.0043 | **3.0x GPU** |
+| 4,701 | 13,103 | 0.0292 | 0.0073 | 0.0057 | **5.1x GPU** |
+| 11,012 | 30,536 | 0.0700 | 0.0125 | 0.0087 | **8.1x GPU** |
+| 21,162 | 58,486 | 0.1380 | 0.0268 | 0.0138 | **10.0x GPU** |
+
+GPU crossover is ~1,000 vertices. The DAG kernel nearly doubles the speedup over repeated squaring at scale.
+
+### Requirements
+
+```bash
+pip install cupy-cuda12x  # or cupy-cuda11x for older CUDA
+```
+
+GPU features are optional — all functionality gracefully falls back to CPU when CuPy is unavailable.
+
+### Quick Start
+
+```python
+from redblackgraph.gpu import CSRMatrixGPU, transitive_closure_dag_gpu
+
+# Transfer sparse matrix to GPU
+A_gpu = CSRMatrixGPU.from_cpu(my_sparse_matrix)
+
+# Compute transitive closure
+closure, diameter = transitive_closure_dag_gpu(A_gpu)
+
+# Transfer result back to CPU
+result = closure.to_cpu()
+```
+
+Run `python bench_closure.py` to reproduce the benchmark on your hardware.
+

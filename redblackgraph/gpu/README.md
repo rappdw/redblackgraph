@@ -12,7 +12,7 @@ redblackgraph/gpu/
 ├── spgemm_symbolic.py     # Symbolic phase: compute output sparsity pattern via hash tables
 ├── spgemm_numeric.py      # Numeric phase: compute AVOS values with atomicMin
 ├── spgemm.py              # High-level SpGEMM API: spgemm(A, B)
-├── transitive_closure.py  # GPU-resident transitive closure via repeated squaring
+├── transitive_closure.py  # GPU transitive closure: repeated squaring + DAG-specific
 └── README.md              # This file
 ```
 
@@ -21,7 +21,9 @@ redblackgraph/gpu/
 ```python
 import numpy as np
 import scipy.sparse as sp
-from redblackgraph.gpu import CSRMatrixGPU, spgemm, transitive_closure_gpu
+from redblackgraph.gpu import (
+    CSRMatrixGPU, spgemm, transitive_closure_gpu, transitive_closure_dag_gpu
+)
 
 # Create GPU matrix from CPU sparse matrix
 A_cpu = sp.csr_matrix(np.array([
@@ -37,10 +39,29 @@ C_gpu = A_gpu @ A_gpu       # operator form
 C_gpu = spgemm(A_gpu)       # function form (self-multiply)
 C_gpu = spgemm(A_gpu, B_gpu)  # general A @ B
 
-# Transitive closure
-R_gpu, diameter = A_gpu.transitive_closure()
+# Transitive closure — repeated squaring (any graph)
+R_gpu, diameter = transitive_closure_gpu(A_gpu)
+
+# Transitive closure — level-parallel DAG propagation (DAGs only, faster)
+R_gpu, diameter = transitive_closure_dag_gpu(A_gpu)
+
 R_cpu = R_gpu.to_cpu()
 ```
+
+## Transitive Closure Algorithms
+
+### Repeated squaring (`transitive_closure_gpu`)
+Computes TC(A) = A + A² + A⁴ + A⁸ + ... using AVOS SpGEMM. Works for any graph.
+Converges in O(log d) iterations where d is the graph diameter. All data stays
+GPU-resident between iterations.
+
+### Level-parallel DAG propagation (`transitive_closure_dag_gpu`)
+Specialized for DAGs (triangular matrices). Computes topological levels, then
+processes each level in parallel on GPU. At each level, a CUDA kernel expands
+successor closures (applying avos_product), followed by sort + AVOS-sum reduction.
+
+The DAG kernel achieves up to 10x speedup over the optimized Cython CPU algorithm
+for graphs above ~1,000 vertices, nearly doubling the speedup of repeated squaring.
 
 ## Dependencies
 
