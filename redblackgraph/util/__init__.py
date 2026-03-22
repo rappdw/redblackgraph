@@ -5,4 +5,7 @@ def __getattr__(name):
     if name == 'RbgGraphBuilder':
         from .graph_builder import RbgGraphBuilder
         return RbgGraphBuilder
+    if name == 'FamilyDagSynthesizer':
+        from .synthesizer import FamilyDagSynthesizer
+        return FamilyDagSynthesizer
     raise AttributeError(f"module '{__name__}' has no attribute {name!r}")
