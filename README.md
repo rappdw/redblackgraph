@@ -7,6 +7,7 @@
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/) 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/) 
 
+
 Red-Black Graph - A DAG of Multiple, Interleaved Binary Trees
 ----------------------------------
 
@@ -96,6 +97,21 @@ uv pip install meson-python meson ninja cython tempita numpy
 uv pip install -e ".[test,io]" --no-build-isolation
 ```
 
+### uv setup script
+
+If you use `uv`, a convenience script is provided to create a fresh `.venv`, install build/test dependencies, perform an editable install using `pip` with `--no-build-isolation`, and install the `test` extra:
+
+```bash
+./bin/setup-uv.sh
+source .venv/bin/activate
+uv run -m pytest
+```
+
+The script expects:
+- `uv` on your `PATH`
+- the `ninja` build tool installed (e.g. `sudo apt install ninja-build` on Debian/Ubuntu)
+- the `fs-crawler` submodule present at `./fs-crawler`
+
 The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 
 # Building and Publishing Wheels
@@ -179,4 +195,3 @@ result = closure.to_cpu()
 ```
 
 Run `python bench_closure.py` to reproduce the benchmark on your hardware.
-
