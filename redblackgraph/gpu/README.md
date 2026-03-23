@@ -1,150 +1,78 @@
-# GPU Module - Naive Implementation
+# GPU Module
 
-**Status**: Proof of Concept / Learning Implementation  
-**Purpose**: Understand build, installation, and DGX Spark deployment
-
-## ⚠️ Important Notice
-
-This is a **naive implementation for learning purposes only**. It demonstrates:
-- CuPy integration
-- Basic GPU operations
-- Memory transfer patterns
-- Infrastructure requirements
-
-**NOT suitable for production use** due to:
-- Naive O(n³) matrix multiplication
-- Dense matrix conversion
-- No memory optimization
-- Limited to small matrices (nnz < 10k)
-
-For production implementation, see `.plans/gpu_implementation/`.
+GPU-accelerated AVOS operations using CuPy and CUDA.
 
 ## Module Structure
 
 ```
 redblackgraph/gpu/
-├── __init__.py          # Module exports
-├── core.py              # AVOS operations using CuPy ElementwiseKernel
-├── matrix.py            # rb_matrix_gpu wrapper
-└── README.md            # This file
+├── __init__.py            # Module exports + NVRTC probe
+├── csr_gpu.py             # CSRMatrixGPU: sparse matrix on GPU with raw int32 buffers
+├── avos_kernels.py        # CUDA RawKernels for AVOS sum/product (int32)
+├── spgemm_symbolic.py     # Symbolic phase: compute output sparsity pattern via hash tables
+├── spgemm_numeric.py      # Numeric phase: compute AVOS values with atomicMin
+├── spgemm.py              # High-level SpGEMM API: spgemm(A, B)
+├── transitive_closure.py  # GPU transitive closure: repeated squaring + DAG-specific
+└── README.md              # This file
 ```
 
 ## Quick Usage
 
 ```python
-# Check if GPU is available
-try:
-    from redblackgraph.gpu import rb_matrix_gpu, avos_product_gpu
-    print("✓ GPU module available")
-except ImportError:
-    print("✗ CuPy not installed")
+import numpy as np
+import scipy.sparse as sp
+from redblackgraph.gpu import (
+    CSRMatrixGPU, spgemm, transitive_closure_gpu, transitive_closure_dag_gpu
+)
 
-# Element-wise operations
-import cupy as cp
-x = cp.array([2, 3, 4], dtype=cp.int32)
-y = cp.array([3, 2, 1], dtype=cp.int32)
-result = avos_product_gpu(x, y)
-print(result.get())  # [11, 6, 4]
+# Create GPU matrix from CPU sparse matrix
+A_cpu = sp.csr_matrix(np.array([
+    [1, 2, 0],
+    [0, -1, 3],
+    [0, 0, 1],
+], dtype=np.int32))
 
-# Sparse matrix operations
-from scipy import sparse
-A_cpu = sparse.csr_matrix(...)
-A_gpu = rb_matrix_gpu.from_cpu(A_cpu)
-A_back = A_gpu.to_cpu()
+A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
+
+# SpGEMM: C = A @ B
+C_gpu = A_gpu @ A_gpu       # operator form
+C_gpu = spgemm(A_gpu)       # function form (self-multiply)
+C_gpu = spgemm(A_gpu, B_gpu)  # general A @ B
+
+# Transitive closure — repeated squaring (any graph)
+R_gpu, diameter = transitive_closure_gpu(A_gpu)
+
+# Transitive closure — level-parallel DAG propagation (DAGs only, faster)
+R_gpu, diameter = transitive_closure_dag_gpu(A_gpu)
+
+R_cpu = R_gpu.to_cpu()
 ```
 
-## What's Implemented
+## Transitive Closure Algorithms
 
-### ✅ AVOS Element-wise Operations
+### Repeated squaring (`transitive_closure_gpu`)
+Computes TC(A) = A + A² + A⁴ + A⁸ + ... using AVOS SpGEMM. Works for any graph.
+Converges in O(log d) iterations where d is the graph diameter. All data stays
+GPU-resident between iterations.
 
-- `avos_sum_gpu(x, y)` - Non-zero minimum
-- `avos_product_gpu(x, y)` - AVOS product with parity constraints
+### Level-parallel DAG propagation (`transitive_closure_dag_gpu`)
+Specialized for DAGs (triangular matrices). Computes topological levels, then
+processes each level in parallel on GPU. At each level, a CUDA kernel expands
+successor closures (applying avos_product), followed by sort + AVOS-sum reduction.
 
-**Features**:
-- Full RED_ONE/BLACK_ONE identity semantics
-- Parity filtering for even/odd values
-- Vectorized GPU execution
-- Validated against CPU reference
-
-**Implementation**: CuPy `ElementwiseKernel` with inline CUDA C
-
-### ✅ Sparse Matrix Wrapper
-
-- `rb_matrix_gpu` class wrapping `cupyx.scipy.sparse.csr_matrix`
-
-**Features**:
-- CPU ↔ GPU transfer methods
-- Triangular flag support
-- Shape and nnz properties
-
-**Limitations**:
-- Matrix multiplication is **naive** O(n³)
-- Converts to dense for multiplication
-- Limited to small matrices
+The DAG kernel achieves up to 10x speedup over the optimized Cython CPU algorithm
+for graphs above ~1,000 vertices, nearly doubling the speedup of repeated squaring.
 
 ## Dependencies
 
 ```bash
-# CUDA Toolkit 11.0+ or 12.x
-# Python 3.10+
 pip install cupy-cuda12x  # or cupy-cuda11x
-pip install numpy scipy
 ```
+
+GPU tests are skipped automatically if CuPy is unavailable.
 
 ## Testing
 
 ```bash
-# Run GPU tests
-pytest tests/gpu/test_naive_gpu.py -v
-
-# Tests will skip if CuPy not available
+pytest tests/gpu/ -v
 ```
-
-## Documentation
-
-- **Quick Summary**: `docs/GPU_NAIVE_SUMMARY.md`
-- **Full Documentation**: `docs/gpu_naive_implementation.md`
-- **DGX Spark Setup**: `scripts/setup_dgx_spark.sh`
-- **Demo**: `examples/gpu_naive_demo.py`
-
-## Next Steps
-
-This is **Phase 0** of the full GPU implementation plan:
-
-1. ✅ **Phase 0** (You are here): Infrastructure and learning
-2. **Phase 1**: Implement optimized CUDA kernels for AVOS
-3. **Phase 2**: Matrix structure with unified memory
-4. **Phase 3**: Two-phase SpGEMM for efficient multiplication
-5. **Phase 4**: Transitive closure
-6. **Phase 5-8**: Optimization and polish
-
-See `.plans/gpu_implementation/QUICK_START.md` for the complete roadmap.
-
-## Performance Notes
-
-**Current Performance** (naive implementation):
-- Element-wise operations: ~100x faster than CPU ✓
-- Matrix multiplication: **Slower than CPU** ✗
-
-**Target Performance** (after optimization):
-- Matrix multiplication: 5-50x faster than CPU
-- Transitive closure: 10-100x faster
-- Billion-scale matrices (1B×1B at 0.1% density)
-
-## Code Quality
-
-This naive implementation is:
-- ✅ Correct (validated against CPU reference)
-- ✅ Well-documented
-- ✅ Tested
-- ❌ Not performant for matrices
-- ❌ Not production-ready
-
-Use it to learn, then implement the optimized version!
-
-## Contact
-
-For questions about:
-- **This implementation**: See `docs/gpu_naive_implementation.md`
-- **Full GPU plan**: See `.plans/gpu_implementation/`
-- **AVOS mathematics**: See `MATHEMATICAL_ANALYSIS.md`

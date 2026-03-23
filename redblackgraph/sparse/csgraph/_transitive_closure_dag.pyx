@@ -21,20 +21,37 @@ include 'parameters.pxi'
 include '_rbg_math.pxi'
 
 
-# Dynamic array for storing sparse row entries
+# Dynamic array for storing sparse row entries, with open-addressing hash map
+# for O(1) column lookup instead of O(n) linear scan.
 cdef struct SparseRow:
-    ITYPE_t* cols      # Column indices
-    DTYPE_t* vals      # Values
+    ITYPE_t* cols      # Column indices (flat array)
+    DTYPE_t* vals      # Values (flat array)
     ITYPE_t size       # Current number of entries
-    ITYPE_t capacity   # Allocated capacity
+    ITYPE_t capacity   # Allocated capacity for cols/vals
+    ITYPE_t* ht_keys   # Hash table keys (column indices, -1 = empty)
+    ITYPE_t* ht_vals   # Hash table values (index into cols/vals)
+    ITYPE_t ht_mask    # Hash table size - 1 (size is always power of 2)
+
+
+# Sentinel for empty hash table slots
+DEF HT_EMPTY = -1
+# Minimum hash table size (must be power of 2)
+DEF HT_MIN_SIZE = 16
 
 
 cdef inline void sparse_row_init(SparseRow* row, ITYPE_t initial_capacity):
-    """Initialize a sparse row with given capacity."""
+    """Initialize a sparse row with given capacity and hash table."""
     row.cols = <ITYPE_t*>malloc(initial_capacity * sizeof(ITYPE_t))
     row.vals = <DTYPE_t*>malloc(initial_capacity * sizeof(DTYPE_t))
     row.size = 0
     row.capacity = initial_capacity
+    # Initialize hash table (size = HT_MIN_SIZE, load factor threshold ~50%)
+    row.ht_mask = HT_MIN_SIZE - 1
+    row.ht_keys = <ITYPE_t*>malloc(HT_MIN_SIZE * sizeof(ITYPE_t))
+    row.ht_vals = <ITYPE_t*>malloc(HT_MIN_SIZE * sizeof(ITYPE_t))
+    cdef ITYPE_t j
+    for j in range(HT_MIN_SIZE):
+        row.ht_keys[j] = HT_EMPTY
 
 
 cdef inline void sparse_row_free(SparseRow* row):
@@ -45,8 +62,15 @@ cdef inline void sparse_row_free(SparseRow* row):
     if row.vals != NULL:
         free(row.vals)
         row.vals = NULL
+    if row.ht_keys != NULL:
+        free(row.ht_keys)
+        row.ht_keys = NULL
+    if row.ht_vals != NULL:
+        free(row.ht_vals)
+        row.ht_vals = NULL
     row.size = 0
     row.capacity = 0
+    row.ht_mask = 0
 
 
 cdef inline void sparse_row_ensure_capacity(SparseRow* row, ITYPE_t needed):
@@ -61,21 +85,73 @@ cdef inline void sparse_row_ensure_capacity(SparseRow* row, ITYPE_t needed):
         row.capacity = new_capacity
 
 
+cdef inline ITYPE_t _ht_hash(ITYPE_t col, ITYPE_t mask):
+    """Hash a column index. Multiply-shift hash for good distribution."""
+    # Knuth multiplicative hash (golden ratio constant for 32-bit)
+    cdef unsigned int h = <unsigned int>col * <unsigned int>2654435761u
+    return <ITYPE_t>(h & <unsigned int>mask)
+
+
+cdef inline void _ht_rehash(SparseRow* row):
+    """Double the hash table size and reinsert all entries."""
+    cdef ITYPE_t old_size = row.ht_mask + 1
+    cdef ITYPE_t new_size = old_size * 2
+    cdef ITYPE_t new_mask = new_size - 1
+    cdef ITYPE_t* new_keys = <ITYPE_t*>malloc(new_size * sizeof(ITYPE_t))
+    cdef ITYPE_t* new_vals = <ITYPE_t*>malloc(new_size * sizeof(ITYPE_t))
+    cdef ITYPE_t j, slot, key
+
+    for j in range(new_size):
+        new_keys[j] = HT_EMPTY
+
+    # Reinsert all existing entries
+    for j in range(old_size):
+        key = row.ht_keys[j]
+        if key != HT_EMPTY:
+            slot = _ht_hash(key, new_mask)
+            while new_keys[slot] != HT_EMPTY:
+                slot = (slot + 1) & new_mask
+            new_keys[slot] = key
+            new_vals[slot] = row.ht_vals[j]
+
+    free(row.ht_keys)
+    free(row.ht_vals)
+    row.ht_keys = new_keys
+    row.ht_vals = new_vals
+    row.ht_mask = new_mask
+
+
 cdef inline void sparse_row_add(SparseRow* row, ITYPE_t col, DTYPE_t val):
     """Add an entry to the sparse row (assumes col is not already present)."""
-    sparse_row_ensure_capacity(row, row.size + 1)
-    row.cols[row.size] = col
-    row.vals[row.size] = val
-    row.size += 1
+    cdef ITYPE_t pos = row.size
+    sparse_row_ensure_capacity(row, pos + 1)
+    row.cols[pos] = col
+    row.vals[pos] = val
+    row.size = pos + 1
+
+    # Insert into hash table
+    # Check load factor first: rehash if size > 50% of table capacity
+    if row.size * 2 > row.ht_mask + 1:
+        _ht_rehash(row)
+
+    cdef ITYPE_t slot = _ht_hash(col, row.ht_mask)
+    while row.ht_keys[slot] != HT_EMPTY:
+        slot = (slot + 1) & row.ht_mask
+    row.ht_keys[slot] = col
+    row.ht_vals[slot] = pos
 
 
 cdef inline ITYPE_t sparse_row_find(SparseRow* row, ITYPE_t col):
-    """Find index of column in row, or -1 if not found."""
-    cdef ITYPE_t i
-    for i in range(row.size):
-        if row.cols[i] == col:
-            return i
-    return -1
+    """Find index of column in row, or -1 if not found. O(1) via hash table."""
+    cdef ITYPE_t slot = _ht_hash(col, row.ht_mask)
+    cdef ITYPE_t key
+    while True:
+        key = row.ht_keys[slot]
+        if key == HT_EMPTY:
+            return -1
+        if key == col:
+            return row.ht_vals[slot]
+        slot = (slot + 1) & row.ht_mask
 
 
 cdef inline void sparse_row_set_or_add(SparseRow* row, ITYPE_t col, DTYPE_t val):

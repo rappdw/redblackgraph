@@ -1,7 +1,7 @@
 """
 Numeric phase of SpGEMM (Sparse General Matrix-Matrix Multiplication).
 
-This module implements the value computation phase for C = A @ A where:
+This module implements the value computation phase for C = A @ B where:
 - Pattern is known from symbolic phase (hash tables with column indices)
 - Computes actual AVOS product values using global memory hash tables
 - Uses atomicMin for deterministic AVOS sum reduction
@@ -15,11 +15,11 @@ The numeric phase computes:
 import numpy as np
 from typing import Tuple
 
-from ._cuda_utils import CUPY_AVAILABLE
-
-if CUPY_AVAILABLE:
+try:
     import cupy as cp
-else:
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
     cp = None
 
 
@@ -98,17 +98,22 @@ __device__ inline int from_min_space(int val) {
     return (val == AVOS_ZERO_SENTINEL) ? 0 : val;
 }
 
-// Numeric phase kernel using global memory hash tables
-// Accumulates AVOS products into hash tables using atomicMin
+// Numeric phase kernel using global memory hash tables.
+// For C = A @ B, accumulates AVOS products into hash tables using atomicMin.
+// When upper_triangular != 0, only processes B[k,j] where j >= row_i.
 __global__ void numeric_hash_kernel(
     const int* __restrict__ indptrA,
     const int* __restrict__ indicesA,
     const int* __restrict__ dataA,
+    const int* __restrict__ indptrB,
+    const int* __restrict__ indicesB,
+    const int* __restrict__ dataB,
     const int* __restrict__ hash_keys,      // From symbolic phase (column indices)
     int* __restrict__ hash_vals,            // Values to accumulate (initialized to AVOS_ZERO_SENTINEL)
     const long long* __restrict__ table_offsets,
     const int* __restrict__ table_sizes,
-    int n_rows
+    int n_rows,
+    int upper_triangular
 ) {
     int row_i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -129,18 +134,18 @@ __global__ void numeric_hash_kernel(
         int k = indicesA[k_idx];
         int val_ik = dataA[k_idx];
 
-        // Get row k of A
-        int k_row_start = indptrA[k];
-        int k_row_end = indptrA[k + 1];
+        // Get row k of B
+        int k_row_start = indptrB[k];
+        int k_row_end = indptrB[k + 1];
 
-        // For each non-zero A[k,j] in row k
+        // For each non-zero B[k,j] in row k
         for (int j_idx = k_row_start; j_idx < k_row_end; j_idx++) {
-            int j = indicesA[j_idx];
-            int val_kj = dataA[j_idx];
+            int j = indicesB[j_idx];
+            int val_kj = dataB[j_idx];
 
-            // Apply triangular mask: only j >= row_i
-            if (j >= row_i) {
-                // Compute A[i,k] ⊗ A[k,j]
+            // Apply triangular mask if requested
+            if (!upper_triangular || j >= row_i) {
+                // Compute A[i,k] ⊗ B[k,j]
                 int prod = avos_product(val_ik, val_kj);
 
                 if (prod != 0) {
@@ -214,7 +219,7 @@ class NumericPhase:
     """
     Numeric phase implementation for SpGEMM using global memory hash tables.
 
-    Computes actual values for C = A @ A using AVOS operations.
+    Computes actual values for C = A @ B using AVOS operations.
     No arbitrary limit on unique output columns per row.
     """
 
@@ -232,26 +237,36 @@ class NumericPhase:
         indptrA: 'cp.ndarray',
         indicesA: 'cp.ndarray',
         dataA: 'cp.ndarray',
+        indptrB: 'cp.ndarray',
+        indicesB: 'cp.ndarray',
+        dataB: 'cp.ndarray',
         indptrC: 'cp.ndarray',
         nnzC: int,
         n_rows: int,
+        n_cols: int,
         hash_keys: 'cp.ndarray',
         table_offsets: 'cp.ndarray',
-        table_sizes: 'cp.ndarray'
+        table_sizes: 'cp.ndarray',
+        upper_triangular: bool = True
     ) -> Tuple['cp.ndarray', 'cp.ndarray']:
         """
-        Compute column indices and values for C = A @ A using hash tables.
+        Compute column indices and values for C = A @ B using hash tables.
 
         Args:
             indptrA: Row pointers of A
             indicesA: Column indices of A
             dataA: Values of A (int32)
+            indptrB: Row pointers of B
+            indicesB: Column indices of B
+            dataB: Values of B (int32)
             indptrC: Row pointers of C (from symbolic phase)
             nnzC: Total non-zeros in C (from symbolic phase)
-            n_rows: Number of rows
+            n_rows: Number of rows in C
+            n_cols: Number of columns in C
             hash_keys: Hash table keys from symbolic phase
             table_offsets: Start offset for each row's hash table
             table_sizes: Size of each row's hash table
+            upper_triangular: If True, apply mask j >= i
 
         Returns:
             indicesC: Column indices of C (int32, sorted within each row)
@@ -267,7 +282,11 @@ class NumericPhase:
         indptrA_i32 = cp.asarray(indptrA, dtype=cp.int32)
         indicesA_i32 = cp.asarray(indicesA, dtype=cp.int32)
         dataA_i32 = cp.asarray(dataA, dtype=cp.int32)
+        indptrB_i32 = cp.asarray(indptrB, dtype=cp.int32)
+        indicesB_i32 = cp.asarray(indicesB, dtype=cp.int32)
+        dataB_i32 = cp.asarray(dataB, dtype=cp.int32)
         indptrC_i32 = cp.asarray(indptrC, dtype=cp.int32)
+        ut_flag = cp.int32(1 if upper_triangular else 0)
 
         # Allocate hash values array (initialized to AVOS_ZERO_SENTINEL)
         total_hash_size = len(hash_keys)
@@ -281,7 +300,9 @@ class NumericPhase:
             self._hash_kernel(
                 (grid_size,), (block_size,),
                 (indptrA_i32, indicesA_i32, dataA_i32,
-                 hash_keys, hash_vals, table_offsets, table_sizes, n_rows)
+                 indptrB_i32, indicesB_i32, dataB_i32,
+                 hash_keys, hash_vals, table_offsets, table_sizes,
+                 n_rows, ut_flag)
             )
 
         # Step 2: Extract entries from hash tables
@@ -297,8 +318,6 @@ class NumericPhase:
             )
 
         # Step 3: Sort by (row, col) for deterministic output
-        # Create composite sort key: row * n_cols + col
-        n_cols = n_rows  # Square matrix
         sort_key = out_rows.astype(cp.int64) * n_cols + out_cols.astype(cp.int64)
         order = cp.argsort(sort_key)
 
@@ -317,10 +336,15 @@ def compute_numeric_values(
     n_rows: int,
     hash_keys: 'cp.ndarray',
     table_offsets: 'cp.ndarray',
-    table_sizes: 'cp.ndarray'
+    table_sizes: 'cp.ndarray',
+    indptrB: 'cp.ndarray' = None,
+    indicesB: 'cp.ndarray' = None,
+    dataB: 'cp.ndarray' = None,
+    n_cols: int = None,
+    upper_triangular: bool = True
 ) -> Tuple['cp.ndarray', 'cp.ndarray']:
     """
-    Compute numeric values for C = A @ A (upper triangular).
+    Compute numeric values for C = A @ B.
 
     This is the main entry point for the numeric phase.
 
@@ -334,16 +358,32 @@ def compute_numeric_values(
         hash_keys: Hash table keys from symbolic phase
         table_offsets: Start offset for each row's hash table
         table_sizes: Size of each row's hash table
+        indptrB: Row pointers of B (defaults to A for self-multiply)
+        indicesB: Column indices of B (defaults to A for self-multiply)
+        dataB: Values of B (defaults to A for self-multiply)
+        n_cols: Number of columns in C (defaults to n_rows for square)
+        upper_triangular: If True, apply mask j >= i
 
     Returns:
         indicesC: Column indices of C (sorted within each row)
         dataC: Values of C
     """
-    numeric = NumericPhase()
+    if indptrB is None:
+        indptrB = indptrA
+    if indicesB is None:
+        indicesB = indicesA
+    if dataB is None:
+        dataB = dataA
+    if n_cols is None:
+        n_cols = n_rows
+
+    numeric = get_numeric_phase()
     return numeric.compute_values(
         indptrA, indicesA, dataA,
-        indptrC, nnzC, n_rows,
-        hash_keys, table_offsets, table_sizes
+        indptrB, indicesB, dataB,
+        indptrC, nnzC, n_rows, n_cols,
+        hash_keys, table_offsets, table_sizes,
+        upper_triangular=upper_triangular
     )
 
 

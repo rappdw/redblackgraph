@@ -3,7 +3,7 @@
 import pytest
 
 try:
-    from redblackgraph.gpu._cuda_utils import CUPY_AVAILABLE
+    from redblackgraph.gpu import CUPY_AVAILABLE
 except ImportError:
     CUPY_AVAILABLE = False
 

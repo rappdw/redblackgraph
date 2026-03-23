@@ -17,10 +17,7 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
 
-pytestmark = [
-    pytest.mark.gpu,
-    pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available"),
-]
+pytestmark = pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available")
 
 
 def compute_pattern_cpu(A_csr) -> tuple:

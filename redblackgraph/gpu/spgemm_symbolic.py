@@ -1,9 +1,9 @@
 """
 Symbolic phase of SpGEMM (Sparse General Matrix-Matrix Multiplication).
 
-This module implements the pattern computation phase for C = A @ A where:
-- A is upper triangular CSR matrix
-- Result C is also upper triangular
+This module implements the pattern computation phase for C = A @ B where:
+- A and B are CSR matrices (B defaults to A for self-multiply)
+- Optional upper triangular mask filters output to j >= i
 - Uses global memory hash tables for unlimited output columns per row
 
 The symbolic phase computes:
@@ -16,11 +16,11 @@ This allows us to allocate C's CSR arrays before the numeric phase.
 import numpy as np
 from typing import Tuple
 
-from ._cuda_utils import CUPY_AVAILABLE
-
-if CUPY_AVAILABLE:
+try:
     import cupy as cp
-else:
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
     cp = None
 
 
@@ -28,14 +28,18 @@ else:
 COUNT_CANDIDATES_KERNEL = r'''
 extern "C" {
 
-// Count the number of candidate contributions for each row
-// candidates[i] = sum over k in row i of A of nnz(row k of A)
-// This is an upper bound on unique output columns per row
+// Count the number of candidate contributions for each row of C = A @ B.
+// candidates[i] = sum over k in row i of A of nnz(row k of B)
+// This is an upper bound on unique output columns per row.
+// When upper_triangular != 0, only counts B[k,j] entries with j >= i.
 __global__ void count_candidates_kernel(
     const int* __restrict__ indptrA,
     const int* __restrict__ indicesA,
+    const int* __restrict__ indptrB,
+    const int* __restrict__ indicesB,
     int* __restrict__ candidates,
-    int n_rows
+    int n_rows,
+    int upper_triangular
 ) {
     int row_i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -47,21 +51,55 @@ __global__ void count_candidates_kernel(
     int count = 0;
     for (int k_idx = row_start; k_idx < row_end; k_idx++) {
         int k = indicesA[k_idx];
-        // Count entries in row k of A that satisfy triangular mask (j >= row_i)
-        int k_row_start = indptrA[k];
-        int k_row_end = indptrA[k + 1];
+        int k_row_start = indptrB[k];
+        int k_row_end = indptrB[k + 1];
 
-        // For upper triangular, we need j >= row_i
-        // Since A is upper triangular, all j in row k satisfy j >= k
-        // We need j >= row_i, and since k >= row_i (from upper triangular A[i,k]),
-        // and j >= k, we have j >= k >= row_i, so all entries qualify
-        count += (k_row_end - k_row_start);
+        if (upper_triangular) {
+            // Count only B[k,j] where j >= row_i
+            for (int j_idx = k_row_start; j_idx < k_row_end; j_idx++) {
+                if (indicesB[j_idx] >= row_i) {
+                    count++;
+                }
+            }
+        } else {
+            count += (k_row_end - k_row_start);
+        }
     }
 
     candidates[row_i] = count;
 }
 
 } // extern "C"
+'''
+
+
+# CUDA kernel to compute hash table sizes from candidate counts (all on GPU)
+COMPUTE_TABLE_SIZES_KERNEL = r'''
+extern "C" __global__ void compute_table_sizes(
+    const int* __restrict__ candidates,
+    int* __restrict__ table_sizes,
+    int n_rows
+) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= n_rows) return;
+
+    int c = candidates[i];
+    if (c <= 0) {
+        table_sizes[i] = 0;
+        return;
+    }
+
+    // next_power_of_2(2 * c)
+    unsigned int n = (unsigned int)(2 * c);
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    table_sizes[i] = (int)n;
+}
 '''
 
 
@@ -80,16 +118,20 @@ __device__ inline unsigned int hash_func(int key, int table_size) {
     return h & (table_size - 1);  // table_size must be power of 2
 }
 
-// Symbolic phase kernel using global memory hash tables
-// Inserts unique column indices into per-row hash tables
+// Symbolic phase kernel using global memory hash tables.
+// For C = A @ B, inserts unique column indices from B rows into per-row hash tables.
+// When upper_triangular != 0, only inserts j where j >= row_i.
 __global__ void symbolic_hash_kernel(
     const int* __restrict__ indptrA,
     const int* __restrict__ indicesA,
+    const int* __restrict__ indptrB,
+    const int* __restrict__ indicesB,
     int* __restrict__ hash_keys,      // Global hash table keys (initialized to -1)
     const long long* __restrict__ table_offsets,  // Start offset for each row's hash table
     const int* __restrict__ table_sizes,    // Size of each row's hash table (power of 2)
     int* __restrict__ overflow_flag,
-    int n_rows
+    int n_rows,
+    int upper_triangular
 ) {
     int row_i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -109,15 +151,15 @@ __global__ void symbolic_hash_kernel(
     for (int k_idx = row_start; k_idx < row_end; k_idx++) {
         int k = indicesA[k_idx];
 
-        // Add columns from row k of A
-        int k_row_start = indptrA[k];
-        int k_row_end = indptrA[k + 1];
+        // Add columns from row k of B
+        int k_row_start = indptrB[k];
+        int k_row_end = indptrB[k + 1];
 
         for (int j_idx = k_row_start; j_idx < k_row_end; j_idx++) {
-            int j = indicesA[j_idx];
+            int j = indicesB[j_idx];
 
-            // Apply triangular mask: only j >= row_i
-            if (j >= row_i) {
+            // Apply triangular mask if requested
+            if (!upper_triangular || j >= row_i) {
                 // Insert j into hash table using linear probing
                 unsigned int h = hash_func(j, size);
 
@@ -186,7 +228,7 @@ class SymbolicPhase:
     """
     Symbolic phase implementation for SpGEMM using global memory hash tables.
 
-    Computes the sparsity pattern for C = A @ A (upper triangular).
+    Computes the sparsity pattern for C = A @ B.
     No arbitrary limit on unique output columns per row.
     """
 
@@ -198,6 +240,9 @@ class SymbolicPhase:
         self._count_module = cp.RawModule(code=COUNT_CANDIDATES_KERNEL)
         self._count_kernel = self._count_module.get_function('count_candidates_kernel')
 
+        self._table_sizes_module = cp.RawModule(code=COMPUTE_TABLE_SIZES_KERNEL)
+        self._table_sizes_kernel = self._table_sizes_module.get_function('compute_table_sizes')
+
         self._hash_module = cp.RawModule(code=SYMBOLIC_HASH_KERNEL)
         self._hash_kernel = self._hash_module.get_function('symbolic_hash_kernel')
         self._count_entries_kernel = self._hash_module.get_function('count_hash_entries_kernel')
@@ -206,15 +251,21 @@ class SymbolicPhase:
         self,
         indptrA: 'cp.ndarray',
         indicesA: 'cp.ndarray',
-        n_rows: int
+        indptrB: 'cp.ndarray',
+        indicesB: 'cp.ndarray',
+        n_rows: int,
+        upper_triangular: bool = True
     ) -> Tuple['cp.ndarray', 'cp.ndarray', 'cp.ndarray', 'cp.ndarray']:
         """
-        Compute row non-zero counts for C = A @ A using global memory hash tables.
+        Compute row non-zero counts for C = A @ B using global memory hash tables.
 
         Args:
             indptrA: Row pointers of A (int32 or int64)
             indicesA: Column indices of A (int32)
-            n_rows: Number of rows in A
+            indptrB: Row pointers of B (int32 or int64)
+            indicesB: Column indices of B (int32)
+            n_rows: Number of rows in A (= rows in C)
+            upper_triangular: If True, apply mask j >= i
 
         Returns:
             row_nnz: Array of length n_rows with count of non-zeros per row
@@ -231,26 +282,29 @@ class SymbolicPhase:
         # Convert to int32 if needed
         indptrA_i32 = cp.asarray(indptrA, dtype=cp.int32)
         indicesA_i32 = cp.asarray(indicesA, dtype=cp.int32)
+        indptrB_i32 = cp.asarray(indptrB, dtype=cp.int32)
+        indicesB_i32 = cp.asarray(indicesB, dtype=cp.int32)
+        ut_flag = cp.int32(1 if upper_triangular else 0)
 
         # Step 1: Count candidates per row (upper bound on unique outputs)
         candidates = cp.zeros(n_rows, dtype=cp.int32)
         self._count_kernel(
             (grid_size,), (block_size,),
-            (indptrA_i32, indicesA_i32, candidates, n_rows)
+            (indptrA_i32, indicesA_i32, indptrB_i32, indicesB_i32,
+             candidates, n_rows, ut_flag)
         )
 
-        # Step 2: Compute hash table sizes (next power of 2, with load factor 0.5)
-        # table_size = next_pow2(max(1, 2 * candidates))
-        candidates_cpu = candidates.get()
-        table_sizes_cpu = np.array([
-            _next_power_of_2(max(1, 2 * c)) if c > 0 else 0
-            for c in candidates_cpu
-        ], dtype=np.int32)
+        # Step 2: Compute hash table sizes on GPU (next power of 2, with load factor 0.5)
+        table_sizes = cp.zeros(n_rows, dtype=cp.int32)
+        self._table_sizes_kernel(
+            (grid_size,), (block_size,),
+            (candidates, table_sizes, n_rows)
+        )
 
-        # Step 3: Compute table offsets (prefix sum) - use int64 for large tables
-        table_offsets_cpu = np.zeros(n_rows + 1, dtype=np.int64)
-        table_offsets_cpu[1:] = np.cumsum(table_sizes_cpu.astype(np.int64))
-        total_hash_size = int(table_offsets_cpu[-1])
+        # Step 3: Compute table offsets (prefix sum) on GPU - use int64 for large tables
+        table_offsets_full = cp.zeros(n_rows + 1, dtype=cp.int64)
+        table_offsets_full[1:] = cp.cumsum(table_sizes.astype(cp.int64))
+        total_hash_size = int(table_offsets_full[-1].get())
 
         # Check memory usage and warn if very large
         hash_memory_mb = total_hash_size * 4 / (1024 * 1024)
@@ -261,8 +315,7 @@ class SymbolicPhase:
                 f"This may cause out-of-memory errors on some GPUs."
             )
 
-        table_sizes = cp.asarray(table_sizes_cpu, dtype=cp.int32)
-        table_offsets = cp.asarray(table_offsets_cpu[:-1], dtype=cp.int64)  # Don't need last element
+        table_offsets = table_offsets_full[:-1]  # Don't need last element
 
         # Step 4: Allocate and initialize hash tables
         if total_hash_size > 0:
@@ -276,7 +329,9 @@ class SymbolicPhase:
         if total_hash_size > 0:
             self._hash_kernel(
                 (grid_size,), (block_size,),
-                (indptrA_i32, indicesA_i32, hash_keys, table_offsets, table_sizes, overflow_flag, n_rows)
+                (indptrA_i32, indicesA_i32, indptrB_i32, indicesB_i32,
+                 hash_keys, table_offsets, table_sizes, overflow_flag,
+                 n_rows, ut_flag)
             )
 
             # Check for overflow
@@ -328,25 +383,31 @@ def compute_symbolic_pattern(
     indptrA: 'cp.ndarray',
     indicesA: 'cp.ndarray',
     n_rows: int,
-    n_cols: int
+    n_cols: int,
+    indptrB: 'cp.ndarray' = None,
+    indicesB: 'cp.ndarray' = None,
+    upper_triangular: bool = True
 ) -> Tuple['cp.ndarray', int]:
     """
-    Compute symbolic pattern for C = A @ A (upper triangular).
-
-    This is the main entry point for the symbolic phase.
+    Compute symbolic pattern for C = A @ B.
 
     Args:
         indptrA: Row pointers of A
         indicesA: Column indices of A
         n_rows: Number of rows in A
-        n_cols: Number of columns in A
+        n_cols: Number of columns in B
+        indptrB: Row pointers of B (defaults to A for self-multiply)
+        indicesB: Column indices of B (defaults to A for self-multiply)
+        upper_triangular: If True, apply mask j >= i
 
     Returns:
         indptrC: Row pointers for C (length n_rows + 1)
         nnzC: Total number of non-zeros in C
     """
     indptrC, nnzC, _, _, _ = compute_symbolic_pattern_with_tables(
-        indptrA, indicesA, n_rows, n_cols
+        indptrA, indicesA, n_rows, n_cols,
+        indptrB=indptrB, indicesB=indicesB,
+        upper_triangular=upper_triangular
     )
     return indptrC, nnzC
 
@@ -355,11 +416,23 @@ def compute_symbolic_pattern_with_tables(
     indptrA: 'cp.ndarray',
     indicesA: 'cp.ndarray',
     n_rows: int,
-    n_cols: int
+    n_cols: int,
+    indptrB: 'cp.ndarray' = None,
+    indicesB: 'cp.ndarray' = None,
+    upper_triangular: bool = True
 ) -> Tuple['cp.ndarray', int, 'cp.ndarray', 'cp.ndarray', 'cp.ndarray']:
     """
-    Compute symbolic pattern for C = A @ A (upper triangular), returning
-    additional data structures needed by the numeric phase.
+    Compute symbolic pattern for C = A @ B, returning additional data
+    structures needed by the numeric phase.
+
+    Args:
+        indptrA: Row pointers of A
+        indicesA: Column indices of A
+        n_rows: Number of rows in A
+        n_cols: Number of columns in B
+        indptrB: Row pointers of B (defaults to A for self-multiply)
+        indicesB: Column indices of B (defaults to A for self-multiply)
+        upper_triangular: If True, apply mask j >= i
 
     Returns:
         indptrC: Row pointers for C (length n_rows + 1)
@@ -368,10 +441,16 @@ def compute_symbolic_pattern_with_tables(
         table_offsets: Start offset for each row's hash table
         table_sizes: Size of each row's hash table
     """
+    if indptrB is None:
+        indptrB = indptrA
+    if indicesB is None:
+        indicesB = indicesA
+
     # Compute per-row non-zero counts using hash tables
-    symbolic = SymbolicPhase()
+    symbolic = get_symbolic_phase()
     row_nnz, hash_keys, table_offsets, table_sizes = symbolic.compute_pattern(
-        indptrA, indicesA, n_rows
+        indptrA, indicesA, indptrB, indicesB, n_rows,
+        upper_triangular=upper_triangular
     )
 
     # Build indptr via prefix sum

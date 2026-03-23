@@ -1,76 +1,75 @@
 """
-GPU-accelerated Red-Black Graph operations using CuPy and CUDA.
+GPU-accelerated AVOS operations using CuPy and CUDA.
 
-Exports
--------
-Availability:
-    CUPY_AVAILABLE       — True when CuPy + CUDA GPU are usable
-    is_gpu_available()   — same, as a callable
+Provides sparse matrix multiplication (SpGEMM) and transitive closure
+on GPU using the AVOS semiring, with global memory hash tables for
+unlimited output columns per row.
 
-Element-wise AVOS ops (production int32 via RawKernel):
-    avos_sum_gpu, avos_product_gpu
-
-Sparse matrix types and SpGEMM:
-    CSRMatrixGPU
-    spgemm_upper_triangular, matmul_gpu, spgemm_with_stats, SpGEMMStats
-
-High-level matrix wrapper:
-    rb_matrix_gpu
-
-Device policy:
-    DevicePolicy, get_device_policy, set_device_policy, device, resolve_device
+Production API:
+- CSRMatrixGPU: Sparse matrix on GPU with raw int32 buffers
+- spgemm: General A @ B sparse matrix multiply
+- transitive_closure_gpu: Repeated squaring on GPU
 """
 
-# Single source of truth for CuPy / CUDA availability
-from ._cuda_utils import CUPY_AVAILABLE, check_cupy, is_gpu_available
-
-# Device policy (works without CuPy)
-from ._device_policy import (
-    DevicePolicy,
-    device,
-    get_device_policy,
-    resolve_device,
-    set_device_policy,
-)
-
 __all__ = [
-    # Availability
-    "CUPY_AVAILABLE",
-    "is_gpu_available",
-    # Device policy
-    "DevicePolicy",
-    "device",
-    "get_device_policy",
-    "set_device_policy",
-    "resolve_device",
+    'CSRMatrixGPU',
+    'spgemm', 'spgemm_upper_triangular', 'matmul_gpu',
+    'transitive_closure_gpu', 'transitive_closure_dag_gpu',
 ]
 
-# Production int32 AVOS ops and sparse infrastructure require CuPy at import
-# time because the CUDA kernels are compiled eagerly.  Guard so that
-# ``import redblackgraph.gpu`` never fails on CPU-only machines.
+try:
+    import cupy as cp
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
+    cp = None
+
+
+def _try_preload_nvrtc() -> bool:
+    if not CUPY_AVAILABLE:
+        return False
+
+    try:
+        import ctypes
+        import glob
+        import os
+        import site
+
+        # CuPy loads several CUDA libraries via dlopen("lib*.so.*"). If the user
+        # installed NVIDIA Python runtime wheels, preload those libraries from
+        # site-packages so they are discoverable even without a system CUDA toolkit.
+        loaded_any = False
+        for sp in site.getsitepackages():
+            patterns = [
+                os.path.join(sp, "nvidia", "cuda_nvrtc", "lib", "libnvrtc.so*"),
+                os.path.join(sp, "nvidia", "cublas", "lib", "libcublas.so*"),
+                os.path.join(sp, "nvidia", "cusparse", "lib", "libcusparse.so*"),
+            ]
+
+            for pat in patterns:
+                cand = glob.glob(pat)
+                if cand:
+                    cand.sort(reverse=True)
+                    ctypes.CDLL(cand[0], mode=ctypes.RTLD_GLOBAL)
+                    loaded_any = True
+
+        return loaded_any
+    except Exception:
+        return False
+
+
 if CUPY_AVAILABLE:
-    # Production element-wise AVOS operations (int32 RawKernel)
-    from .avos_kernels import avos_product_gpu, avos_sum_gpu
+    _try_preload_nvrtc()  # Best-effort: helps when using pip-installed CUDA wheels
+    # Verify NVRTC actually works (system CUDA toolkit or preloaded wheels)
+    try:
+        cp.RawKernel('extern "C" __global__ void _rbg_probe() {}', '_rbg_probe')
+    except Exception:
+        CUPY_AVAILABLE = False
+        cp = None
 
-    # CSR matrix and SpGEMM
-    from .csr_gpu import CSRMatrixGPU
-    from .spgemm import (
-        SpGEMMStats,
-        matmul_gpu,
-        spgemm_upper_triangular,
-        spgemm_with_stats,
-    )
+# Production API
+from .csr_gpu import CSRMatrixGPU
+from .spgemm import spgemm, spgemm_upper_triangular, matmul_gpu
+from .transitive_closure import transitive_closure_gpu, transitive_closure_dag_gpu
 
-    # High-level matrix wrapper
-    from .matrix import rb_matrix_gpu
 
-    __all__ += [
-        "avos_sum_gpu",
-        "avos_product_gpu",
-        "CSRMatrixGPU",
-        "spgemm_upper_triangular",
-        "matmul_gpu",
-        "spgemm_with_stats",
-        "SpGEMMStats",
-        "rb_matrix_gpu",
-    ]

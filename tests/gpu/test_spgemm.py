@@ -20,10 +20,7 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
 
-pytestmark = [
-    pytest.mark.gpu,
-    pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available"),
-]
+pytestmark = pytest.mark.skipif(not CUPY_AVAILABLE, reason="CuPy not available")
 
 # Import CPU reference for validation
 from redblackgraph.reference.rbg_math import avos_sum, avos_product
@@ -247,16 +244,50 @@ class TestMatmulAPI:
         assert np.array_equal(C1.to_cpu().toarray(), C2.to_cpu().toarray())
     
     def test_matmul_errors(self):
-        """Test that unsupported operations raise errors."""
+        """Test that incompatible shapes raise errors."""
         A_cpu = sp.eye(3, dtype=np.int32, format='csr')
-        B_cpu = sp.eye(3, dtype=np.int32, format='csr') * 2
-        
+        B_cpu = sp.eye(4, dtype=np.int32, format='csr')
+
         A_gpu = CSRMatrixGPU.from_cpu(A_cpu, triangular=True)
         B_gpu = CSRMatrixGPU.from_cpu(B_cpu, triangular=True)
-        
-        # A @ B (different matrices) not yet implemented
-        with pytest.raises(NotImplementedError):
+
+        # Incompatible shapes
+        with pytest.raises(ValueError):
             matmul_gpu(A_gpu, B_gpu)
+
+    def test_general_matmul(self):
+        """Test A @ B where A != B."""
+        from redblackgraph.reference.rbg_math import avos_sum, avos_product
+        # A: 3x3 upper triangular
+        A_dense = np.array([
+            [1, 2, 0],
+            [0, 1, 3],
+            [0, 0, -1],
+        ], dtype=np.int32)
+        # B: 3x3, different values
+        B_dense = np.array([
+            [-1, 0, 4],
+            [0, 1, 0],
+            [0, 0, 1],
+        ], dtype=np.int32)
+
+        # CPU reference: AVOS matmul
+        n = 3
+        C_ref = np.zeros((n, n), dtype=np.int32)
+        for i in range(n):
+            for j in range(n):
+                acc = 0
+                for k in range(n):
+                    p = avos_product(int(A_dense[i, k]), int(B_dense[k, j]))
+                    acc = avos_sum(acc, p)
+                C_ref[i, j] = acc
+
+        A_gpu = CSRMatrixGPU.from_cpu(sp.csr_matrix(A_dense), triangular=False)
+        B_gpu = CSRMatrixGPU.from_cpu(sp.csr_matrix(B_dense), triangular=False)
+        C_gpu = matmul_gpu(A_gpu, B_gpu)
+        C_result = C_gpu.to_cpu().toarray()
+
+        assert np.array_equal(C_result, C_ref)
 
 
 class TestSpGEMMStats:

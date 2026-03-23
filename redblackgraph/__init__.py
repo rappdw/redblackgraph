@@ -14,31 +14,20 @@ from .constants import (
     is_red_one, is_black_one
 )
 
-# Optional file I/O utilities (require fs-crawler and XlsxWriter)
-# Install with: pip install redblackgraph[io]
-try:
-    from .util import RelationshipFileReader, RedBlackGraphWriter, RbgGraphBuilder
-    _io_available = True
-except ImportError:
-    _io_available = False
-
 __all__ = ['__version__']
 __all__.extend(core.__all__)
 __all__.extend(sparse.__all__)
 __all__.extend(['Color'])
-__all__.extend(['RED_ONE', 'BLACK_ONE', 'red_one_for_dtype', 'black_one_for_dtype', 
+__all__.extend(['RED_ONE', 'BLACK_ONE', 'red_one_for_dtype', 'black_one_for_dtype',
                 'is_red_one', 'is_black_one'])
-if _io_available:
-    __all__.extend(['RelationshipFileReader', 'RedBlackGraphWriter', 'RbgGraphBuilder'])
 
-# Optional GPU acceleration (requires CuPy + CUDA GPU)
-# Install with: pip install redblackgraph[gpu]
-try:
-    from .gpu import CUPY_AVAILABLE as _gpu_available
-    if _gpu_available:
-        from .gpu import rb_matrix_gpu, DevicePolicy, device, is_gpu_available
-        __all__.extend(['rb_matrix_gpu', 'DevicePolicy', 'device', 'is_gpu_available'])
-    else:
-        _gpu_available = False
-except ImportError:
-    _gpu_available = False
+
+def __getattr__(name):
+    """Lazy import for optional I/O utilities (require fs-crawler and XlsxWriter)."""
+    if name in ('RelationshipFileReader', 'RedBlackGraphWriter'):
+        from .util import relationship_file_io
+        return getattr(relationship_file_io, name)
+    if name == 'RbgGraphBuilder':
+        from .util.graph_builder import RbgGraphBuilder
+        return RbgGraphBuilder
+    raise AttributeError(f"module '{__name__}' has no attribute {name!r}")

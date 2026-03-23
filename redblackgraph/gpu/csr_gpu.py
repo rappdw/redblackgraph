@@ -12,12 +12,21 @@ import numpy as np
 import warnings
 from typing import Optional, Tuple
 
-from ._cuda_utils import CUPY_AVAILABLE, check_cupy as _check_cupy
-
-if CUPY_AVAILABLE:
+try:
     import cupy as cp
-else:
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
     cp = None
+
+
+def _check_cupy():
+    """Check if CuPy is available."""
+    if not CUPY_AVAILABLE:
+        raise ImportError(
+            "CuPy is required for GPU operations. "
+            "Install it with: pip install cupy-cuda12x"
+        )
 
 
 class CSRMatrixGPU:
@@ -223,6 +232,70 @@ class CSRMatrixGPU:
         """Data type of values (always int32)."""
         return self.data.dtype
     
+    def __matmul__(self, other):
+        """Matrix multiplication: C = self @ other using AVOS SpGEMM."""
+        from .spgemm import spgemm
+        if not isinstance(other, CSRMatrixGPU):
+            return NotImplemented
+        return spgemm(self, other)
+
+    def copy(self):
+        """Return a deep copy of this matrix."""
+        return CSRMatrixGPU(
+            self.data.copy(),
+            self.indices.copy(),
+            self.indptr.copy(),
+            self.shape,
+            triangular=self.triangular,
+            validate=False
+        )
+
+    def eliminate_zeros(self):
+        """Remove zero entries from the matrix (in-place)."""
+        mask = self.data != 0
+        if cp.all(mask):
+            return  # Nothing to do
+        new_data = self.data[mask]
+        new_indices = self.indices[mask]
+        # Rebuild indptr
+        indptr_cpu = self.indptr.get()
+        data_mask_cpu = mask.get()
+        new_indptr = np.zeros_like(indptr_cpu)
+        for i in range(len(indptr_cpu) - 1):
+            start, end = indptr_cpu[i], indptr_cpu[i + 1]
+            new_indptr[i + 1] = new_indptr[i] + int(np.sum(data_mask_cpu[start:end]))
+        self.data = new_data
+        self.indices = new_indices
+        self.indptr = cp.asarray(new_indptr)
+
+    def transitive_closure(self, max_iterations=64):
+        """Compute transitive closure via repeated squaring on GPU."""
+        from .transitive_closure import transitive_closure_gpu
+        return transitive_closure_gpu(self, max_iterations=max_iterations)
+
+    def prefetch(self, device=None):
+        """
+        Prefetch all CSR arrays to the specified device using cudaMemPrefetchAsync.
+
+        On Grace Hopper / GB10 with unified memory, this hints the driver to
+        migrate pages before they are accessed, reducing first-touch faults.
+        On discrete GPUs this is a no-op if the memory is already device-resident.
+
+        Args:
+            device: CuPy device or int. If None, uses the current device.
+        """
+        if device is None:
+            device = cp.cuda.Device()
+        elif isinstance(device, int):
+            device = cp.cuda.Device(device)
+
+        stream = cp.cuda.get_current_stream()
+        for arr in (self.data, self.indices, self.indptr):
+            if arr.nbytes > 0:
+                cp.cuda.runtime.memPrefetchAsync(
+                    arr.data.ptr, arr.nbytes, device.id, stream.ptr
+                )
+
     def __repr__(self) -> str:
         tri_str = " (upper triangular)" if self.triangular else ""
         return (

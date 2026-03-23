@@ -164,7 +164,7 @@ fi
 # Verify GPU module
 echo ""
 echo "Verifying GPU module..."
-if python3 -c "from redblackgraph.gpu import rb_matrix_gpu; print('✓ GPU module loaded')" 2>/dev/null; then
+if python3 -c "from redblackgraph.gpu import CSRMatrixGPU; print('✓ GPU module loaded')" 2>/dev/null; then
     echo "✓ GPU module working"
 else
     echo "❌ ERROR: GPU module not accessible"

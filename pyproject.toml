@@ -78,6 +78,7 @@ Download = "https://github.com/rappdw/redblackgraph"
 [project.scripts]
 rbg = "redblackgraph.__main__:main"
 rbg-graph-builder = "redblackgraph.util.graph_builder:main"
+rbg-synthesize = "redblackgraph.util.synthesizer:main"
 
 [tool.meson-python.args]
 # Pass additional arguments to meson if needed

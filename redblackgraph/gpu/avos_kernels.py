@@ -12,12 +12,16 @@ References:
 
 from typing import NamedTuple
 
-from ._cuda_utils import CUPY_AVAILABLE, check_cupy
-
-if CUPY_AVAILABLE:
+try:
     import cupy as cp
-else:
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
     cp = None
+
+
+# NVRTC preloading and probing is handled by redblackgraph.gpu.__init__
+# which runs before this module is imported. No duplicate check needed here.
 
 
 class SemiringSpec(NamedTuple):

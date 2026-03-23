@@ -241,6 +241,12 @@ def transitive_closure_squaring(A, max_iterations=64) -> TransitiveClosure:
     
     if is_upper_triangular(A_sparse):
         return transitive_closure_dag_sparse(A_sparse)
+
+    # Check for lower triangular (e.g. synthesized family DAGs).
+    # A lower-triangular matrix is also a DAG — the DAG sparse algorithm
+    # handles it via topological_sort internally.
+    if _is_lower_triangular(A_sparse):
+        return transitive_closure_dag_sparse(A_sparse)
     
     R = rb_matrix(A_sparse) if not isinstance(A_sparse, rb_matrix) else A_sparse.copy()
     
@@ -349,6 +355,18 @@ def _sparse_avos_sum(A, B):
     result.sort_indices()
     
     return result
+
+
+def _is_lower_triangular(A_csr):
+    """Check if a CSR matrix is lower triangular (all off-diagonal entries below diagonal)."""
+    indptr = A_csr.indptr
+    indices = A_csr.indices
+    n = A_csr.shape[0]
+    if len(indices) == 0:
+        return True
+    # Expand row indices and check all column indices <= row index
+    rows = np.repeat(np.arange(n, dtype=indices.dtype), np.diff(indptr))
+    return bool(np.all(indices <= rows))
 
 
 def _sparse_equal(A, B):
@@ -548,16 +566,9 @@ def transitive_closure_adaptive(
         # Very sparse and large - use Dijkstra
         return transitive_closure(A_sparse, method="D")
     
-    # 3. Check if upper triangular
-    if is_upper_triangular(A_sparse):
-        # Already upper triangular - use optimized FW
-        from redblackgraph.core.redblack import array as rb_array
-        if isspmatrix(A_sparse):
-            A_dense = rb_array(A_sparse.toarray())
-        else:
-            A_dense = rb_array(np.asarray(A_sparse))
-        result, diameter = floyd_warshall(A_dense, assume_upper_triangular=True)
-        return TransitiveClosure(csr_matrix(result), diameter)
-    
+    # 3. Check if triangular (DAG) — use fast DAG-specific algorithm
+    if is_upper_triangular(A_sparse) or _is_lower_triangular(A_sparse):
+        return transitive_closure_dag_sparse(A_sparse)
+
     # 4. Default: standard Floyd-Warshall
     return transitive_closure(A_sparse, method="FW")

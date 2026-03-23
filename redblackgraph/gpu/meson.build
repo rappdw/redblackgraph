@@ -2,15 +2,12 @@
 
 python_sources = [
   '__init__.py',
-  '_cuda_utils.py',
-  '_device_policy.py',
-  'core.py',
-  'matrix.py',
   'csr_gpu.py',
   'avos_kernels.py',
   'spgemm_symbolic.py',
   'spgemm_numeric.py',
   'spgemm.py',
+  'transitive_closure.py',
   'README.md',
 ]
 
