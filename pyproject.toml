@@ -91,17 +91,20 @@ build = "cp310-* cp311-* cp312-*"
 # Skip PyPy, musllinux, and 32-bit builds
 skip = "pp* *-musllinux_* *-win32 *-manylinux_i686"
 
-# Test that the wheel can be imported successfully
-test-command = "python -c \"import redblackgraph; print('✓ Import successful, version:', redblackgraph.__version__)\""
+# Pre-install binary wheels for runtime deps to avoid source builds in constrained containers
+before-test = "pip install --only-binary :all: numpy scipy"
 
-# Only need runtime dependencies for import test
-test-requires = ["numpy", "scipy"]
+# Test that the wheel can be imported successfully
+test-command = "python -c \"import redblackgraph; print('Import successful, version:', redblackgraph.__version__)\""
+
+# Only need numpy for import test (scipy is pre-installed via before-test)
+test-requires = ["numpy"]
 
 # Build configuration
 [tool.cibuildwheel.linux]
-# Use manylinux2014 for broader compatibility
-manylinux-x86_64-image = "manylinux2014"
-manylinux-aarch64-image = "manylinux2014"
+# Use manylinux_2_28 so pre-built scipy wheels are available
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
 
 # Ninja is installed via pip in the build environment
 # No system packages needed
