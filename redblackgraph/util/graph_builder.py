@@ -45,7 +45,7 @@ class RbgGraphBuilder(AbstractGraphBuilder):
     def get_ordering(self) -> Sequence[int]:
         if self.graph is None:
             self.graph = rb.rb_matrix(coo_matrix((self.val, (self.row, self.col)), shape=(self.nv, self.nv)))
-        
+
         # For very large graphs, skip canonical ordering to avoid memory issues
         # TODO: Implement sparse transitive closure or alternative ordering method
         if self.nv > self.sparse_threshold:
@@ -56,7 +56,7 @@ class RbgGraphBuilder(AbstractGraphBuilder):
             )
             # Return identity ordering (or could use topological sort if available)
             return list(range(self.nv))
-        
+
         start_time = time.time()
         print(f"Computing transitive closure...")
         closure = self.graph.transitive_closure().W
