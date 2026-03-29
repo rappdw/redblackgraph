@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, main, develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -147,7 +147,7 @@ jobs:
     name: Update Coverage Badge
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
     
