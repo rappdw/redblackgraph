@@ -50,7 +50,7 @@ dependencies = [
 [project.optional-dependencies]
 # File I/O utilities (CSV/Excel graph readers/writers)
 io = [
-    "fs-crawler",
+    "tqdm",  # Progress bars in the relationship-database reader (vendored from fs-crawler)
     "XlsxWriter",
 ]
 gpu = [
@@ -66,7 +66,7 @@ test = [
     "pytest>=3.0",
     "pytest-cov>=2.4",
     "pylint>=1.8.1",
-    "fs-crawler",  # Tests use RelationshipFileReader
+    "tqdm",  # Used by the vendored relationship-database reader
     "XlsxWriter",  # Tests use RedBlackGraphWriter
 ]
 
@@ -132,6 +132,3 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-
-[tool.uv.sources]
-fs-crawler = { path = "fs-crawler" }

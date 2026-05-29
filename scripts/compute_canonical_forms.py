@@ -18,7 +18,7 @@ import numpy as np
 import redblackgraph as rb
 from scipy.sparse import coo_matrix
 from redblackgraph.sparse.csgraph import avos_canonical_ordering
-from fscrawler import RelationshipDbReader
+from redblackgraph.util.relationship_db_reader import RelationshipDbReader
 from redblackgraph.util.graph_builder import RbgGraphBuilder
 
 

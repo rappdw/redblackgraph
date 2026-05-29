@@ -23,7 +23,7 @@ __all__.extend(['RED_ONE', 'BLACK_ONE', 'red_one_for_dtype', 'black_one_for_dtyp
 
 
 def __getattr__(name):
-    """Lazy import for optional I/O utilities (require fs-crawler and XlsxWriter)."""
+    """Lazy import for optional I/O utilities (require tqdm and XlsxWriter)."""
     if name in ('RelationshipFileReader', 'RedBlackGraphWriter'):
         from .util import relationship_file_io
         return getattr(relationship_file_io, name)

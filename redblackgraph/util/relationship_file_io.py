@@ -15,7 +15,7 @@ import numpy as np
 import redblackgraph as rb
 import xlsxwriter
 
-from fscrawler import VertexInfo
+from redblackgraph.util.abstract_graph import VertexInfo
 
 logger = logging.getLogger(__name__)
 

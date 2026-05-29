@@ -286,7 +286,7 @@ Examples:
     logging.info(f"Graph loaded: {graph.shape[0]:,} vertices")
     
     # Load vertex names
-    from fscrawler import RelationshipDbReader
+    from redblackgraph.util.relationship_db_reader import RelationshipDbReader
     from redblackgraph.util.graph_builder import RbgGraphBuilder
     
     logging.info("Loading vertex information from database...")

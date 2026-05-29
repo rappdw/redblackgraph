@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import redblackgraph as rb
 from scipy.sparse import coo_matrix
-from fscrawler import RelationshipDbReader
+from redblackgraph.util.relationship_db_reader import RelationshipDbReader
 from redblackgraph.util.graph_builder import RbgGraphBuilder
 from redblackgraph.util.relationship_file_io import RedBlackGraphWriter
 

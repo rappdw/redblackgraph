@@ -42,6 +42,9 @@ Run the following:
 
 ```shell script
 # use crawl-fs to extract a sample data set from FamilySearch
+# NOTE: fs-crawler (the FamilySearch crawler) is deprecated. RedBlackGraph now
+# vendors the graph-reading code it needs, so fs-crawler is only required if you
+# want to crawl FamilySearch to produce the source data files.
 pip install fs-crawler
 crawl-fs -i <FamilySearch Ids to seed crawl> -o <output-directory> -b <name portion of output file>
 
@@ -110,7 +113,6 @@ uv run -m pytest
 The script expects:
 - `uv` on your `PATH`
 - the `ninja` build tool installed (e.g. `sudo apt install ninja-build` on Debian/Ubuntu)
-- the `fs-crawler` submodule present at `./fs-crawler`
 
 The Meson build system compiles all C/C++ extensions and Cython modules automatically.
 

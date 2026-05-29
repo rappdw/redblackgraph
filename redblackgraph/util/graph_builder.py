@@ -6,7 +6,8 @@ import numpy as np
 import redblackgraph as rb
 import time
 
-from fscrawler import AbstractGraphBuilder, RelationshipDbReader
+from redblackgraph.util.abstract_graph import AbstractGraphBuilder
+from redblackgraph.util.relationship_db_reader import RelationshipDbReader
 from scipy.sparse import coo_matrix
 from redblackgraph.sparse.csgraph import avos_canonical_ordering
 
@@ -270,7 +271,7 @@ def main():
     import time
     import logging
     
-    # Configure logging to see fs-crawler messages
+    # Configure logging to see graph-reader messages
     logging.basicConfig(
         format='%(levelname)s [%(name)s]: %(message)s',
         level=logging.INFO

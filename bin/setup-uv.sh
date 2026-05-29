@@ -9,7 +9,6 @@ set -euo pipefail
 #
 # Prerequisites:
 #   - uv on PATH (https://docs.astral.sh/uv/)
-#   - fs-crawler submodule initialized (git submodule update --init)
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
@@ -18,11 +17,6 @@ if ! command -v uv >/dev/null 2>&1; then
   echo "ERROR: 'uv' is not installed or not on PATH." >&2
   echo "Install uv first: https://docs.astral.sh/uv/" >&2
   exit 1
-fi
-
-if [[ ! -d "${repo_root}/fs-crawler" ]]; then
-  echo "Initializing fs-crawler submodule..."
-  git submodule update --init --recursive
 fi
 
 install_gpu=0

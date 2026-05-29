@@ -73,7 +73,7 @@ def get_vertex_names_from_db(db_path: Path, hops: int):
         dict: Mapping of vertex_id to (external_id, name) tuples, or None if unavailable
     """
     try:
-        from fscrawler import RelationshipDbReader
+        from redblackgraph.util.relationship_db_reader import RelationshipDbReader
         from redblackgraph.util.graph_builder import RbgGraphBuilder
         
         if not db_path.exists():
