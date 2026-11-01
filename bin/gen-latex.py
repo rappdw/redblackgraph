@@ -23,20 +23,22 @@ if __name__ == '__main__':
                     line = line.replace('<!-- ', '').replace(' -->', '')
                 out_file.write(line)
 
-    # generate the latex file
+    # generate the latex file. Cells tagged "title" are dropped: the notebook's "title" metadata
+    # becomes the LaTeX \title, so the heading cell would otherwise appear twice.
     cmd = ["jupyter",
            "nbconvert",
            out_file_name,
            "--to",
-           "latex"
+           "latex",
+           "--TagRemovePreprocessor.enabled=True",
+           "--TagRemovePreprocessor.remove_cell_tags=title",
            ]
     rc = subprocess.check_call(cmd, cwd=os.getcwd())
-    # rc = 0
-    # out_file_name = "/Users/drapp/sandbox/redBlackGraph/notebooks/tmp.Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.tex"
     if rc == 0:
         # Modify the tex file to fix up a few things that nbconvert doesn't quite handle
-        # Fixup title:          \title{tmp.Red Black Graph - A DAG of Multiple, Interleaved Binary Trees}
-        # Insert author:        \author{Daniel W Rapp}
+        # Fixup title:          \title{tmp.<notebook name>} when the notebook has no "title" metadata
+        # Insert author:        \author{Daniel W Rapp}, in that same case (otherwise the
+        #                       notebook's "authors" metadata supplies it)
         # Remove munged up \includegraphics command:
         #                       \let\Oldincludegraphics\includegraphics
         #                       % Set max figure width to be 80% of text width, for now hardcoded.

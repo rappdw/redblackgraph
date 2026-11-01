@@ -60,16 +60,16 @@ calculate_relationship(closure.W[0], closure.W[1])
 ## The Paper and the Mathematics
 
 The notebook
-[`notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb`](notebooks/Red%20Black%20Graph%20-%20A%20DAG%20of%20Multiple,%20Interleaved%20Binary%20Trees.ipynb)
-is a research paper describing Red Black Graphs, the avos algebra and its applications, with
-runnable examples. To read it locally:
+[`notebooks/red-black-graphs.ipynb`](notebooks/red-black-graphs.ipynb), *Red Black Graphs and the Avos
+Semiring*, is a research paper describing Red Black Graphs, the avos algebra and its applications,
+with runnable examples. To read it locally:
 
 ```bash
 pip install jupyterlab
-jupyter lab "notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb"
+jupyter lab notebooks/red-black-graphs.ipynb
 ```
 
-To produce a PDF, run `bin/generate-pdf.sh "<notebook>"`. It needs `nbconvert`, `pandoc` and
+To produce a PDF, run `bin/generate-pdf.sh notebooks/red-black-graphs.ipynb`. It needs `nbconvert`, `pandoc` and
 `xelatex` (for example from TeX Live), and writes the PDF to `build/latex-<timestamp>/`.
 
 Related documents:

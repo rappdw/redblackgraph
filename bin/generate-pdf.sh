@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Generate a PDF of a notebook.
 #
-# Usage: bin/generate-pdf.sh "notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb"
+# Usage: bin/generate-pdf.sh notebooks/red-black-graphs.ipynb
 #
 # Requires jupyter nbconvert (pip install nbconvert), pandoc, and a TeX installation that
 # provides xelatex (e.g. TeX Live). The PDF is written to build/latex-<timestamp>/.

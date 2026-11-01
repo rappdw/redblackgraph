@@ -48,7 +48,7 @@ The parity constraints are NOT commutative because identities serve two differen
   - RIGHT identity: "does this ancestor have the specified gender?" (parity filter)
 
 For detailed mathematical justification and examples, see:
-notebooks/Red Black Graph - A DAG of Multiple, Interleaved Binary Trees.ipynb
+notebooks/red-black-graphs.ipynb and docs/MATHEMATICAL_FOUNDATIONS.md
 
 Graph Theory Interpretation:
 ----------------------------

@@ -1,11 +1,11 @@
-# Mathematical Foundations (draft)
+# Mathematical Foundations
 
-> **Status:** Draft rewrite of the "Formal Definition", "Red Black Arithmetic", "Parity Identity
-> Constraints" and "Mathematical Foundations: Algebraic Structure" sections of
-> *Red Black Graph – A DAG of Multiple, Interleaved Binary Trees*. It also supplies the proofs
-> left as TODOs in "Observation – Simple/Complete Relationship" and "Adding an Edge to $R^+$".
+> This is the full formal development behind *Red Black Graphs and the Avos Semiring*
+> (`notebooks/red-black-graphs.ipynb`). The notebook's definition and foundations sections, and
+> its proofs of the simple/complete relationship and of vertex and edge composition, are drawn
+> from it.
 >
-> **Main change:** The previous text concluded that the avos algebra is *not* a semiring. That
+> **Main change from earlier versions:** The previous text concluded that the avos algebra is *not* a semiring. That
 > conclusion came from storing a vertex's color in the diagonal of the matrix (the values
 > $-1$/$1$), not from the algebra itself. Once color is kept separately, the avos sum and product
 > form a semiring: the **shortlex path semiring** over the free monoid on two letters. Standard
