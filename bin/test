@@ -3,13 +3,6 @@
 
 cd "$(dirname $0)"; cd ..
 
-# if [[ "$1" == "docker" ]]; then
-# 		shift
-#     build-image -f jenkins
-#     run-image jenkins -c "./bin/test $@"
-#     exit $?
-# fi
-
 OUTPUT_DIR=${OUTPUT_DIR:-_testing_output}
 MODULE_NAME=redblackgraph
 
@@ -24,14 +17,12 @@ function integration_test {
 
 # Parse command line arguments in any order
 verbose='false'
-dflag=''    # use docker
 hflag=''    # show help
 iflag=''    # run integration tests
 lflag=''    # run pylint
 uflag=''    # run unit tests
-while getopts 'dhilu' flag; do    # if a character is followed by a colon, that argument is expected to have an argument.
+while getopts 'hilu' flag; do    # if a character is followed by a colon, that argument is expected to have an argument.
   case "${flag}" in
-    d) dflag='true' ;;
     h) hflag='true' ;;
     i) iflag='true' ;;
     l) lflag='true' ;;
@@ -49,11 +40,10 @@ if [ -n "$hflag" ] || [ -z "$1" ]; then
     echo "  $ bin/test [option(s)]"
     echo
     echo "Flags can be combined or separate in any order, for example:"
-    echo "  $ bin/test -lid"
+    echo "  $ bin/test -li"
     echo "  $ bin/test -u -l"
     echo
     echo "Options"
-    echo -e "  -d, \trun tests in Docker container"
     echo -e "  -h, \tshow brief Help"
     echo -e "  -i, \trun Integration tests"
     echo -e "  -l, \trun pylint"
@@ -63,7 +53,7 @@ fi
 
 
 ## LINT
-if [ -n "$lflag" ] && [ -z "$dflag" ]; then
+if [ -n "$lflag" ]; then
     pylint $MODULE_NAME --rcfile=.pylintrc -d C,R | tee $OUTPUT_DIR/pylint_output.txt
     if [ -z $iflag ] && [ -z $uflag ]; then
         exit 0
@@ -84,30 +74,14 @@ export GIT_HASH=`git log --pretty=format:'%h' -n 1`
 ############################################################################
 #### Run Tests
 ############################################################################
-## DOCKER
-if [ -n "$dflag" ]; then
-    build-image -f jenkins
-    if [ -n "$lflag" ]; then
-        run-image jenkins -c "./bin/test -l"
-    fi
-
-    if [ -n "$iflag" ]; then
-        run-image jenkins -c "./bin/test -i"
-    else
-        run-image jenkins -c "./bin/test -u"
-    fi
-
-## NOT DOCKER
+if [ -n "$iflag" ]; then
+    echo "Integration tests"
+    echo "GIT_HASH: $GIT_HASH" > $OUTPUT_DIR/pytest_integration_output.txt
+    integration_test
 else
-    if [ -n "$iflag" ]; then
-        echo "Integration tests"
-        echo "GIT_HASH: $GIT_HASH" > $OUTPUT_DIR/pytest_integration_output.txt
-        integration_test
-    else
-        echo "Unit tests"
-        echo "GIT_HASH: $GIT_HASH" > $OUTPUT_DIR/pytest_output.txt
-        unit_test
-    fi
+    echo "Unit tests"
+    echo "GIT_HASH: $GIT_HASH" > $OUTPUT_DIR/pytest_output.txt
+    unit_test
 fi
 
 exit ${PIPESTATUS[0]}

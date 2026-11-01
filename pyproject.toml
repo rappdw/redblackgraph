@@ -14,7 +14,7 @@ build-backend = "mesonpy"
 name = "redblackgraph"
 # Version is set in meson.build (meson-python doesn't support dynamic versioning)
 version = "0.7.0"
-description = "Red Black Graph - AVOS algebra for graph computation"
+description = "Ahnentafel path algebra for family-tree graphs: closure, kinship and cycle prevention with the avos semiring"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "AGPLv3+"}

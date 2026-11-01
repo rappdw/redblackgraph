@@ -1,22 +1,39 @@
 #!/usr/bin/env bash
-set -e
+# Generate a PDF of a notebook.
+#
+# Usage: bin/generate-pdf.sh notebooks/red-black-graphs.ipynb
+#
+# Requires jupyter nbconvert (pip install nbconvert), pandoc, and a TeX installation that
+# provides xelatex (e.g. TeX Live). The PDF is written to build/latex-<timestamp>/.
+set -euo pipefail
 
 if [ "$#" -eq 0 ]; then
-    echo "You must specify a notebook from which to generate pdf"
-    exit -1
+    echo "You must specify a notebook from which to generate pdf" >&2
+    exit 1
 fi
 
-FILENAME=$(printf %q "$1")
+for tool in jupyter pandoc xelatex; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "error: '$tool' is required but was not found on PATH" >&2
+        exit 1
+    fi
+done
 
-build-image notebook
-run-image -c "gen-latex.sh $FILENAME" notebook
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+notebook="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+notebook_dir="$(dirname "$notebook")"
+name="$(basename "$notebook" .ipynb)"
+out_dir="$repo_root/build/latex-$(date '+%y-%m-%d.%s')"
+mkdir -p "$out_dir"
 
-dirname=$"build/latex-$(date '+%y-%m-%d.%s')"
-mkdir -p $dirname
+# convert to LaTeX and apply the fixups (writes "$name.tex" next to the notebook)
+python "$repo_root/bin/gen-latex.py" "$notebook"
 
-pushd notebooks
-file_name="$(basename "$1" .ipynb)"
-popd
+# compile from the notebook directory so relative image paths resolve; run twice for references
+cd "$notebook_dir"
+for _ in 1 2; do
+    xelatex -interaction=nonstopmode -halt-on-error -output-directory="$out_dir" "$name.tex" >/dev/null
+done
+mv "$name.tex" "$out_dir/"
 
-echo docker run --rm --user $UID:$GID -v $PWD/notebooks:/sources -v $PWD:/output embix/pdflatex:v1 -output-directory="/output/$dirname" "$file_name.tex"
-docker run --rm --user $UID:$GID -v $PWD/notebooks:/sources -v $PWD:/output embix/pdflatex:v1 -output-directory="/output/$dirname" "$file_name.tex"
+echo "Wrote $out_dir/$name.pdf"

@@ -99,7 +99,8 @@ __device__ inline int MSB(int x) {
 // - RED_ONE (-1) and BLACK_ONE (1) have special semantics
 // - Cross-gender products (-1 ⊗ 1) and (1 ⊗ -1) return 0
 //
-// See MATHEMATICAL_ANALYSIS.md for complete semantics
+// See docs/MATHEMATICAL_FOUNDATIONS.md (section 6) for why these rules give the same
+// results as the plain product on valid graphs
 __device__ inline int avos_product(int x, int y) {
     // Zero annihilates
     if (x == 0 || y == 0) return 0;

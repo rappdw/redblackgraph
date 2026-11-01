@@ -59,3 +59,9 @@ redblackgraph/_version.py
 # Test artifacts
 .test-wheel-install/
 _testing_output/
+
+# Claude Code
+.claude/
+
+# Secrets
+.secrets
